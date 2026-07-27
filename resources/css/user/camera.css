@@ -1,0 +1,93 @@
+/* =========================================
+   USER CAMERA
+========================================= */
+
+.user-camera-page{
+    width:100%;
+}
+
+.user-camera-card{
+    background:#07131B;
+    border:1px solid #00E5FF;
+    border-radius:18px;
+    padding:25px;
+}
+
+.user-camera-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:25px;
+}
+
+.user-camera-header h2{
+    color:#fff;
+    font-size:24px;
+}
+
+.user-camera-live{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    color:#fff;
+    font-size:14px;
+}
+
+.user-live-dot{
+    width:10px;
+    height:10px;
+    border-radius:50%;
+    background:#44ff44;
+}
+
+.user-camera-item{
+    margin-bottom:22px;
+    position:relative;
+}
+
+.user-camera-item:last-child{
+    margin-bottom:0;
+}
+
+.user-camera-label{
+    position:absolute;
+    top:15px;
+    left:15px;
+    z-index:5;
+    background:#000;
+    color:#fff;
+    padding:8px 18px;
+    border-radius:30px;
+    font-size:12px;
+}
+
+.user-camera-frame{
+    width:100%;
+    height:330px;
+    overflow:hidden;
+    border-radius:15px;
+    border:2px solid #00E5FF;
+    background:#000;
+    transition:.3s;
+}
+
+.user-camera-frame img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+}
+
+.user-camera-frame:hover{
+    box-shadow:0 0 18px rgba(0,229,255,.4);
+}
+
+.user-camera-info{
+    position:absolute;
+    bottom:15px;
+    left:15px;
+    background:#000;
+    color:#fff;
+    padding:8px 18px;
+    border-radius:30px;
+    font-size:12px;
+}

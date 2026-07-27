@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@yield('title') | Laksamana 5</title>
+
+    @vite([
+        'resources/css/app.css',
+        'resources/css/global.css',
+        'resources/css/admin.css',
+        'resources/css/admin/dashboard.css',
+        'resources/css/admin/monitoring.css',
+        'resources/css/admin/camera.css',
+        'resources/css/admin/alarm.css',
+        'resources/css/admin/settings.css',
+
+        'resources/js/app.js'
+    ])
+</head>
+<body>
+<div class="layout">
+    @include('partials.admin.sidebar')
+    <div class="main-content">
+        @include('partials.admin.navbar')
+        <div class="content">
+            @yield('content')
+        </div>
+    </div>
+</div>
+</body>
+</html>

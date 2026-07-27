@@ -1,0 +1,487 @@
+/* ======================================================
+   ALARM PAGE
+====================================================== */
+
+.alarm-grid{
+    display:grid;
+    grid-template-columns:repeat(12,minmax(0,1fr));
+    gap:20px;
+    width:100%;
+}
+
+
+/* ======================================================
+   CARD
+====================================================== */
+
+.alarm-card{
+    background:#07131B;
+    border:1px solid #00E5FF;
+    border-radius:16px;
+    padding:18px;
+    color:#fff;
+    box-sizing:border-box;
+}
+
+
+/* ======================================================
+   GRID POSITION
+====================================================== */
+
+/* 4 CARD PALING ATAS */
+
+.alarm-summary{
+    grid-column:1 / 13;
+
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:20px;
+}
+
+
+/* BARIS KEDUA */
+
+.alarm-active-card{
+    grid-column:1 / 8;
+}
+
+.alarm-system-card{
+    grid-column:8 / 13;
+}
+
+
+/* BARIS KETIGA */
+
+.alarm-history-card{
+    grid-column:1 / 5;
+}
+
+.alarm-chart-card{
+    grid-column:5 / 13;
+}
+
+
+/* ======================================================
+   TITLE
+====================================================== */
+
+.alarm-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:20px;
+}
+
+.alarm-card h3{
+    font-size:22px;
+    font-weight:600;
+    color:#00E5FF;
+}
+
+.alarm-card p{
+    color:#9CA3AF;
+}
+
+.alarm-card small{
+    color:#9CA3AF;
+}
+
+
+/* ======================================================
+   SUMMARY CARD
+====================================================== */
+
+.alarm-summary .alarm-card{
+    display:flex;
+    align-items:center;
+    gap:18px;
+    min-height:110px;
+}
+
+.alarm-summary i{
+    font-size:46px;
+}
+
+.alarm-summary h2{
+    margin-top:6px;
+    font-size:30px;
+    font-weight:700;
+}
+
+.alarm-summary p{
+    margin-top:4px;
+    font-size:13px;
+}
+
+
+/* WARNA ICON */
+
+.alarm-total-card i{
+    color:#25D9FF;
+}
+
+.alarm-critical-card i{
+    color:#FF3B30;
+}
+
+.alarm-warning-card i{
+    color:#FFD43B;
+}
+
+.alarm-info-card i{
+    color:#E7F542;
+}
+
+/* ======================================================
+   FILTER BUTTON
+====================================================== */
+
+.alarm-filter{
+    display:flex;
+    gap:8px;
+}
+
+.alarm-filter button{
+    background:transparent;
+    border:1px solid #3B4A56;
+    color:#C7D2FE;
+    padding:5px 12px;
+    border-radius:6px;
+    cursor:pointer;
+    font-size:12px;
+    transition:.3s;
+}
+
+.alarm-filter button:hover{
+    border-color:#00E5FF;
+    color:#00E5FF;
+}
+
+.alarm-filter button.active{
+    background:#00E5FF;
+    color:#07131B;
+    border-color:#00E5FF;
+    font-weight:600;
+}
+
+
+/* ======================================================
+   TABLE
+====================================================== */
+
+.alarm-table{
+    width:100%;
+    border-collapse:collapse;
+    margin-top:10px;
+}
+
+.alarm-table thead tr{
+    border-bottom:1px solid rgba(255,255,255,.12);
+}
+
+.alarm-table th{
+    padding:12px 10px;
+    text-align:left;
+    font-size:13px;
+    color:#94A3B8;
+    font-weight:600;
+}
+
+.alarm-table td{
+    padding:14px 10px;
+    font-size:14px;
+    color:#F8FAFC;
+}
+
+.alarm-table tbody tr{
+    transition:.25s;
+}
+
+.alarm-table tbody tr:hover{
+    background:#0E1C27;
+}
+
+
+/* ======================================================
+   PRIORITY BADGE
+====================================================== */
+
+.badge{
+    display:inline-block;
+    padding:4px 10px;
+    border-radius:6px;
+    font-size:11px;
+    font-weight:600;
+    color:#fff;
+}
+
+.badge.critical{
+    background:#FF3B30;
+}
+
+.badge.warning{
+    background:#FACC15;
+    color:#111827;
+}
+
+.badge.info{
+    background:#3B82F6;
+}
+
+
+/* ======================================================
+   STATUS
+====================================================== */
+
+.status-red{
+    color:#FF3B30;
+    font-weight:600;
+}
+
+.status-yellow{
+    color:#FFD43B;
+    font-weight:600;
+}
+
+.status-blue{
+    color:#25D9FF;
+    font-weight:600;
+}
+
+
+/* ======================================================
+   ACTIVE CARD
+====================================================== */
+
+.alarm-active-card{
+    min-height:370px;
+}
+
+.alarm-active-card h3{
+    color:#00E5FF;
+}
+
+/* ======================================================
+   STATUS SISTEM
+====================================================== */
+
+.alarm-system-card{
+    min-height:370px;
+}
+
+.alarm-system-card h3{
+    color:#00E5FF;
+    margin-bottom:20px;
+}
+
+.alarm-system-card ul{
+    list-style:none;
+    padding:0;
+    margin:0;
+}
+
+.alarm-system-card li{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:12px 0;
+    border-bottom:1px solid rgba(255,255,255,.08);
+    font-size:14px;
+}
+
+.alarm-system-card li:last-child{
+    border-bottom:none;
+}
+
+.green{
+    color:#3DDC84;
+    font-weight:600;
+}
+
+.yellow{
+    color:#FFD43B;
+    font-weight:600;
+}
+
+.red{
+    color:#FF4D4F;
+    font-weight:600;
+}
+
+
+/* ======================================================
+   RIWAYAT ALARM
+====================================================== */
+
+.alarm-history-card{
+    min-height:260px;
+}
+
+.alarm-history-card h3{
+    color:#00E5FF;
+    margin-bottom:20px;
+}
+
+.alarm-history-card ul{
+    list-style:none;
+    margin:0;
+    padding:0;
+}
+
+.alarm-history-card li{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    padding:10px 0;
+    border-bottom:1px solid rgba(255,255,255,.06);
+    font-size:14px;
+    color:#E2E8F0;
+}
+
+.alarm-history-card li:last-child{
+    border-bottom:none;
+}
+
+.history-btn{
+    margin-top:20px;
+    float:right;
+
+    padding:8px 18px;
+
+    background:#00E5FF;
+    color:#07131B;
+
+    border:none;
+    border-radius:8px;
+
+    cursor:pointer;
+    font-weight:600;
+
+    transition:.3s;
+}
+
+.history-btn:hover{
+
+    background:#25D9FF;
+
+}
+
+
+/* ======================================================
+   DISTRIBUSI ALARM
+====================================================== */
+
+.alarm-chart-card{
+
+    min-height:260px;
+
+}
+
+.alarm-chart-card h3{
+
+    color:#00E5FF;
+    margin-bottom:20px;
+
+}
+
+.alarm-chart-placeholder{
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+
+    height:180px;
+
+}
+
+.alarm-chart-placeholder::before{
+
+    content:"";
+
+    width:170px;
+    height:170px;
+
+    border-radius:50%;
+
+    background:
+    conic-gradient(
+
+        #FF3B30 0deg 90deg,
+        #FACC15 90deg 216deg,
+        #3B82F6 216deg 360deg
+
+    );
+
+    position:absolute;
+
+}
+
+.alarm-chart-placeholder::after{
+
+    content:"";
+
+    width:80px;
+    height:80px;
+
+    border-radius:50%;
+
+    background:#07131B;
+
+    position:absolute;
+
+}
+
+
+/* ======================================================
+   RESPONSIVE
+====================================================== */
+
+@media(max-width:1200px){
+
+    .alarm-summary{
+
+        grid-template-columns:repeat(2,1fr);
+
+    }
+
+    .alarm-active-card,
+    .alarm-system-card,
+    .alarm-history-card,
+    .alarm-chart-card{
+
+        grid-column:1 / -1;
+
+    }
+
+}
+
+@media(max-width:768px){
+
+    .alarm-summary{
+
+        grid-template-columns:1fr;
+
+    }
+
+    .alarm-header{
+
+        flex-direction:column;
+        align-items:flex-start;
+        gap:15px;
+
+    }
+
+    .alarm-filter{
+
+        flex-wrap:wrap;
+
+    }
+
+    .alarm-table{
+
+        display:block;
+        overflow-x:auto;
+
+    }
+
+}

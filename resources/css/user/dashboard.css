@@ -1,0 +1,384 @@
+/* =========================================
+   USER DASHBOARD
+========================================= */
+
+.user-dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    gap: 20px;
+}
+
+
+/* =========================================
+   CARD
+========================================= */
+
+.user-card {
+    background: #07131B;
+    border: 1px solid #00E5FF;
+    border-radius: 18px;
+    padding: 20px;
+    color: #fff;
+}
+
+.user-card h3 {
+    margin-bottom: 18px;
+    font-size: 18px;
+}
+
+
+/* =========================================
+   GRID
+========================================= */
+
+.user-status-card {
+    grid-column: 1 / 5;
+}
+
+.user-speed-card {
+    grid-column: 5 / 9;
+}
+
+.user-heading-card {
+    grid-column: 9 / 13;
+}
+
+.user-camera-card {
+    grid-column: 1 / 9;
+}
+
+.user-battery-card {
+    grid-column: 9 / 13;
+}
+
+.user-performance-card {
+    grid-column: 1 / 5;
+}
+
+.user-system-card {
+    grid-column: 5 / 8;
+}
+
+.user-map-card {
+    grid-column: 8 / 13;
+}
+
+
+/* =========================================
+   STATUS KAPAL
+========================================= */
+
+.user-status-content {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.user-status-icon {
+    font-size: 60px;
+    color: #00E5FF;
+}
+
+.user-status-content h2 {
+    margin: 8px 0;
+    color: #00E5FF;
+}
+
+.user-status-content small {
+    color: #94A3B8;
+}
+
+.user-status-content p {
+    color: #CBD5E1;
+}
+
+
+/* =========================================
+   SPEED & HEADING
+========================================= */
+
+.user-speed-card,
+.user-heading-card {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.user-speed-card i,
+.user-heading-card i {
+    font-size: 52px;
+    color: #00E5FF;
+}
+
+.user-speed-card h2,
+.user-heading-card h2 {
+    margin-top: 8px;
+    color: #00E5FF;
+}
+
+
+/* =========================================
+   CAMERA
+========================================= */
+
+.user-camera-wrapper {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+}
+
+.user-camera-item {
+    text-align: center;
+}
+
+.user-camera-item p {
+    margin-top: 10px;
+    color: #CBD5E1;
+}
+
+.user-camera-box {
+    height: 230px;
+    border: 2px solid #00E5FF;
+    border-radius: 15px;
+    overflow: hidden;
+    background: #000;
+}
+
+.user-camera-box img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+
+/* =========================================
+   CAMERA PLACEHOLDER
+========================================= */
+
+.user-camera-placeholder {
+    width: 100%;
+    height: 100%;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    background: #07131B;
+    color: #00E5FF;
+}
+
+.user-camera-placeholder i {
+    font-size: 40px;
+    margin-bottom: 10px;
+}
+
+.user-camera-placeholder span {
+    font-size: 12px;
+}
+
+
+/* =========================================
+   BATTERY
+========================================= */
+
+.user-battery-content {
+    display: flex;
+    gap: 25px;
+    align-items: center;
+}
+
+.user-battery-icon {
+    font-size: 80px;
+    color: #00E5FF;
+}
+
+.user-battery-info {
+    flex: 1;
+}
+
+.user-battery-item {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid rgba(255, 255, 255, .08);
+}
+
+.user-battery-item span {
+    color: #CBD5E1;
+}
+
+.user-battery-item strong {
+    color: #00E5FF;
+}
+
+
+/* =========================================
+   PERFORMANCE
+========================================= */
+
+.user-performance-wrapper {
+    display: flex;
+    justify-content: space-around;
+}
+
+.user-performance-item {
+    text-align: center;
+}
+
+.user-performance-item p {
+    margin-top: 15px;
+    font-weight: 600;
+}
+
+.user-performance-item small {
+    color: #94A3B8;
+}
+
+
+/* =========================================
+   PERFORMANCE CIRCLE
+========================================= */
+
+.user-circle {
+    width: 120px;
+    height: 120px;
+
+    border-radius: 50%;
+
+    background: conic-gradient(
+        #00E5FF 79%,
+        #173543 79%
+    );
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    position: relative;
+}
+
+.user-circle::before {
+    content: "";
+
+    position: absolute;
+
+    width: 88px;
+    height: 88px;
+
+    background: #07131B;
+    border-radius: 50%;
+}
+
+.user-circle span {
+    position: relative;
+    z-index: 1;
+
+    font-size: 24px;
+    font-weight: bold;
+}
+
+
+/* =========================================
+   CIRCLE 76%
+========================================= */
+
+.user-circle-76 {
+    background: conic-gradient(
+        #00E5FF 76%,
+        #173543 76%
+    );
+}
+
+
+/* =========================================
+   SYSTEM
+========================================= */
+
+.user-system-card ul {
+    margin: 20px 0;
+    padding: 0;
+    list-style: none;
+}
+
+.user-system-card li {
+    margin-bottom: 15px;
+    color: #CBD5E1;
+}
+
+.user-system-card i {
+    color: #00E5FF;
+    margin-right: 8px;
+}
+
+
+/* =========================================
+   MAP
+========================================= */
+
+.user-map-placeholder {
+    height: 250px;
+
+    border: 2px solid #00E5FF;
+    border-radius: 15px;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    background: #10202B;
+    color: #00E5FF;
+
+    font-weight: bold;
+}
+
+
+/* =========================================
+   RESPONSIVE
+========================================= */
+
+@media (max-width: 1100px) {
+
+    .user-dashboard-grid {
+        grid-template-columns: repeat(6, 1fr);
+    }
+
+    .user-status-card,
+    .user-speed-card,
+    .user-heading-card {
+        grid-column: span 2;
+    }
+
+    .user-camera-card,
+    .user-battery-card {
+        grid-column: span 3;
+    }
+
+    .user-performance-card,
+    .user-system-card,
+    .user-map-card {
+        grid-column: span 2;
+    }
+}
+
+
+@media (max-width: 768px) {
+
+    .user-dashboard-grid {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .user-card {
+        width: 100%;
+    }
+
+    .user-camera-wrapper {
+        grid-template-columns: 1fr;
+    }
+
+    .user-camera-box {
+        height: 200px;
+    }
+}

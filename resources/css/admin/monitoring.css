@@ -1,0 +1,288 @@
+/* =====================================================
+   MONITORING
+===================================================== */
+
+.monitoring-page{
+    display:flex;
+    flex-direction:column;
+    gap:20px;
+}
+
+
+/* =====================================================
+   CARD
+===================================================== */
+
+.monitor-card{
+    background:#07131B;
+    border:1px solid #00E5FF;
+    border-radius:18px;
+    padding:20px;
+    color:#fff;
+}
+
+
+/* =====================================================
+   MAP
+===================================================== */
+
+.monitor-map-card{
+    width:100%;
+}
+
+.monitor-map-placeholder{
+    height:420px;
+    margin-top:18px;
+    border:2px solid #00E5FF;
+    border-radius:15px;
+    background:#10202B;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+}
+
+.monitor-map-center{
+    text-align:center;
+}
+
+.monitor-map-center i{
+    font-size:70px;
+    color:#00E5FF;
+}
+
+.monitor-map-center h2{
+    margin-top:15px;
+    color:#00E5FF;
+}
+
+.monitor-map-center p{
+    color:#9CA3AF;
+    margin-top:8px;
+}
+
+
+/* =====================================================
+   GRID INFO
+===================================================== */
+
+.monitor-info-grid{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:20px;
+}
+
+.monitor-info-grid .monitor-card{
+    min-height:145px;
+}
+
+/* =====================================================
+   GRID BOTTOM
+===================================================== */
+
+.monitor-bottom-grid{
+    display:grid;
+    grid-template-columns:
+    1fr
+    1fr
+    1fr;
+    gap:20px;
+}
+
+
+/* =====================================================
+   TITLE
+===================================================== */
+
+.monitor-card-title,
+.monitor-info-header{
+    display:flex;
+    align-items:center;
+    gap:10px;
+}
+
+.monitor-card-title i,
+.monitor-info-header i{
+    font-size:22px;
+    color:#00E5FF;
+}
+
+.monitor-card-title span,
+.monitor-info-header span{
+    font-size:18px;
+    font-weight:600;
+}
+
+
+/* =====================================================
+   INFO
+===================================================== */
+
+.monitor-info-value{
+    margin-top:22px;
+}
+
+.monitor-info-value strong{
+    display:block;
+    font-size:30px;
+    color:#00E5FF;
+}
+
+.monitor-info-value small{
+    color:#94A3B8;
+    margin-top:8px;
+    display:block;
+}
+
+/* =====================================================
+   COMPASS
+===================================================== */
+
+.monitor-compass-wrapper{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+}
+
+.monitor-compass-circle{
+    width:230px;
+    height:230px;
+    border:3px solid #00E5FF;
+    border-radius:50%;
+    position:relative;
+    margin-top:15px;
+}
+
+.monitor-north,
+.monitor-east,
+.monitor-south,
+.monitor-west{
+    position:absolute;
+    color:#00E5FF;
+    font-weight:bold;
+    font-size:22px;
+}
+
+.monitor-north{
+    top:10px;
+    left:50%;
+    transform:translateX(-50%);
+}
+
+.monitor-east{
+    right:10px;
+    top:50%;
+    transform:translateY(-50%);
+}
+
+.monitor-south{
+    bottom:10px;
+    left:50%;
+    transform:translateX(-50%);
+}
+
+.monitor-west{
+    left:10px;
+    top:50%;
+    transform:translateY(-50%);
+}
+
+.monitor-compass-center{
+    position:absolute;
+    inset:0;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+}
+
+.monitor-compass-center i{
+    font-size:48px;
+    color:#00E5FF;
+    transform:rotate(128deg);
+}
+
+.monitor-heading-value{
+    text-align:center;
+    margin-top:18px;
+}
+
+.monitor-heading-value h2{
+    color:#00E5FF;
+    font-size:36px;
+}
+
+.monitor-heading-value p{
+    color:#94A3B8;
+}
+
+
+/* =====================================================
+   BATTERY
+===================================================== */
+
+.monitor-battery{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    margin-top:15px;
+}
+
+.monitor-battery-big{
+    font-size:120px;
+    color:#00E5FF;
+}
+
+.monitor-battery h1{
+    font-size:54px;
+    color:#00E5FF;
+    margin:10px 0;
+}
+
+.monitor-battery p{
+    color:#94A3B8;
+}
+
+.monitor-battery-bar{
+    width:100%;
+    height:12px;
+    background:#173645;
+    border-radius:20px;
+    overflow:hidden;
+    margin-top:25px;
+}
+
+.monitor-battery-fill{
+    width:45%;
+    height:100%;
+    background:#00E5FF;
+}
+
+
+/* =====================================================
+   POWER
+===================================================== */
+
+.monitor-power-list{
+    margin-top:20px;
+}
+
+.monitor-power-item{
+    margin-bottom:18px;
+}
+
+.monitor-power-top{
+    display:flex;
+    justify-content:space-between;
+    margin-bottom:8px;
+}
+
+.monitor-progress{
+    height:10px;
+    background:#18323D;
+    border-radius:20px;
+    overflow:hidden;
+}
+
+.monitor-progress-fill{
+    height:100%;
+    background:#00E5FF;
+}
