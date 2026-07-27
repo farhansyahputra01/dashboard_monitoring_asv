@@ -55,4 +55,14 @@ Route::prefix('admin')
             ->name('alarm');
         Route::get('/settings', [SettingController::class, 'index'])
             ->name('settings');
+        Route::get('/settings/account', [SettingController::class, 'account'])
+            ->name('settings.account');
+        Route::get('/settings/account/edit', [SettingController::class, 'editAccount'])
+            ->name('settings.account.edit');
+        Route::post('/settings/account/edit', [SettingController::class, 'updateAccount'])
+            ->name('settings.account.update');
+        Route::get('/settings/account/password', [SettingController::class, 'resetPassword'])
+            ->name('settings.account.password');
+        Route::post('/settings/account/password', [SettingController::class, 'updatePassword'])
+            ->name('settings.account.password.update');
     });

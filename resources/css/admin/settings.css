@@ -1,0 +1,283 @@
+/* =========================================
+   SETTINGS MENU
+========================================= */
+
+.settings-menu-card {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.settings-menu-item {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+
+    padding: 18px;
+
+    background: #10202B;
+    border: 1px solid rgba(0, 229, 255, .15);
+    border-radius: 12px;
+
+    color: #fff;
+    text-decoration: none;
+
+    transition: .3s;
+}
+
+.settings-menu-item:hover {
+    border-color: #00E5FF;
+    background: rgba(0, 229, 255, .08);
+    transform: translateX(4px);
+}
+
+.settings-menu-icon {
+    width: 48px;
+    height: 48px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 10px;
+
+    background: rgba(0, 229, 255, .12);
+    color: #00E5FF;
+
+    font-size: 24px;
+    flex-shrink: 0;
+}
+
+.settings-menu-info {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+
+    flex: 1;
+}
+
+.settings-menu-info strong {
+    font-size: 16px;
+}
+
+.settings-menu-info span {
+    color: #94A3B8;
+    font-size: 13px;
+}
+
+.settings-menu-arrow {
+    color: #64748B;
+    font-size: 18px;
+
+    transition: .3s;
+}
+
+.settings-menu-item:hover .settings-menu-arrow {
+    color: #00E5FF;
+    transform: translateX(3px);
+}
+
+/* =========================================
+   ACCOUNT
+========================================= */
+
+.account-info {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+}
+
+.account-info-item {
+    padding: 18px;
+    background: #10202B;
+    border-radius: 10px;
+}
+
+.account-info-item span {
+    display: block;
+    margin-bottom: 8px;
+    color: #94A3B8;
+    font-size: 13px;
+}
+
+.account-info-item strong {
+    color: #fff;
+    font-size: 15px;
+}
+
+
+/* =========================================
+   ACCOUNT ACTION
+========================================= */
+
+.settings-action-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+
+    padding: 11px 18px;
+
+    border-radius: 9px;
+
+    background: #00E5FF;
+    color: #07131B;
+
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 700;
+
+    transition: .3s;
+}
+
+.settings-action-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 18px rgba(0, 229, 255, .2);
+}
+
+
+/* =========================================
+   RESPONSIVE
+========================================= */
+
+@media (max-width: 800px) {
+
+    .account-info {
+        grid-template-columns: 1fr;
+    }
+
+}
+
+/* =========================================
+   FORM ACTION
+========================================= */
+
+.settings-form-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    margin-top: 25px;
+}
+
+.settings-form-actions .settings-save-btn {
+    margin-top: 0;
+}
+
+.settings-cancel-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+
+    height: 45px;
+    padding: 0 18px;
+
+    border: 1px solid rgba(255, 255, 255, .15);
+    border-radius: 9px;
+
+    background: #10202B;
+    color: #CBD5E1;
+
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 600;
+
+    transition: .3s;
+}
+
+.settings-cancel-btn:hover {
+    border-color: #00E5FF;
+    color: #00E5FF;
+}
+
+/* =========================================
+   PASSWORD FORM
+========================================= */
+
+.password-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.form-group label {
+    color: #CBD5E1;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.input-wrapper {
+    position: relative;
+}
+
+.input-wrapper > i {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+
+    color: #64748B;
+    font-size: 18px;
+}
+
+.input-wrapper input {
+    width: 100%;
+    height: 48px;
+
+    box-sizing: border-box;
+
+    padding: 0 15px 0 45px;
+
+    border: 1px solid rgba(255, 255, 255, .12);
+    border-radius: 10px;
+
+    outline: none;
+
+    background: #10202B;
+    color: #fff;
+
+    font-size: 14px;
+
+    transition: .3s;
+}
+
+.input-wrapper input::placeholder {
+    color: #64748B;
+}
+
+.input-wrapper input:focus {
+    border-color: #00E5FF;
+    box-shadow: 0 0 0 3px rgba(0, 229, 255, .08);
+}
+
+.settings-save-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+
+    height: 45px;
+    padding: 0 18px;
+
+    border: none;
+    border-radius: 9px;
+
+    background: #00E5FF;
+    color: #07131B;
+
+    font-size: 14px;
+    font-weight: 700;
+
+    cursor: pointer;
+
+    transition: .3s;
+}
+
+.settings-save-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 18px rgba(0, 229, 255, .2);
+}
