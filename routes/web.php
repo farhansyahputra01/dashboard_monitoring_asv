@@ -65,4 +65,6 @@ Route::prefix('admin')
             ->name('settings.account.password');
         Route::post('/settings/account/password', [SettingController::class, 'updatePassword'])
             ->name('settings.account.password.update');
+        Route::post('/monitoring/track', [AdminMonitoringController::class, 'updateTrack'])
+            ->name('monitoring.track');
     });

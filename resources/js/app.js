@@ -1,4 +1,5 @@
 import './bootstrap';
+import './track-sync';
 
 import '../css/app.css';
 import '../css/global.css';

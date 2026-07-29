@@ -5,14 +5,74 @@
     {{-- ================= MAP ================= --}}
     <div class="monitor-card monitor-map-card">
         <div class="monitor-card-title">
-            <i class="bi bi-geo-alt-fill"></i>
-            <span>Posisi Kapal</span>
+            <i class="bi bi-signpost-2-fill"></i>
+            <span>Lintasan</span>
         </div>
-        <div class="monitor-map-placeholder">
-            <div class="monitor-map-center">
-                <i class="bi bi-map"></i>
-                <h2>MAP LIVE</h2>
-                <p>Lokasi kapal ditampilkan secara real-time</p>
+        <div class="monitor-track-layout">
+            {{-- PANEL INFORMASI --}}
+            <div class="monitor-track-info">
+                <div class="track-info-section">
+                    <h4>Positioning</h4>
+                    <ol>
+                        <li>Start</li>
+                        <li>Floating Ball Set 1–10</li>
+                        <li>Mission Surface</li>
+                        <li>Mission Underwater</li>
+                        <li>Docking</li>
+                        <li>Finish</li>
+                    </ol>
+                </div>
+                <div class="track-info-section">
+                    <h4>Altitude Information</h4>
+                    <ol>
+                        <li>TOG</li>
+                        <li>COG</li>
+                        <li>COG</li>
+                    </ol>
+                </div>
+                <div class="track-info-section">
+                    <h4>Indikator Lain</h4>
+                    <ol>
+                        <li>Battery Level</li>
+                        <li>Visual Video</li>
+                    </ol>
+                </div>
+            </div>
+            {{-- AREA LINTASAN --}}
+            <div class="monitor-track-area">
+                <div class="track-grid">
+                    {{-- LABEL KOLOM --}}
+                    <div class="track-column-labels">
+                        <span>A</span>
+                        <span>B</span>
+                        <span>C</span>
+                        <span>D</span>
+                        <span>E</span>
+                    </div>
+                    {{-- LABEL BARIS --}}
+                    <div class="track-row-labels">
+                        <span>5</span>
+                        <span>4</span>
+                        <span>3</span>
+                        <span>2</span>
+                        <span>1</span>
+                    </div>
+                    {{-- LINTASAN --}}
+                    <div class="track-field">
+                        <div
+                            id="lintasanA"
+                            style="{{ optional($setting)->active_track == 'B' ? 'display:none;' : '' }}"
+                        >
+                            @include('admin.monitoring.lintasan-a')
+                        </div>
+                        <div
+                            id="lintasanB"
+                            style="{{ optional($setting)->active_track == 'B' ? '' : 'display:none;' }}"
+                        >
+                            @include('admin.monitoring.lintasan-b')
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

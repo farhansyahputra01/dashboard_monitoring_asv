@@ -3,11 +3,35 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
+use App\Models\MonitoringSetting;
 
 class MonitoringController extends Controller
 {
     public function index()
     {
-        return view('admin.monitoring.index');
+        $setting = MonitoringSetting::first();
+
+        return view('admin.monitoring.index', compact('setting'));
+    }
+
+    public function updateTrack(Request $request)
+    {
+        $request->validate([
+            'active_track' => 'required|in:A,B'
+        ]);
+
+        $setting = MonitoringSetting::first();
+
+        if (!$setting) {
+            $setting = new MonitoringSetting();
+        }
+
+        $setting->active_track = $request->active_track;
+        $setting->save();
+
+        return redirect()
+            ->route('admin.monitoring')
+            ->with('success', 'Lintasan berhasil diperbarui.');
     }
 }

@@ -125,11 +125,24 @@
             </li>
         </ul>
     </div>
-    {{-- MAP --}}
+    {{-- LINTASAN --}}
     <div class="user-card user-map-card">
         <h3>Posisi Kapal</h3>
-        <div class="user-map-placeholder">
-            MAP LIVE
+        <div class="dashboard-track-wrapper">
+            <div
+                id="dashboardUserLintasanA"
+                class="dashboard-track-item"
+                style="{{ optional($setting)->active_track == 'B' ? 'display:none;' : '' }}"
+            >
+                @include('admin.monitoring.lintasan-a')
+            </div>
+            <div
+                id="dashboardUserLintasanB"
+                class="dashboard-track-item"
+                style="{{ optional($setting)->active_track == 'B' ? '' : 'display:none;' }}"
+            >
+                @include('admin.monitoring.lintasan-b')
+            </div>
         </div>
     </div>
 </div>

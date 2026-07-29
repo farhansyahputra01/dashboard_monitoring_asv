@@ -10,17 +10,37 @@
             <i class="bi bi-signpost-2-fill"></i>
             <span>Lintasan</span>
         </div>
-        
         {{-- PILIHAN LINTASAN --}}
-        <div class="monitor-track-selector">
-            <label for="trackSelect">
-                Pilih Lintasan
-            </label>
-            <select id="trackSelect">
-                <option value="A">Lintasan A</option>
-                <option value="B">Lintasan B</option>
+        <form
+            action="{{ route('admin.monitoring.track') }}"
+            method="POST"
+            class="monitor-track-selector"
+        >
+            @csrf
+            <label>Pilih Lintasan</label>
+            <select
+                name="active_track"
+                id="trackSelect"
+            >
+                <option
+                    value="A"
+                    {{ optional($setting)->active_track=='A' ? 'selected' : '' }}
+                >
+                    Lintasan A
+                </option>
+                <option
+                    value="B"
+                    {{ optional($setting)->active_track=='B' ? 'selected' : '' }}
+                >
+                    Lintasan B
+                </option>
             </select>
-        </div>
+            <button
+                type="submit"
+            >
+                Simpan
+            </button>
+        </form>
         {{-- AREA MONITORING LINTASAN --}}
         <div class="monitor-track-layout">
             {{-- =================================================
@@ -98,10 +118,16 @@
                     </div>
                     {{-- LINTASAN --}}
                     <div class="track-field">
-                        <div id="lintasanA">
+                        <div
+                            id="lintasanA"
+                            style="{{ optional($setting)->active_track == 'B' ? 'display:none;' : '' }}"
+                        >
                             @include('admin.monitoring.lintasan-a')
                         </div>
-                        <div id="lintasanB" style="display:none;">
+                        <div
+                            id="lintasanB"
+                            style="{{ optional($setting)->active_track == 'B' ? '' : 'display:none;' }}"
+                        >
                             @include('admin.monitoring.lintasan-b')
                         </div>
                     </div>
@@ -266,16 +292,17 @@
      DUMMY GPS
 ========================================================= --}}
 <script>
-    document.addEventListener("DOMContentLoaded",function(){
-        const select=document.getElementById("trackSelect");
-        select.addEventListener("change",function(){
-            if(this.value==="A"){
-                document.getElementById("lintasanA").style.display="block";
-                document.getElementById("lintasanB").style.display="none";
-            }else{
-                document.getElementById("lintasanA").style.display="none";
-                document.getElementById("lintasanB").style.display="block";
-            }
+    document.addEventListener("DOMContentLoaded", function () {
+        const select = document.getElementById("trackSelect");
+        function tampilkan(track){
+            document.getElementById("lintasanA").style.display =
+                track === "A" ? "block" : "none";
+            document.getElementById("lintasanB").style.display =
+                track === "B" ? "block" : "none";
+        }
+        tampilkan(select.value);
+        select.addEventListener("change", function(){
+            tampilkan(this.value);
         });
     });
 </script>

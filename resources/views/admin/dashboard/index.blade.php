@@ -129,8 +129,25 @@
     {{-- Posisi Kapal --}}
     <div class="card dashboard-map-card">
         <h3>Posisi Kapal</h3>
-        <div class="dashboard-map-placeholder">
-            MAP LIVE
+
+        <div class="dashboard-track-wrapper">
+
+            <div
+                id="dashboardAdminLintasanA"
+                class="dashboard-track-item"
+                style="{{ optional($setting)->active_track == 'B' ? 'display:none;' : '' }}"
+            >
+                @include('admin.monitoring.lintasan-a')
+            </div>
+
+            <div
+                id="dashboardAdminLintasanB"
+                class="dashboard-track-item"
+                style="{{ optional($setting)->active_track == 'B' ? '' : 'display:none;' }}"
+            >
+                @include('admin.monitoring.lintasan-b')
+            </div>
+
         </div>
     </div>
 </div>
