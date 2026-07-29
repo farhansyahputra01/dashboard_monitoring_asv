@@ -38,13 +38,25 @@
         <div class="dashboard-camera-wrapper">
             <div class="dashboard-camera-item">
                 <div class="dashboard-camera-box">
-                    <img src="{{ asset('images/camera-atas.jpg') }}">
+                    <video
+                        id="dashboard-camera-atas"
+                        autoplay
+                        playsinline
+                        muted
+                        style="width:100%;height:100%;object-fit:cover;">
+                    </video>
                 </div>
                 <p>Kamera Atas Air</p>
             </div>
             <div class="dashboard-camera-item">
                 <div class="dashboard-camera-box">
-                    <img src="{{ asset('images/camera-bawah.jpg') }}">
+                    <video
+                        id="dashboard-camera-bawah"
+                        autoplay
+                        playsinline
+                        muted
+                        style="width:100%;height:100%;object-fit:cover;">
+                    </video>
                 </div>
                 <p>Kamera Bawah Air</p>
             </div>
@@ -122,4 +134,46 @@
         </div>
     </div>
 </div>
+
+<script>
+document.addEventListener("DOMContentLoaded", async () => {
+    try {
+        await navigator.mediaDevices.getUserMedia({
+            video:true,
+            audio:false
+        });
+        const DEVICE_BAWAH =
+        "ed8b5b0d75e7e3db3f4839c11399217ffe8d9d7ae4ed5bc217ba038c230472ff";
+        const DEVICE_ATAS =
+        "02fe8959a97e174d48a667ec0451e9d4cf13d79b9feccc39757896afd19ab4ba";
+        // Kamera Atas
+        const streamAtas = await navigator.mediaDevices.getUserMedia({
+            video:{
+                deviceId:{
+                    exact:DEVICE_ATAS
+                }
+            },
+            audio:false
+        });
+        document
+            .getElementById("dashboard-camera-atas")
+            .srcObject = streamAtas;
+        // Kamera Bawah
+        const streamBawah = await navigator.mediaDevices.getUserMedia({
+            video:{
+                deviceId:{
+                    exact:DEVICE_BAWAH
+                }
+            },
+            audio:false
+        });
+        document
+            .getElementById("dashboard-camera-bawah")
+            .srcObject = streamBawah;
+    }
+    catch(error){
+        console.error(error);
+    }
+});
+</script>
 @endsection

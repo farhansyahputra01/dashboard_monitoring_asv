@@ -2,24 +2,117 @@
 @section('title','Monitoring')
 @section('content')
 <div class="monitoring-page">
-    {{-- ================= MAP ================= --}}
+    {{-- =====================================================
+         LINTASAN
+    ====================================================== --}}
     <div class="monitor-card monitor-map-card">
         <div class="monitor-card-title">
-            <i class="bi bi-geo-alt-fill"></i>
-            <span>Posisi Kapal</span>
+            <i class="bi bi-signpost-2-fill"></i>
+            <span>Lintasan</span>
         </div>
-        <div class="monitor-map-placeholder">
-            <div class="monitor-map-center">
-                <i class="bi bi-map"></i>
-                <h2>MAP LIVE</h2>
-                <p>GPS akan ditampilkan di sini</p>
+        
+        {{-- PILIHAN LINTASAN --}}
+        <div class="monitor-track-selector">
+            <label for="trackSelect">
+                Pilih Lintasan
+            </label>
+            <select id="trackSelect">
+                <option value="A">Lintasan A</option>
+                <option value="B">Lintasan B</option>
+            </select>
+        </div>
+        {{-- AREA MONITORING LINTASAN --}}
+        <div class="monitor-track-layout">
+            {{-- =================================================
+                 PANEL INFORMASI
+            ================================================== --}}
+            <div class="monitor-track-info">
+                <div class="track-info-section">
+                    <h4>Positioning</h4>
+                    <ol>
+                        <li>Start</li>
+                        <li>Floating Ball Set 1–10</li>
+                        <li>Mission Surface</li>
+                        <li>Mission Underwater</li>
+                        <li>Docking</li>
+                        <li>Finish</li>
+                    </ol>
+                </div>
+                <div class="track-info-section">
+                    <h4>Altitude Information</h4>
+                    <ol>
+                        <li>TOG</li>
+                        <li>COG</li>
+                        <li>COG</li>
+                    </ol>
+                </div>
+                <div class="track-info-section">
+                    <h4>Indikator Lain</h4>
+                    <ol>
+                        <li>Battery Level</li>
+                        <li>Visual Video</li>
+                    </ol>
+                </div>
+                {{-- STATUS DUMMY --}}
+                <div class="track-status">
+                    <div>
+                        <span>Latitude</span>
+                        <strong id="dummyLatitude">
+                            1.123400
+                        </strong>
+                    </div>
+                    <div>
+                        <span>Longitude</span>
+                        <strong id="dummyLongitude">
+                            102.123400
+                        </strong>
+                    </div>
+                    <div>
+                        <span>GPS</span>
+                        <strong class="gps-active">
+                            ● ACTIVE
+                        </strong>
+                    </div>
+                </div>
+            </div>
+            {{-- =================================================
+                 AREA LINTASAN
+            ================================================== --}}
+            <div class="monitor-track-area">
+                <div class="track-grid">
+                    {{-- LABEL KOLOM --}}
+                    <div class="track-column-labels">
+                        <span>A</span>
+                        <span>B</span>
+                        <span>C</span>
+                        <span>D</span>
+                        <span>E</span>
+                    </div>
+                    {{-- LABEL BARIS --}}
+                    <div class="track-row-labels">
+                        <span>5</span>
+                        <span>4</span>
+                        <span>3</span>
+                        <span>2</span>
+                        <span>1</span>
+                    </div>
+                    {{-- LINTASAN --}}
+                    <div class="track-field">
+                        <div id="lintasanA">
+                            @include('admin.monitoring.lintasan-a')
+                        </div>
+                        <div id="lintasanB" style="display:none;">
+                            @include('admin.monitoring.lintasan-b')
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
-
-    {{-- ================= INFO ================= --}}
+    {{-- =====================================================
+         INFO
+    ====================================================== --}}
     <div class="monitor-info-grid">
-
         {{-- Koordinat --}}
         <div class="monitor-card">
             <div class="monitor-info-header">
@@ -27,11 +120,14 @@
                 <span>Koordinat</span>
             </div>
             <div class="monitor-info-value">
-                <strong>07°12.345' S</strong>
-                <small>112°45.678' E</small>
+                <strong id="coordinateLatitude">
+                    07°12.345' S
+                </strong>
+                <small id="coordinateLongitude">
+                    112°45.678' E
+                </small>
             </div>
         </div>
-
         {{-- Kecepatan --}}
         <div class="monitor-card">
             <div class="monitor-info-header">
@@ -43,7 +139,6 @@
                 <small>5.8 km/h</small>
             </div>
         </div>
-
         {{-- Haluan --}}
         <div class="monitor-card">
             <div class="monitor-info-header">
@@ -55,7 +150,6 @@
                 <small>South East</small>
             </div>
         </div>
-
         {{-- Total Jarak --}}
         <div class="monitor-card">
             <div class="monitor-info-header">
@@ -67,7 +161,6 @@
                 <small>Total Perjalanan</small>
             </div>
         </div>
-
         {{-- Waktu Tempuh --}}
         <div class="monitor-card">
             <div class="monitor-info-header">
@@ -79,7 +172,6 @@
                 <small>Durasi Operasi</small>
             </div>
         </div>
-
         {{-- Lokasi --}}
         <div class="monitor-card">
             <div class="monitor-info-header">
@@ -92,8 +184,9 @@
             </div>
         </div>
     </div>
-
-    {{-- ================= BOTTOM ================= --}}
+    {{-- =====================================================
+         BOTTOM
+    ====================================================== --}}
     <div class="monitor-bottom-grid">
         {{-- Compass --}}
         <div class="monitor-card">
@@ -117,7 +210,6 @@
                 </div>
             </div>
         </div>
-
         {{-- Battery --}}
         <div class="monitor-card">
             <div class="monitor-card-title">
@@ -133,7 +225,6 @@
                 </div>
             </div>
         </div>
-
         {{-- Distribusi --}}
         <div class="monitor-card">
             <div class="monitor-card-title">
@@ -151,13 +242,18 @@
                 ] as $item)
                 <div class="monitor-power-item">
                     <div class="monitor-power-top">
-                        <span>{{ $item[0] }}</span>
-                        <strong>{{ $item[1] }}%</strong>
+                        <span>
+                            {{ $item[0] }}
+                        </span>
+                        <strong>
+                            {{ $item[1] }}%
+                        </strong>
                     </div>
                     <div class="monitor-progress">
-                        <div class="monitor-progress-fill"
-                             style="width:{{ $item[1] }}%">
-                        </div>
+                        <div
+                            class="monitor-progress-fill"
+                            style="width:{{ $item[1] }}%"
+                        ></div>
                     </div>
                 </div>
                 @endforeach
@@ -165,4 +261,22 @@
         </div>
     </div>
 </div>
+
+{{-- =========================================================
+     DUMMY GPS
+========================================================= --}}
+<script>
+    document.addEventListener("DOMContentLoaded",function(){
+        const select=document.getElementById("trackSelect");
+        select.addEventListener("change",function(){
+            if(this.value==="A"){
+                document.getElementById("lintasanA").style.display="block";
+                document.getElementById("lintasanB").style.display="none";
+            }else{
+                document.getElementById("lintasanA").style.display="none";
+                document.getElementById("lintasanB").style.display="block";
+            }
+        });
+    });
+</script>
 @endsection
