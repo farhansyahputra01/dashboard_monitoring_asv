@@ -35,9 +35,7 @@
                     Lintasan B
                 </option>
             </select>
-            <button
-                type="submit"
-            >
+            <button type="submit">
                 Simpan
             </button>
         </form>
@@ -161,8 +159,12 @@
                 <span>Kecepatan</span>
             </div>
             <div class="monitor-info-value">
-                <strong>1.6 m/s</strong>
-                <small>5.8 km/h</small>
+                <strong>
+                    1.6 m/s
+                </strong>
+                <small>
+                    5.8 km/h
+                </small>
             </div>
         </div>
         {{-- Haluan --}}
@@ -172,8 +174,12 @@
                 <span>Haluan</span>
             </div>
             <div class="monitor-info-value">
-                <strong>128°</strong>
-                <small>South East</small>
+                <strong>
+                    128°
+                </strong>
+                <small>
+                    South East
+                </small>
             </div>
         </div>
         {{-- Total Jarak --}}
@@ -183,8 +189,12 @@
                 <span>Total Jarak</span>
             </div>
             <div class="monitor-info-value">
-                <strong>12.45 km</strong>
-                <small>Total Perjalanan</small>
+                <strong>
+                    12.45 km
+                </strong>
+                <small>
+                    Total Perjalanan
+                </small>
             </div>
         </div>
         {{-- Waktu Tempuh --}}
@@ -194,8 +204,12 @@
                 <span>Waktu Tempuh</span>
             </div>
             <div class="monitor-info-value">
-                <strong>02:19:32</strong>
-                <small>Durasi Operasi</small>
+                <strong>
+                    02:19:32
+                </strong>
+                <small>
+                    Durasi Operasi
+                </small>
             </div>
         </div>
         {{-- Lokasi --}}
@@ -205,13 +219,51 @@
                 <span>Lokasi Perairan</span>
             </div>
             <div class="monitor-info-value">
-                <strong>Kolam Lomba KKI 2026</strong>
-                <small>Politeknik Negeri Bengkalis</small>
+                <strong>
+                    Kolam Lomba KKI 2026
+                </strong>
+                <small>
+                    Politeknik Negeri Bengkalis
+                </small>
+            </div>
+        </div>
+        {{-- =================================================
+             SUHU
+        ================================================== --}}
+        <div class="monitor-card">
+            <div class="monitor-info-header">
+                <i class="bi bi-thermometer-half"></i>
+                <span>Suhu</span>
+            </div>
+            <div class="monitor-info-value">
+                <strong>
+                    31 °C
+                </strong>
+                <small>
+                    Suhu Lingkungan
+                </small>
+            </div>
+        </div>
+        {{-- =================================================
+             KELEMBAPAN
+        ================================================== --}}
+        <div class="monitor-card">
+            <div class="monitor-info-header">
+                <i class="bi bi-droplet-fill"></i>
+                <span>Kelembapan</span>
+            </div>
+            <div class="monitor-info-value">
+                <strong>
+                    78%
+                </strong>
+                <small>
+                    Kelembapan Lingkungan
+                </small>
             </div>
         </div>
     </div>
     {{-- =====================================================
-         BOTTOM
+         MONITORING TAMBAHAN
     ====================================================== --}}
     <div class="monitor-bottom-grid">
         {{-- Compass --}}
@@ -222,17 +274,29 @@
             </div>
             <div class="monitor-compass-wrapper">
                 <div class="monitor-compass-circle">
-                    <div class="monitor-north">N</div>
-                    <div class="monitor-east">E</div>
-                    <div class="monitor-south">S</div>
-                    <div class="monitor-west">W</div>
+                    <div class="monitor-north">
+                        N
+                    </div>
+                    <div class="monitor-east">
+                        E
+                    </div>
+                    <div class="monitor-south">
+                        S
+                    </div>
+                    <div class="monitor-west">
+                        W
+                    </div>
                     <div class="monitor-compass-center">
                         <i class="bi bi-send-fill"></i>
                     </div>
                 </div>
                 <div class="monitor-heading-value">
-                    <h2>128°</h2>
-                    <p>South East</p>
+                    <h2>
+                        128°
+                    </h2>
+                    <p>
+                        South East
+                    </p>
                 </div>
             </div>
         </div>
@@ -244,10 +308,16 @@
             </div>
             <div class="monitor-battery">
                 <i class="bi bi-battery-half monitor-battery-big"></i>
-                <h1>45%</h1>
-                <p>Baterai Normal</p>
+                <h1>
+                    45%
+                </h1>
+                <p>
+                    Baterai Normal
+                </p>
                 <div class="monitor-battery-bar">
-                    <div class="monitor-battery-fill"></div>
+                    <div
+                        class="monitor-battery-fill"
+                    ></div>
                 </div>
             </div>
         </div>
@@ -255,7 +325,9 @@
         <div class="monitor-card">
             <div class="monitor-card-title">
                 <i class="bi bi-lightning-charge-fill"></i>
-                <span>Distribusi Konsumsi Daya</span>
+                <span>
+                    Distribusi Konsumsi Daya
+                </span>
             </div>
             <div class="monitor-power-list">
                 @foreach([
@@ -266,44 +338,44 @@
                     ['Sensor',5],
                     ['Komunikasi',5],
                 ] as $item)
-                <div class="monitor-power-item">
-                    <div class="monitor-power-top">
-                        <span>
-                            {{ $item[0] }}
-                        </span>
-                        <strong>
-                            {{ $item[1] }}%
-                        </strong>
+                    <div class="monitor-power-item">
+                        <div class="monitor-power-top">
+                            <span>
+                                {{ $item[0] }}
+                            </span>
+                            <strong>
+                                {{ $item[1] }}%
+                            </strong>
+                        </div>
+                        <div class="monitor-progress">
+                            <div
+                                class="monitor-progress-fill"
+                                style="width:{{ $item[1] }}%"
+                            ></div>
+                        </div>
                     </div>
-                    <div class="monitor-progress">
-                        <div
-                            class="monitor-progress-fill"
-                            style="width:{{ $item[1] }}%"
-                        ></div>
-                    </div>
-                </div>
                 @endforeach
             </div>
         </div>
     </div>
 </div>
-
 {{-- =========================================================
      DUMMY GPS
 ========================================================= --}}
 <script>
-    document.addEventListener("DOMContentLoaded", function () {
-        const select = document.getElementById("trackSelect");
-        function tampilkan(track){
-            document.getElementById("lintasanA").style.display =
-                track === "A" ? "block" : "none";
-            document.getElementById("lintasanB").style.display =
-                track === "B" ? "block" : "none";
-        }
-        tampilkan(select.value);
-        select.addEventListener("change", function(){
-            tampilkan(this.value);
-        });
+document.addEventListener("DOMContentLoaded", function () {
+    const select =
+        document.getElementById("trackSelect");
+    function tampilkan(track) {
+        document.getElementById("lintasanA").style.display =
+            track === "A" ? "block" : "none";
+        document.getElementById("lintasanB").style.display =
+            track === "B" ? "block" : "none";
+    }
+    tampilkan(select.value);
+    select.addEventListener("change", function () {
+        tampilkan(this.value);
     });
+});
 </script>
 @endsection
