@@ -59,21 +59,21 @@
                     <div>
                         <span>Latitude</span>
                         <strong id="dummyLatitude">
-                            1.123400
+                            0.000000
                         </strong>
                     </div>
 
                     <div>
                         <span>Longitude</span>
                         <strong id="dummyLongitude">
-                            102.123400
+                            0.000000
                         </strong>
                     </div>
 
                     <div>
                         <span>GPS</span>
-                        <strong class="gps-active">
-                            ● ACTIVE
+                        <strong id="gpsStatusText" class="gps-active">
+                            ● SEARCHING
                         </strong>
                     </div>
 
@@ -147,11 +147,11 @@
             <div class="monitor-info-value">
 
                 <strong id="coordinateLatitude">
-                    07°12.345' S
+                    0.000000
                 </strong>
 
                 <small id="coordinateLongitude">
-                    112°45.678' E
+                    0.000000
                 </small>
 
             </div>
@@ -169,12 +169,12 @@
 
             <div class="monitor-info-value">
 
-                <strong>
-                    1.6 m/s
+                <strong id="mon-speed-ms">
+                    0.0 m/s
                 </strong>
 
-                <small>
-                    5.8 km/h
+                <small id="mon-speed-kmh">
+                    0.0 km/h
                 </small>
 
             </div>
@@ -192,12 +192,12 @@
 
             <div class="monitor-info-value">
 
-                <strong>
-                    128°
+                <strong id="mon-heading-deg">
+                    0°
                 </strong>
 
-                <small>
-                    South East
+                <small id="mon-heading-dir">
+                    N/A
                 </small>
 
             </div>
@@ -210,17 +210,17 @@
 
             <div class="monitor-info-header">
                 <i class="bi bi-signpost-2-fill"></i>
-                <span>Total Jarak</span>
+                <span>Altitude / Satelites</span>
             </div>
 
             <div class="monitor-info-value">
 
-                <strong>
-                    12.45 km
+                <strong id="mon-alt-meters">
+                    0 m
                 </strong>
 
-                <small>
-                    Total Perjalanan
+                <small id="mon-satellites">
+                    0 Sats
                 </small>
 
             </div>
@@ -232,18 +232,18 @@
         <div class="monitor-card">
 
             <div class="monitor-info-header">
-                <i class="bi bi-stopwatch-fill"></i>
-                <span>Waktu Tempuh</span>
+                <i class="bi bi-lightning-charge-fill"></i>
+                <span>Tegangan & Arus</span>
             </div>
 
             <div class="monitor-info-value">
 
-                <strong>
-                    02:19:32
+                <strong id="mon-voltage">
+                    0.0 V
                 </strong>
 
-                <small>
-                    Durasi Operasi
+                <small id="mon-current">
+                    0.0 A
                 </small>
 
             </div>
@@ -285,7 +285,7 @@
             <div class="monitor-info-value">
 
                 <strong id="temperature">
-                    31 °C
+                    0 °C
                 </strong>
 
                 <small>
@@ -308,7 +308,7 @@
             <div class="monitor-info-value">
 
                 <strong id="humidity">
-                    78%
+                    0%
                 </strong>
 
                 <small>
@@ -362,7 +362,7 @@
                         W
                     </div>
 
-                    <div class="monitor-compass-center">
+                    <div class="monitor-compass-center" id="compassArrow">
 
                         <i class="bi bi-send-fill"></i>
 
@@ -373,12 +373,12 @@
 
                 <div class="monitor-heading-value">
 
-                    <h2>
-                        128°
+                    <h2 id="mon-compass-heading">
+                        0°
                     </h2>
 
-                    <p>
-                        South East
+                    <p id="mon-compass-dir">
+                        N/A
                     </p>
 
                 </div>
@@ -406,19 +406,20 @@
 
                 <i class="bi bi-battery-half monitor-battery-big"></i>
 
-                <h1>
-                    45%
+                <h1 id="mon-battery-percent">
+                    0%
                 </h1>
 
-                <p>
-                    Baterai Normal
+                <p id="mon-battery-status">
+                    Standby
                 </p>
 
                 <div class="monitor-battery-bar">
 
                     <div
+                        id="mon-battery-fill"
                         class="monitor-battery-fill"
-                        style="width:45%"
+                        style="width:0%"
                     ></div>
 
                 </div>
@@ -490,5 +491,107 @@
     </div>
 
 </div>
+
+<script>
+function getHeadingDirection(heading) {
+    if (heading >= 337.5 || heading < 22.5) return 'North';
+    if (heading >= 22.5 && heading < 67.5) return 'North East';
+    if (heading >= 67.5 && heading < 112.5) return 'East';
+    if (heading >= 112.5 && heading < 157.5) return 'South East';
+    if (heading >= 157.5 && heading < 202.5) return 'South';
+    if (heading >= 202.5 && heading < 247.5) return 'South West';
+    if (heading >= 247.5 && heading < 292.5) return 'West';
+    if (heading >= 292.5 && heading < 337.5) return 'North West';
+    return 'N/A';
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    setTimeout(() => {
+        if (window.Echo) {
+            window.Echo.channel('sensors')
+                .listen('SensorDataUpdated', (e) => {
+                    const data = e.sensorData;
+                    
+                    // Lat/Lng
+                    if (data.latitude !== null) {
+                        const lat = parseFloat(data.latitude).toFixed(6);
+                        document.getElementById('dummyLatitude').textContent = lat;
+                        document.getElementById('coordinateLatitude').textContent = lat;
+                    }
+                    if (data.longitude !== null) {
+                        const lng = parseFloat(data.longitude).toFixed(6);
+                        document.getElementById('dummyLongitude').textContent = lng;
+                        document.getElementById('coordinateLongitude').textContent = lng;
+                    }
+                    
+                    // Satellites & GPS Status
+                    if (data.satellites !== null) {
+                        document.getElementById('mon-satellites').textContent = data.satellites + ' Sats';
+                        const gpsText = document.getElementById('gpsStatusText');
+                        if (data.satellites > 0) {
+                            gpsText.textContent = '● ACTIVE';
+                            gpsText.className = 'gps-active';
+                        } else {
+                            gpsText.textContent = '● SEARCHING';
+                            gpsText.className = '';
+                        }
+                    }
+                    
+                    // Speed
+                    if (data.speed !== null) {
+                        const speedKmh = parseFloat(data.speed).toFixed(1);
+                        const speedMs = (data.speed * 0.277778).toFixed(1);
+                        document.getElementById('mon-speed-ms').textContent = speedMs + ' m/s';
+                        document.getElementById('mon-speed-kmh').textContent = speedKmh + ' km/h';
+                    }
+                    
+                    // Heading
+                    if (data.heading !== null) {
+                        const hDeg = Math.round(data.heading);
+                        const hDir = getHeadingDirection(data.heading);
+                        document.getElementById('mon-heading-deg').textContent = hDeg + '°';
+                        document.getElementById('mon-heading-dir').textContent = hDir;
+                        document.getElementById('mon-compass-heading').textContent = hDeg + '°';
+                        document.getElementById('mon-compass-dir').textContent = hDir;
+                        
+                        const arrow = document.getElementById('compassArrow');
+                        if (arrow) {
+                            arrow.style.transform = `rotate(${hDeg}deg)`;
+                        }
+                    }
+                    
+                    // Altitude
+                    if (data.altitude !== null) {
+                        document.getElementById('mon-alt-meters').textContent = Math.round(data.altitude) + ' m';
+                    }
+                    
+                    // Voltage & Current
+                    if (data.voltage !== null) {
+                        document.getElementById('mon-voltage').textContent = parseFloat(data.voltage).toFixed(1) + ' V';
+                    }
+                    if (data.current !== null) {
+                        document.getElementById('mon-current').textContent = parseFloat(data.current).toFixed(1) + ' A';
+                    }
+                    
+                    // Temp & Humidity
+                    if (data.temperature !== null) {
+                        document.getElementById('temperature').textContent = parseFloat(data.temperature).toFixed(1) + ' °C';
+                    }
+                    if (data.humidity !== null) {
+                        document.getElementById('humidity').textContent = parseFloat(data.humidity).toFixed(1) + '%';
+                    }
+                    
+                    // Battery
+                    if (data.battery_percent !== null) {
+                        const bPercent = Math.round(data.battery_percent);
+                        document.getElementById('mon-battery-percent').textContent = bPercent + '%';
+                        document.getElementById('mon-battery-fill').style.width = bPercent + '%';
+                        document.getElementById('mon-battery-status').textContent = bPercent < 20 ? 'Baterai Lemah' : 'Baterai Normal';
+                    }
+                });
+        }
+    }, 1000);
+});
+</script>
 
 @endsection

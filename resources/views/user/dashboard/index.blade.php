@@ -20,7 +20,7 @@
         <i class="bi bi-speedometer2"></i>
         <div>
             <small>Kecepatan</small>
-            <h2>1.6 <span>m/s</span></h2>
+            <h2><span id="dash-speed">0.0</span> <span>m/s</span></h2>
         </div>
     </div>
     {{-- HALUAN --}}
@@ -28,8 +28,8 @@
         <i class="bi bi-compass"></i>
         <div>
             <small>Haluan</small>
-            <h2>128 SE</h2>
-            <p>Southeast</p>
+            <h2><span id="dash-heading">0</span>°</h2>
+            <p id="dash-heading-text">N/A</p>
         </div>
     </div>
     {{-- KAMERA --}}
@@ -74,15 +74,15 @@
             <div class="user-battery-info">
                 <div class="user-battery-item">
                     <span>Status Baterai</span>
-                    <strong>45%</strong>
+                    <strong id="dash-battery-percent">0%</strong>
                 </div>
                 <div class="user-battery-item">
                     <span>Tegangan</span>
-                    <strong>51.2 V</strong>
+                    <strong id="dash-voltage">0.0 V</strong>
                 </div>
                 <div class="user-battery-item">
-                    <span>Sisa Operasi</span>
-                    <strong>10 Jam 30 Menit</strong>
+                    <span>Arus</span>
+                    <strong id="dash-current">0.0 A</strong>
                 </div>
             </div>
         </div>
@@ -93,17 +93,17 @@
         <div class="user-performance-wrapper">
             <div class="user-performance-item">
                 <div class="user-circle">
-                    <span>79%</span>
+                    <span id="dash-satellites">0</span>
                 </div>
-                <p>Performa Mesin</p>
-                <small>Sempurna</small>
+                <p>Satelit GPS</p>
+                <small id="dash-gps-status">Mencari...</small>
             </div>
             <div class="user-performance-item">
                 <div class="user-circle user-circle-76">
-                    <span>76%</span>
+                    <span id="dash-altitude">0m</span>
                 </div>
-                <p>Konsumsi Baterai</p>
-                <small>Baik</small>
+                <p>Ketinggian</p>
+                <small>Ketinggian Laut</small>
             </div>
         </div>
     </div>
@@ -113,7 +113,7 @@
         <ul>
             <li>
                 <i class="bi bi-wifi"></i>
-                Koneksi Terhubung
+                <span id="system-ws-status">Koneksi Menghubungkan...</span>
             </li>
             <li>
                 <i class="bi bi-broadcast"></i>
@@ -186,5 +186,54 @@ document.addEventListener("DOMContentLoaded", async () => {
         console.error(error);
     }
 });
+
+function getHeadingDirection(heading) {
+    if (heading >= 337.5 || heading < 22.5) return 'North';
+    if (heading >= 22.5 && heading < 67.5) return 'North East';
+    if (heading >= 67.5 && heading < 112.5) return 'East';
+    if (heading >= 112.5 && heading < 157.5) return 'South East';
+    if (heading >= 157.5 && heading < 202.5) return 'South';
+    if (heading >= 202.5 && heading < 247.5) return 'South West';
+    if (heading >= 247.5 && heading < 292.5) return 'West';
+    if (heading >= 292.5 && heading < 337.5) return 'North West';
+    return 'N/A';
+}
+
+setTimeout(() => {
+    if (window.Echo) {
+        document.getElementById('system-ws-status').textContent = 'WebSockets Terhubung';
+        window.Echo.channel('sensors')
+            .listen('SensorDataUpdated', (e) => {
+                const data = e.sensorData;
+                if (data.speed !== null) {
+                    // Convert km/h to m/s if speed is in km/h (1 km/h = 0.277778 m/s)
+                    const speedMS = (data.speed * 0.277778).toFixed(1);
+                    document.getElementById('dash-speed').textContent = speedMS;
+                }
+                if (data.heading !== null) {
+                    document.getElementById('dash-heading').textContent = Math.round(data.heading);
+                    document.getElementById('dash-heading-text').textContent = getHeadingDirection(data.heading);
+                }
+                if (data.battery_percent !== null) {
+                    document.getElementById('dash-battery-percent').textContent = Math.round(data.battery_percent) + '%';
+                }
+                if (data.voltage !== null) {
+                    document.getElementById('dash-voltage').textContent = parseFloat(data.voltage).toFixed(1) + ' V';
+                }
+                if (data.current !== null) {
+                    document.getElementById('dash-current').textContent = parseFloat(data.current).toFixed(1) + ' A';
+                }
+                if (data.satellites !== null) {
+                    document.getElementById('dash-satellites').textContent = data.satellites;
+                    document.getElementById('dash-gps-status').textContent = data.satellites > 0 ? 'Sinyal Aktif' : 'Mencari...';
+                }
+                if (data.altitude !== null) {
+                    document.getElementById('dash-altitude').textContent = Math.round(data.altitude) + 'm';
+                }
+            });
+    } else {
+        document.getElementById('system-ws-status').textContent = 'WebSockets Terputus';
+    }
+}, 1000);
 </script>
 @endsection
