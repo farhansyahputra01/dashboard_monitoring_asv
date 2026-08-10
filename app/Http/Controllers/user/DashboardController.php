@@ -4,6 +4,7 @@ namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
 use App\Models\MonitoringSetting;
+use App\Models\SensorData;
 
 class DashboardController extends Controller
 {
@@ -11,6 +12,10 @@ class DashboardController extends Controller
     {
         $setting = MonitoringSetting::first();
 
-        return view('user.dashboard.index', compact('setting'));
+        // Pembacaan terakhir dipakai sebagai nilai awal halaman, supaya setelah
+        // refresh kartu tidak menampilkan nol sambil menunggu broadcast.
+        $latest = SensorData::latest('id')->first();
+
+        return view('user.dashboard.index', compact('setting', 'latest'));
     }
 }

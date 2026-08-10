@@ -1,9 +1,25 @@
 @extends('layouts.user')
-
-@section('title','Monitoring')
-
+@section('title', 'Monitoring')
 @section('content')
-
+@php
+    // Nilai awal dari pembacaan sensor terakhir; setelah itu diperbarui
+    // realtime lewat broadcast SensorDataUpdated di bawah.
+    $arahHaluan = function ($heading) {
+        if ($heading === null) return 'N/A';
+        return match (true) {
+            $heading >= 337.5 || $heading < 22.5 => 'North',
+            $heading < 67.5                      => 'North East',
+            $heading < 112.5                     => 'East',
+            $heading < 157.5                     => 'South East',
+            $heading < 202.5                     => 'South',
+            $heading < 247.5                     => 'South West',
+            $heading < 292.5                     => 'West',
+            default                              => 'North West',
+        };
+    };
+    $sat = $latest?->satellites ?? 0;
+    $batt = $latest?->battery_percent !== null ? round($latest->battery_percent) : 0;
+@endphp
 <div class="monitoring-page">
 
     {{-- =====================================================
@@ -59,21 +75,21 @@
                     <div>
                         <span>Latitude</span>
                         <strong id="dummyLatitude">
-                            0.000000
+                            {{ $latest?->latitude !== null ? number_format($latest->latitude, 6, '.', '') : '-' }}
                         </strong>
                     </div>
 
                     <div>
                         <span>Longitude</span>
                         <strong id="dummyLongitude">
-                            0.000000
+                            {{ $latest?->longitude !== null ? number_format($latest->longitude, 6, '.', '') : '-' }}
                         </strong>
                     </div>
 
                     <div>
                         <span>GPS</span>
-                        <strong id="gpsStatusText" class="gps-active">
-                            ● SEARCHING
+                        <strong id="gpsStatusText" class="{{ $sat > 0 ? 'gps-active' : '' }}">
+                            {{ $sat > 0 ? '● ACTIVE' : '● SEARCHING' }}
                         </strong>
                     </div>
 
@@ -147,11 +163,11 @@
             <div class="monitor-info-value">
 
                 <strong id="coordinateLatitude">
-                    0.000000
+                    {{ $latest?->latitude !== null ? number_format($latest->latitude, 6, '.', '') : '-' }}
                 </strong>
 
                 <small id="coordinateLongitude">
-                    0.000000
+                    {{ $latest?->longitude !== null ? number_format($latest->longitude, 6, '.', '') : '-' }}
                 </small>
 
             </div>
@@ -170,11 +186,11 @@
             <div class="monitor-info-value">
 
                 <strong id="mon-speed-ms">
-                    0.0 m/s
+                    {{ number_format(($latest?->speed ?? 0) * 0.277778, 1) }} m/s
                 </strong>
 
                 <small id="mon-speed-kmh">
-                    0.0 km/h
+                    {{ number_format($latest?->speed ?? 0, 1) }} km/h
                 </small>
 
             </div>
@@ -193,11 +209,11 @@
             <div class="monitor-info-value">
 
                 <strong id="mon-heading-deg">
-                    0°
+                    {{ round($latest?->heading ?? 0) }}°
                 </strong>
 
                 <small id="mon-heading-dir">
-                    N/A
+                    {{ $arahHaluan($latest?->heading) }}
                 </small>
 
             </div>
@@ -216,11 +232,11 @@
             <div class="monitor-info-value">
 
                 <strong id="mon-alt-meters">
-                    0 m
+                    {{ round($latest?->altitude ?? 0) }} m
                 </strong>
 
                 <small id="mon-satellites">
-                    0 Sats
+                    {{ $sat }} Sats
                 </small>
 
             </div>
@@ -239,11 +255,11 @@
             <div class="monitor-info-value">
 
                 <strong id="mon-voltage">
-                    0.0 V
+                    {{ number_format($latest?->voltage ?? 0, 1) }} V
                 </strong>
 
                 <small id="mon-current">
-                    0.0 A
+                    {{ number_format($latest?->current ?? 0, 1) }} A
                 </small>
 
             </div>
@@ -285,7 +301,7 @@
             <div class="monitor-info-value">
 
                 <strong id="temperature">
-                    0 °C
+                    {{ $latest?->temperature !== null ? number_format($latest->temperature, 1) . ' °C' : '- °C' }}
                 </strong>
 
                 <small>
@@ -308,7 +324,7 @@
             <div class="monitor-info-value">
 
                 <strong id="humidity">
-                    0%
+                    {{ $latest?->humidity !== null ? number_format($latest->humidity, 1) . '%' : '-%' }}
                 </strong>
 
                 <small>
@@ -362,7 +378,7 @@
                         W
                     </div>
 
-                    <div class="monitor-compass-center" id="compassArrow">
+                    <div class="monitor-compass-center" id="compassArrow" style="transform: rotate({{ round($latest?->heading ?? 0) }}deg);">
 
                         <i class="bi bi-send-fill"></i>
 
@@ -374,11 +390,11 @@
                 <div class="monitor-heading-value">
 
                     <h2 id="mon-compass-heading">
-                        0°
+                        {{ round($latest?->heading ?? 0) }}°
                     </h2>
 
                     <p id="mon-compass-dir">
-                        N/A
+                        {{ $arahHaluan($latest?->heading) }}
                     </p>
 
                 </div>
@@ -407,11 +423,11 @@
                 <i class="bi bi-battery-half monitor-battery-big"></i>
 
                 <h1 id="mon-battery-percent">
-                    0%
+                    {{ $batt }}%
                 </h1>
 
                 <p id="mon-battery-status">
-                    Standby
+                    {{ $batt < 20 ? 'Baterai Lemah' : 'Baterai Normal' }}
                 </p>
 
                 <div class="monitor-battery-bar">
@@ -419,7 +435,7 @@
                     <div
                         id="mon-battery-fill"
                         class="monitor-battery-fill"
-                        style="width:0%"
+                        style="width:{{ $batt }}%"
                     ></div>
 
                 </div>

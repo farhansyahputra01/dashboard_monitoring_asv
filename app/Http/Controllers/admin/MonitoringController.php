@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\MonitoringSetting;
+use App\Models\SensorData;
 
 class MonitoringController extends Controller
 {
@@ -12,7 +13,11 @@ class MonitoringController extends Controller
     {
         $setting = MonitoringSetting::first();
 
-        return view('admin.monitoring.index', compact('setting'));
+        // Pembacaan terakhir dipakai sebagai nilai awal halaman, supaya setelah
+        // refresh kartu tidak kosong sambil menunggu broadcast berikutnya.
+        $latest = SensorData::latest('id')->first();
+
+        return view('admin.monitoring.index', compact('setting', 'latest'));
     }
 
     public function updateTrack(Request $request)

@@ -9,6 +9,8 @@ use App\Http\Controllers\Admin\MonitoringController as AdminMonitoringController
 use App\Http\Controllers\Admin\CameraController as AdminCameraController;
 use App\Http\Controllers\Admin\AlarmController;
 use App\Http\Controllers\Admin\SettingController;
+use App\Http\Controllers\MonitoringSettingController;
+use App\Http\Controllers\Admin\ControlController;
 
 /*
 |--------------------------------------------------------------------------
@@ -32,6 +34,8 @@ Route::get('/', [UserDashboardController::class, 'index'])
     ->name('dashboard');
 Route::get('/monitoring', [UserMonitoringController::class, 'index'])
     ->name('monitoring');
+Route::get('/monitoring/active-track', [MonitoringSettingController::class, 'activeTrack'])
+    ->name('monitoring.active-track');
 Route::get('/camera', [UserCameraController::class, 'index'])
     ->name('camera');
 
@@ -67,4 +71,12 @@ Route::prefix('admin')
             ->name('settings.account.password.update');
         Route::post('/monitoring/track', [AdminMonitoringController::class, 'updateTrack'])
             ->name('monitoring.track');
+
+        // Berhenti darurat. Hanya admin, karena ini menggerakkan kapal sungguhan.
+        Route::post('/control/stop', [ControlController::class, 'stop'])
+            ->name('control.stop');
+        Route::post('/control/resume', [ControlController::class, 'resume'])
+            ->name('control.resume');
+        Route::get('/control/status', [ControlController::class, 'status'])
+            ->name('control.status');
     });

@@ -6,12 +6,14 @@
     <title>@yield('title') | Laksamana 5</title>
     @vite([
         'resources/css/app.css',
+        'resources/css/global.css',
+        'resources/css/user.css',
+        'resources/css/user/dashboard.css',
+        'resources/css/user/monitoring.css',
+        'resources/css/user/camera.css',
+
         'resources/js/app.js'
     ])
-    <link
-        rel="stylesheet"
-        href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
-    >
 </head>
 <body>
     <div class="layout">

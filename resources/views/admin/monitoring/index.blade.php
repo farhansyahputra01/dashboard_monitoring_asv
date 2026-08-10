@@ -1,6 +1,25 @@
 @extends('layouts.admin')
 @section('title','Monitoring')
 @section('content')
+@php
+    // Nilai awal dari pembacaan sensor terakhir; setelah itu diperbarui
+    // realtime lewat broadcast SensorDataUpdated di bawah.
+    $arahHaluan = function ($heading) {
+        if ($heading === null) return 'N/A';
+        return match (true) {
+            $heading >= 337.5 || $heading < 22.5 => 'North',
+            $heading < 67.5                      => 'North East',
+            $heading < 112.5                     => 'East',
+            $heading < 157.5                     => 'South East',
+            $heading < 202.5                     => 'South',
+            $heading < 247.5                     => 'South West',
+            $heading < 292.5                     => 'West',
+            default                              => 'North West',
+        };
+    };
+    $sat = $latest?->satellites ?? 0;
+    $batt = $latest?->battery_percent !== null ? round($latest->battery_percent) : 0;
+@endphp
 <div class="monitoring-page">
     {{-- =====================================================
          LINTASAN
@@ -71,24 +90,24 @@
                         <li>Visual Video</li>
                     </ol>
                 </div>
-                {{-- STATUS DUMMY --}}
+                {{-- STATUS GPS --}}
                 <div class="track-status">
                     <div>
                         <span>Latitude</span>
                         <strong id="dummyLatitude">
-                            1.123400
+                            {{ $latest?->latitude !== null ? number_format($latest->latitude, 6, '.', '') : '-' }}
                         </strong>
                     </div>
                     <div>
                         <span>Longitude</span>
                         <strong id="dummyLongitude">
-                            102.123400
+                            {{ $latest?->longitude !== null ? number_format($latest->longitude, 6, '.', '') : '-' }}
                         </strong>
                     </div>
                     <div>
                         <span>GPS</span>
-                        <strong class="gps-active">
-                            ● ACTIVE
+                        <strong id="gpsStatusText" class="{{ $sat > 0 ? 'gps-active' : '' }}">
+                            {{ $sat > 0 ? '● ACTIVE' : '● SEARCHING' }}
                         </strong>
                     </div>
                 </div>
@@ -145,10 +164,10 @@
             </div>
             <div class="monitor-info-value">
                 <strong id="coordinateLatitude">
-                    07°12.345' S
+                    {{ $latest?->latitude !== null ? number_format($latest->latitude, 6, '.', '') : '-' }}
                 </strong>
                 <small id="coordinateLongitude">
-                    112°45.678' E
+                    {{ $latest?->longitude !== null ? number_format($latest->longitude, 6, '.', '') : '-' }}
                 </small>
             </div>
         </div>
@@ -159,11 +178,11 @@
                 <span>Kecepatan</span>
             </div>
             <div class="monitor-info-value">
-                <strong>
-                    1.6 m/s
+                <strong id="mon-speed-ms">
+                    {{ number_format(($latest?->speed ?? 0) * 0.277778, 1) }} m/s
                 </strong>
-                <small>
-                    5.8 km/h
+                <small id="mon-speed-kmh">
+                    {{ number_format($latest?->speed ?? 0, 1) }} km/h
                 </small>
             </div>
         </div>
@@ -174,41 +193,41 @@
                 <span>Haluan</span>
             </div>
             <div class="monitor-info-value">
-                <strong>
-                    128°
+                <strong id="mon-heading-deg">
+                    {{ round($latest?->heading ?? 0) }}°
                 </strong>
-                <small>
-                    South East
+                <small id="mon-heading-dir">
+                    {{ $arahHaluan($latest?->heading) }}
                 </small>
             </div>
         </div>
-        {{-- Total Jarak --}}
+        {{-- Altitude / Satelit --}}
         <div class="monitor-card">
             <div class="monitor-info-header">
                 <i class="bi bi-signpost-2-fill"></i>
-                <span>Total Jarak</span>
+                <span>Altitude / Satelites</span>
             </div>
             <div class="monitor-info-value">
-                <strong>
-                    12.45 km
+                <strong id="mon-alt-meters">
+                    {{ round($latest?->altitude ?? 0) }} m
                 </strong>
-                <small>
-                    Total Perjalanan
+                <small id="mon-satellites">
+                    {{ $sat }} Sats
                 </small>
             </div>
         </div>
-        {{-- Waktu Tempuh --}}
+        {{-- Tegangan & Arus --}}
         <div class="monitor-card">
             <div class="monitor-info-header">
-                <i class="bi bi-stopwatch-fill"></i>
-                <span>Waktu Tempuh</span>
+                <i class="bi bi-lightning-charge-fill"></i>
+                <span>Tegangan &amp; Arus</span>
             </div>
             <div class="monitor-info-value">
-                <strong>
-                    02:19:32
+                <strong id="mon-voltage">
+                    {{ number_format($latest?->voltage ?? 0, 1) }} V
                 </strong>
-                <small>
-                    Durasi Operasi
+                <small id="mon-current">
+                    {{ number_format($latest?->current ?? 0, 1) }} A
                 </small>
             </div>
         </div>
@@ -236,8 +255,8 @@
                 <span>Suhu</span>
             </div>
             <div class="monitor-info-value">
-                <strong>
-                    31 °C
+                <strong id="temperature">
+                    {{ $latest?->temperature !== null ? number_format($latest->temperature, 1) . ' °C' : '- °C' }}
                 </strong>
                 <small>
                     Suhu Lingkungan
@@ -253,8 +272,8 @@
                 <span>Kelembapan</span>
             </div>
             <div class="monitor-info-value">
-                <strong>
-                    78%
+                <strong id="humidity">
+                    {{ $latest?->humidity !== null ? number_format($latest->humidity, 1) . '%' : '-%' }}
                 </strong>
                 <small>
                     Kelembapan Lingkungan
@@ -286,16 +305,20 @@
                     <div class="monitor-west">
                         W
                     </div>
-                    <div class="monitor-compass-center">
+                    <div
+                        class="monitor-compass-center"
+                        id="compassArrow"
+                        style="transform: rotate({{ round($latest?->heading ?? 0) }}deg);"
+                    >
                         <i class="bi bi-send-fill"></i>
                     </div>
                 </div>
                 <div class="monitor-heading-value">
-                    <h2>
-                        128°
+                    <h2 id="mon-compass-heading">
+                        {{ round($latest?->heading ?? 0) }}°
                     </h2>
-                    <p>
-                        South East
+                    <p id="mon-compass-dir">
+                        {{ $arahHaluan($latest?->heading) }}
                     </p>
                 </div>
             </div>
@@ -308,15 +331,17 @@
             </div>
             <div class="monitor-battery">
                 <i class="bi bi-battery-half monitor-battery-big"></i>
-                <h1>
-                    45%
+                <h1 id="mon-battery-percent">
+                    {{ $batt }}%
                 </h1>
-                <p>
-                    Baterai Normal
+                <p id="mon-battery-status">
+                    {{ $batt < 20 ? 'Baterai Lemah' : 'Baterai Normal' }}
                 </p>
                 <div class="monitor-battery-bar">
                     <div
                         class="monitor-battery-fill"
+                        id="mon-battery-fill"
+                        style="width: {{ $batt }}%;"
                     ></div>
                 </div>
             </div>
@@ -360,7 +385,7 @@
     </div>
 </div>
 {{-- =========================================================
-     DUMMY GPS
+     PEMILIH LINTASAN + DATA SENSOR REALTIME
 ========================================================= --}}
 <script>
 document.addEventListener("DOMContentLoaded", function () {
@@ -376,6 +401,101 @@ document.addEventListener("DOMContentLoaded", function () {
     select.addEventListener("change", function () {
         tampilkan(this.value);
     });
+});
+
+function getHeadingDirection(heading) {
+    if (heading >= 337.5 || heading < 22.5) return 'North';
+    if (heading >= 22.5 && heading < 67.5) return 'North East';
+    if (heading >= 67.5 && heading < 112.5) return 'East';
+    if (heading >= 112.5 && heading < 157.5) return 'South East';
+    if (heading >= 157.5 && heading < 202.5) return 'South';
+    if (heading >= 202.5 && heading < 247.5) return 'South West';
+    if (heading >= 247.5 && heading < 292.5) return 'West';
+    if (heading >= 292.5 && heading < 337.5) return 'North West';
+    return 'N/A';
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    setTimeout(() => {
+        if (!window.Echo) {
+            return;
+        }
+
+        window.Echo.channel('sensors')
+            .listen('SensorDataUpdated', (e) => {
+                const data = e.sensorData;
+
+                // Posisi. latitude/longitude bernilai null selama GPS belum
+                // fix, jadi nilai lama sengaja dibiarkan apa adanya.
+                if (data.latitude !== null) {
+                    const lat = parseFloat(data.latitude).toFixed(6);
+                    document.getElementById('dummyLatitude').textContent = lat;
+                    document.getElementById('coordinateLatitude').textContent = lat;
+                }
+                if (data.longitude !== null) {
+                    const lng = parseFloat(data.longitude).toFixed(6);
+                    document.getElementById('dummyLongitude').textContent = lng;
+                    document.getElementById('coordinateLongitude').textContent = lng;
+                }
+
+                if (data.satellites !== null) {
+                    document.getElementById('mon-satellites').textContent = data.satellites + ' Sats';
+                    const gpsText = document.getElementById('gpsStatusText');
+                    if (data.satellites > 0) {
+                        gpsText.textContent = '● ACTIVE';
+                        gpsText.className = 'gps-active';
+                    } else {
+                        gpsText.textContent = '● SEARCHING';
+                        gpsText.className = '';
+                    }
+                }
+
+                if (data.speed !== null) {
+                    // Firmware mengirim km/h (gps.speed.kmph())
+                    document.getElementById('mon-speed-ms').textContent = (data.speed * 0.277778).toFixed(1) + ' m/s';
+                    document.getElementById('mon-speed-kmh').textContent = parseFloat(data.speed).toFixed(1) + ' km/h';
+                }
+
+                if (data.heading !== null) {
+                    const hDeg = Math.round(data.heading);
+                    const hDir = getHeadingDirection(data.heading);
+                    document.getElementById('mon-heading-deg').textContent = hDeg + '°';
+                    document.getElementById('mon-heading-dir').textContent = hDir;
+                    document.getElementById('mon-compass-heading').textContent = hDeg + '°';
+                    document.getElementById('mon-compass-dir').textContent = hDir;
+
+                    const arrow = document.getElementById('compassArrow');
+                    if (arrow) {
+                        arrow.style.transform = `rotate(${hDeg}deg)`;
+                    }
+                }
+
+                if (data.altitude !== null) {
+                    document.getElementById('mon-alt-meters').textContent = Math.round(data.altitude) + ' m';
+                }
+
+                if (data.voltage !== null) {
+                    document.getElementById('mon-voltage').textContent = parseFloat(data.voltage).toFixed(1) + ' V';
+                }
+                if (data.current !== null) {
+                    document.getElementById('mon-current').textContent = parseFloat(data.current).toFixed(1) + ' A';
+                }
+
+                if (data.temperature !== null) {
+                    document.getElementById('temperature').textContent = parseFloat(data.temperature).toFixed(1) + ' °C';
+                }
+                if (data.humidity !== null) {
+                    document.getElementById('humidity').textContent = parseFloat(data.humidity).toFixed(1) + '%';
+                }
+
+                if (data.battery_percent !== null) {
+                    const bPercent = Math.round(data.battery_percent);
+                    document.getElementById('mon-battery-percent').textContent = bPercent + '%';
+                    document.getElementById('mon-battery-fill').style.width = bPercent + '%';
+                    document.getElementById('mon-battery-status').textContent = bPercent < 20 ? 'Baterai Lemah' : 'Baterai Normal';
+                }
+            });
+    }, 1000);
 });
 </script>
 @endsection

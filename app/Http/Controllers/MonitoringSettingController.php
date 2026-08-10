@@ -8,6 +8,16 @@ use App\Models\MonitoringSetting;
 class MonitoringSettingController extends Controller
 {
     /**
+     * Lintasan aktif dalam bentuk JSON, dipolling oleh track-sync.js
+     */
+    public function activeTrack()
+    {
+        return response()->json([
+            'active_track' => optional(MonitoringSetting::first())->active_track ?? 'A',
+        ]);
+    }
+
+    /**
      * Menyimpan lintasan aktif
      */
     public function update(Request $request)

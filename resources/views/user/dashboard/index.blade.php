@@ -1,6 +1,24 @@
 @extends('layouts.user')
 @section('title', 'Dashboard')
 @section('content')
+@php
+    // Nilai awal dari pembacaan sensor terakhir; setelah itu diperbarui
+    // realtime lewat broadcast SensorDataUpdated di bawah.
+    $arahHaluan = function ($heading) {
+        if ($heading === null) return 'N/A';
+        return match (true) {
+            $heading >= 337.5 || $heading < 22.5 => 'North',
+            $heading < 67.5                      => 'North East',
+            $heading < 112.5                     => 'East',
+            $heading < 157.5                     => 'South East',
+            $heading < 202.5                     => 'South',
+            $heading < 247.5                     => 'South West',
+            $heading < 292.5                     => 'West',
+            default                              => 'North West',
+        };
+    };
+    $sat = $latest?->satellites ?? 0;
+@endphp
 <div class="user-dashboard-grid">
     {{-- STATUS KAPAL --}}
     <div class="user-card user-status-card">
@@ -20,7 +38,7 @@
         <i class="bi bi-speedometer2"></i>
         <div>
             <small>Kecepatan</small>
-            <h2><span id="dash-speed">0.0</span> <span>m/s</span></h2>
+            <h2><span id="dash-speed">{{ $latest?->speed !== null ? number_format($latest->speed * 0.277778, 1) : '0.0' }}</span> <span>m/s</span></h2>
         </div>
     </div>
     {{-- HALUAN --}}
@@ -28,8 +46,8 @@
         <i class="bi bi-compass"></i>
         <div>
             <small>Haluan</small>
-            <h2><span id="dash-heading">0</span>°</h2>
-            <p id="dash-heading-text">N/A</p>
+            <h2><span id="dash-heading">{{ round($latest?->heading ?? 0) }}</span>°</h2>
+            <p id="dash-heading-text">{{ $arahHaluan($latest?->heading) }}</p>
         </div>
     </div>
     {{-- KAMERA --}}
@@ -39,26 +57,20 @@
             {{-- Kamera Atas Air --}}
             <div class="user-camera-item">
                 <div class="user-camera-box">
-                    <video
-                        id="user-camera-atas"
-                        autoplay
-                        playsinline
-                        muted
-                        style="width:100%;height:100%;object-fit:cover;">
-                    </video>
+                    @include('partials.camera-frame', [
+                        'url' => config('camera.streams.atas'),
+                        'label' => 'Kamera Atas Air',
+                    ])
                 </div>
                 <p>Kamera Atas Air</p>
             </div>
             {{-- Kamera Bawah Air --}}
             <div class="user-camera-item">
                 <div class="user-camera-box">
-                    <video
-                        id="user-camera-bawah"
-                        autoplay
-                        playsinline
-                        muted
-                        style="width:100%;height:100%;object-fit:cover;">
-                    </video>
+                    @include('partials.camera-frame', [
+                        'url' => config('camera.streams.bawah'),
+                        'label' => 'Kamera Bawah Air',
+                    ])
                 </div>
                 <p>Kamera Bawah Air</p>
             </div>
@@ -74,15 +86,15 @@
             <div class="user-battery-info">
                 <div class="user-battery-item">
                     <span>Status Baterai</span>
-                    <strong id="dash-battery-percent">0%</strong>
+                    <strong id="dash-battery-percent">{{ $latest?->battery_percent !== null ? round($latest->battery_percent) : 0 }}%</strong>
                 </div>
                 <div class="user-battery-item">
                     <span>Tegangan</span>
-                    <strong id="dash-voltage">0.0 V</strong>
+                    <strong id="dash-voltage">{{ number_format($latest?->voltage ?? 0, 1) }} V</strong>
                 </div>
                 <div class="user-battery-item">
                     <span>Arus</span>
-                    <strong id="dash-current">0.0 A</strong>
+                    <strong id="dash-current">{{ number_format($latest?->current ?? 0, 1) }} A</strong>
                 </div>
             </div>
         </div>
@@ -93,14 +105,14 @@
         <div class="user-performance-wrapper">
             <div class="user-performance-item">
                 <div class="user-circle">
-                    <span id="dash-satellites">0</span>
+                    <span id="dash-satellites">{{ $sat }}</span>
                 </div>
                 <p>Satelit GPS</p>
-                <small id="dash-gps-status">Mencari...</small>
+                <small id="dash-gps-status">{{ $sat > 0 ? 'Sinyal Aktif' : 'Mencari...' }}</small>
             </div>
             <div class="user-performance-item">
                 <div class="user-circle user-circle-76">
-                    <span id="dash-altitude">0m</span>
+                    <span id="dash-altitude">{{ round($latest?->altitude ?? 0) }}m</span>
                 </div>
                 <p>Ketinggian</p>
                 <small>Ketinggian Laut</small>
@@ -148,44 +160,6 @@
 </div>
 
 <script>
-document.addEventListener("DOMContentLoaded", async () => {
-    try {
-        // Minta izin kamera
-        await navigator.mediaDevices.getUserMedia({
-            video: true,
-            audio: false
-        });
-        // Device ID Kamera
-        const DEVICE_BAWAH = "ed8b5b0d75e7e3db3f4839c11399217ffe8d9d7ae4ed5bc217ba038c230472ff";
-        const DEVICE_ATAS = "02fe8959a97e174d48a667ec0451e9d4cf13d79b9feccc39757896afd19ab4ba";
-        // Kamera Atas
-        const streamAtas = await navigator.mediaDevices.getUserMedia({
-            video: {
-                deviceId: {
-                    exact: DEVICE_ATAS
-                },
-                width: 1280,
-                height: 720
-            },
-            audio: false
-        });
-        document.getElementById("user-camera-atas").srcObject = streamAtas;
-        // Kamera Bawah
-        const streamBawah = await navigator.mediaDevices.getUserMedia({
-            video: {
-                deviceId: {
-                    exact: DEVICE_BAWAH
-                },
-                width: 1280,
-                height: 720
-            },
-            audio: false
-        });
-        document.getElementById("user-camera-bawah").srcObject = streamBawah;
-    } catch (error) {
-        console.error(error);
-    }
-});
 
 function getHeadingDirection(heading) {
     if (heading >= 337.5 || heading < 22.5) return 'North';

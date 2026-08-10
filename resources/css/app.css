@@ -1,3 +1,7 @@
+/* Icon di-bundle lokal (bukan CDN) supaya tetap jalan saat Raspberry Pi
+   tidak punya akses internet. */
+@import 'bootstrap-icons/font/bootstrap-icons.css';
+
 *{
     margin:0;
     padding:0;

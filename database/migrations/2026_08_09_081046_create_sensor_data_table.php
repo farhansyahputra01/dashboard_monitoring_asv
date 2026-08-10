@@ -15,8 +15,8 @@ return new class extends Migration
             $table->id();
             $table->float('temperature')->nullable();
             $table->float('humidity')->nullable();
-            $table->double('latitude', 10, 6)->nullable();
-            $table->double('longitude', 10, 6)->nullable();
+            $table->double('latitude')->nullable();
+            $table->double('longitude')->nullable();
             $table->float('speed')->nullable();
             $table->float('altitude')->nullable();
             $table->integer('satellites')->nullable();
@@ -25,6 +25,10 @@ return new class extends Migration
             $table->float('voltage')->nullable();
             $table->float('battery_percent')->nullable();
             $table->timestamps();
+
+            // Tabel ini tumbuh terus (satu baris per paket serial),
+            // index dipakai untuk mengambil data terbaru / rentang waktu.
+            $table->index('created_at');
         });
     }
 

@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('monitoring_settings', function (Blueprint $table) {
             $table->id();
             $table->timestamps();
+            $table->enum('active_track', ['A', 'B'])->default('A');
         });
     }
 

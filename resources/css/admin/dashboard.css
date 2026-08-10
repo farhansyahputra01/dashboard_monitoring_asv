@@ -308,3 +308,25 @@
     display: block;
     object-fit: contain;
 }
+/* ---------------------------------------------------------------------------
+   Berhenti darurat
+   Tombol berganti peran (berhenti / jalankan kembali), jadi bentuknya harus
+   ikut berubah - operator tidak boleh menebak keadaan kapal dari teks saja.
+--------------------------------------------------------------------------- */
+.dashboard-emergency-btn.is-stopped {
+    background: #2a6f50;
+    border-color: #2a6f50;
+}
+
+.dashboard-emergency-msg {
+    margin-top: .5rem;
+    font-size: .78rem;
+    line-height: 1.45;
+    color: rgba(255, 255, 255, .6);
+    min-height: 1rem;
+}
+
+.dashboard-emergency-msg.is-error {
+    color: #ff8a7a;
+    font-weight: 600;
+}
