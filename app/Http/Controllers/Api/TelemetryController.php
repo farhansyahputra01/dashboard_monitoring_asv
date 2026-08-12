@@ -55,7 +55,17 @@ class TelemetryController extends Controller
 
         $sensorData = SensorData::create($this->applySensorRules($validated));
 
-        broadcast(new SensorDataUpdated($sensorData));
+        // SensorDataUpdated sekarang ShouldBroadcastNow, jadi pengiriman ke
+        // Reverb terjadi DI DALAM request ini (bukan lewat antrean) demi
+        // realtime. Konsekuensinya Reverb yang mati bisa melempar exception
+        // di sini - dan itu tidak boleh menggagalkan penyimpanan telemetri
+        // yang sudah terlanjur tersimpan di baris atas. Data kapal jauh
+        // lebih berharga daripada satu kali push ke browser.
+        try {
+            broadcast(new SensorDataUpdated($sensorData));
+        } catch (\Throwable $e) {
+            report($e);
+        }
 
         return response()->json([
             'id' => $sensorData->id,
