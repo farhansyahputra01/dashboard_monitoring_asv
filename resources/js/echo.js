@@ -54,7 +54,23 @@ function tampilkanStatus(state) {
     });
 }
 
-const sambungan = window.Echo.connector.pusher.connection;
+// Dibungkus try/catch dan diakses dengan optional chaining DENGAN SENGAJA.
+// Berkas ini diimpor bootstrap.js, yang merupakan impor PERTAMA di app.js -
+// jadi kalau satu baris di sini melempar, seluruh bundel gagal dievaluasi dan
+// modul lain (camera-stream, trajectory-map) tidak pernah berjalan. Gejalanya
+// membingungkan: klik dua kali kamera ikut mati, padahal tidak ada
+// hubungannya dengan WebSocket.
+//
+// Rantai connector.pusher.connection milik laravel-echo bukan API publik yang
+// dijamin stabil antar versi, jadi tampilan status - yang sekadar hiasan -
+// tidak boleh menyandera fitur yang sesungguhnya.
+try {
+    const sambungan = window.Echo?.connector?.pusher?.connection;
 
-sambungan.bind('state_change', ({ current }) => tampilkanStatus(current));
-tampilkanStatus(sambungan.state);
+    if (sambungan) {
+        sambungan.bind('state_change', ({ current }) => tampilkanStatus(current));
+        tampilkanStatus(sambungan.state);
+    }
+} catch (e) {
+    console.warn('[echo] status sambungan tidak bisa dipantau:', e);
+}

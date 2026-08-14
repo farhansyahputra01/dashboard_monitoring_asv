@@ -179,6 +179,14 @@ REVERB_HOST=127.0.0.1                 # lihat catatan di bawah - BUKAN IP Pi
 REVERB_PORT=8081
 REVERB_SCHEME=http
 
+# WAJIB ADA. Ini satu-satunya nilai .env yang ditanam ke dalam berkas JS saat
+# `npm run build`. Kalau barisnya hilang, import.meta.env.VITE_REVERB_APP_KEY
+# menjadi undefined, konstruktor Pusher melempar, dan SELURUH bundel JS gagal
+# dievaluasi - bukan cuma WebSocket yang mati, tapi juga layar penuh kamera dan
+# peta lintasan. Gejalanya menyesatkan: berkas JS terkirim 200 dengan MIME
+# benar, tapi window.Echo tetap undefined.
+VITE_REVERB_APP_KEY="${REVERB_APP_KEY}"
+
 CAMERA_ATAS_URL=/stream/atas
 CAMERA_BAWAH_URL=/stream/bawah        # kosongkan kalau kamera kedua tidak dipasang
 
@@ -313,6 +321,13 @@ ls public/build/manifest.json                                   # harus ada
 grep -rl "$(grep '^REVERB_APP_KEY=' .env | cut -d= -f2)" \
      public/build/assets | head -1                              # harus ADA
 ```
+
+**Kalau yang kedua kosong, JANGAN lanjut.** Artinya `VITE_REVERB_APP_KEY` tidak
+terbaca saat build - biasanya barisnya memang tidak ada di `.env` (Tahap 5).
+Akibatnya bukan sekadar WebSocket mati: bundel JS gagal dievaluasi seluruhnya,
+sehingga layar penuh kamera dan peta lintasan ikut mati tanpa gejala yang
+mengarah ke sana. Perbaiki `.env` lalu bangun ulang - `.env` dulu, build
+kemudian, tidak bisa dibalik.
 
 Yang kedua membuktikan aset dibangun dengan `REVERB_APP_KEY` yang sekarang ada
 di `.env`. Kalau kosong, `.env` diubah **setelah** build - ulangi `npm run build`.
@@ -777,12 +792,41 @@ journalctl -u asv-reverb -f
 tail -f storage/logs/laravel.log
 ```
 
+## Kalau halamannya tampil tapi tidak ada yang bergerak
+
+Periksa dari browser, bukan dari server - gejalanya sering menyesatkan ke arah
+nginx atau Reverb padahal masalahnya di bundel JS. Tempel di Console (F12):
+
+```js
+console.log({
+  echo:   typeof window.Echo,                                    // harus "object"
+  helper: typeof window.saatEchoSiap,                            // harus "function"
+  kamera: document.querySelectorAll('[data-camera-label]').length,
+  skrip:  [...document.querySelectorAll('script[type=module]')].map(s => s.src),
+});
+```
+
+`echo: "undefined"` sementara `helper` dan `kamera` normal berarti berkas JS
+sampai ke browser tapi gagal dijalankan. Tarik pesan galatnya - jangan mencari
+manual di antara keluaran Console:
+
+```js
+import('/build/assets/app-XXXX.js')       // salin nama dari 'skrip' di atas
+  .then(() => console.log('MODUL OK'))
+  .catch(e => console.log('GAGAL:', e.message));
+```
+
+Modul yang gagal disimpan browser beserta galatnya, jadi ini memunculkan pesan
+yang sama persis dalam satu baris bersih. `You must pass your app key when you
+instantiate Pusher` berarti `VITE_REVERB_APP_KEY` hilang saat build.
+
 | Gejala | Penyebab tersering |
 |---|---|
 | Dashboard 500 `Target class ... does not exist` | `composer dump-autoload -o` |
 | Halaman polos tanpa gaya | `public/build` belum ada (Tahap 7) |
 | Angka diam, `sensor_data` bertambah | Reverb mati, `REVERB_APP_KEY` beda dari yang tertanam di aset, atau `REVERB_HOST` server salah |
 | 404 di semua URL | `root` nginx salah path, atau situs lama masih memegang `default_server` |
+| Data beku **dan** dblclick kamera mati sekaligus | bundel JS gagal dievaluasi - hampir selalu `VITE_REVERB_APP_KEY` hilang dari `.env` saat build (Tahap 5) |
 | Angka diam, `sensor_data` kosong | token salah (401) atau Python mati |
 | Kamera kotak kosong | `--stream` tidak ditulis, atau `proxy_buffering off` belum ada |
 | Tombol berhenti tidak berpengaruh | `--stream` tidak ditulis, atau Python mati |
