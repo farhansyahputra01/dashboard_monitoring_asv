@@ -421,3 +421,13 @@
     display: block;
     object-fit: contain;
 }
+/* Lihat catatan yang sama di admin/dashboard.css */
+.user-map-card {
+    display: flex;
+    flex-direction: column;
+}
+
+.user-map-card .trajectory {
+    flex: 1;
+    min-height: 240px;
+}

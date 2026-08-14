@@ -13,3 +13,7 @@ Artisan::command('inspire', function () {
 Schedule::command('asv:prune-sensor-data --days=7')
     ->dailyAt('03:00')
     ->onOneServer();
+
+// Foto misi ikut tersalin walau tidak ada yang membuka dashboard - penting
+// saat lomba berlangsung dan layar sedang menampilkan tab lain.
+Schedule::command('asv:sync-mission-images')->everyMinute();

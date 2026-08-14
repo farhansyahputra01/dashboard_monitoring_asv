@@ -194,10 +194,18 @@
     align-items:center;
 }
 
-.monitor-compass-center i{
-    font-size:48px;
-    color:#00E5FF;
-    transform:rotate(128deg);
+/* Jarum kompas.
+   Sebelumnya memakai ikon bi-send-fill dengan transform:rotate(128deg) -
+   angka sisa mockup ketika heading masih dipatok 128 derajat. Div luarnya
+   diputar sesuai heading sungguhan, jadi 128 derajat itu tertambah di atasnya
+   dan panah selalu meleset sejauh itu dari angka yang tertulis.
+
+   Segitiga di bawah digambar menghadap ATAS pada 0 derajat, jadi rotasi div
+   luar langsung sama dengan haluan sebenarnya - tanpa koreksi apa pun. */
+.monitor-compass-center .compass-needle{
+    width:44px;
+    height:44px;
+    fill:#00E5FF;
 }
 
 .monitor-heading-value{

@@ -65,7 +65,11 @@ return [
     |
     */
 
-    'timezone' => 'UTC',
+    // Diambil dari .env supaya bisa disesuaikan per lokasi pemasangan.
+    // Sebelumnya dipaku ke 'UTC', sehingga seluruh created_at telemetri
+    // tersimpan 7 jam di belakang jam dinding WIB dan tanggal di navbar
+    // bisa mundur sehari saat lewat pukul 07.00.
+    'timezone' => env('APP_TIMEZONE', 'UTC'),
 
     /*
     |--------------------------------------------------------------------------

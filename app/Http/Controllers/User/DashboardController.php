@@ -16,6 +16,10 @@ class DashboardController extends Controller
         // refresh kartu tidak menampilkan nol sambil menunggu broadcast.
         $latest = SensorData::latest('id')->first();
 
-        return view('user.dashboard.index', compact('setting', 'latest'));
+        // Riwayat titik GPS untuk peta jejak. Titik baru setelah ini
+        // ditambahkan realtime lewat siaran SensorDataUpdated.
+        $track = SensorData::recentTrack();
+
+        return view('user.dashboard.index', compact('setting', 'latest', 'track'));
     }
 }

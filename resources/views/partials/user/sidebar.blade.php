@@ -19,5 +19,10 @@
             <i class="bi bi-camera-video"></i>
             <span>Camera</span>
         </a>
+        <a href="{{ route('galeri') }}"
+            class="{{ request()->routeIs('galeri') ? 'active' : '' }}">
+            <i class="bi bi-images"></i>
+            <span>Galeri Misi</span>
+        </a>
     </nav>
 </aside>

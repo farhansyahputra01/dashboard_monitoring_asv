@@ -9,7 +9,16 @@
         'resources/css/global.css',
         'resources/css/user.css',
         'resources/css/user/dashboard.css',
+
+        {{-- Gaya kartu data monitoring (.monitor-card, .monitor-info-grid,
+             kompas, baterai) hanya ada di berkas ini meski namanya "admin" -
+             halaman monitoring user memakai kelas yang sama persis. Tanpa ini
+             blok datanya tampil polos tanpa kartu.
+             HARUS sebelum user/monitoring.css, karena berkas itu menimpa
+             beberapa aturan lintasan khusus tampilan user. --}}
+        'resources/css/admin/monitoring.css',
         'resources/css/user/monitoring.css',
+
         'resources/css/user/camera.css',
 
         'resources/js/app.js'

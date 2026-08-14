@@ -17,7 +17,11 @@ class MonitoringController extends Controller
         // refresh kartu tidak kosong sambil menunggu broadcast berikutnya.
         $latest = SensorData::latest('id')->first();
 
-        return view('admin.monitoring.index', compact('setting', 'latest'));
+        // Riwayat titik GPS untuk peta jejak. Titik baru setelah ini
+        // ditambahkan realtime lewat siaran SensorDataUpdated.
+        $track = SensorData::recentTrack();
+
+        return view('admin.monitoring.index', compact('setting', 'latest', 'track'));
     }
 
     public function updateTrack(Request $request)

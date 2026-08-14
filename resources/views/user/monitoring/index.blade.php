@@ -103,43 +103,7 @@
             ================================================== --}}
             <div class="monitor-track-area">
 
-                <div class="track-grid">
-
-                    {{-- LABEL KOLOM --}}
-                    <div class="track-column-labels">
-                        <span>A</span>
-                        <span>B</span>
-                        <span>C</span>
-                        <span>D</span>
-                        <span>E</span>
-                    </div>
-
-                    {{-- LABEL BARIS --}}
-                    <div class="track-row-labels">
-                        <span>5</span>
-                        <span>4</span>
-                        <span>3</span>
-                        <span>2</span>
-                        <span>1</span>
-                    </div>
-
-                    {{-- LINTASAN --}}
-                    <div class="track-field">
-
-                        @if(optional($setting)->active_track == 'B')
-
-                            @include('admin.monitoring.lintasan-b')
-
-                        @else
-
-                            @include('admin.monitoring.lintasan-a')
-
-                        @endif
-
-                    </div>
-
-                </div>
-
+                @include('partials.trajectory-map', ['track' => $track])
             </div>
 
         </div>
@@ -380,7 +344,9 @@
 
                     <div class="monitor-compass-center" id="compassArrow" style="transform: rotate({{ round($latest?->heading ?? 0) }}deg);">
 
-                        <i class="bi bi-send-fill"></i>
+                        <svg class="compass-needle" viewBox="0 0 24 24" aria-hidden="true">
+                            <polygon points="12,2 19,21 12,17 5,21"/>
+                        </svg>
 
                     </div>
 

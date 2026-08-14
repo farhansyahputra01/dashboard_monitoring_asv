@@ -330,3 +330,16 @@
     color: #ff8a7a;
     font-weight: 600;
 }
+
+/* Kartu peta jejak: jadikan kolom flex supaya kanvas mengisi sisa tinggi
+   kartu. Tanpa ini .trajectory{height:100%} tidak punya acuan (tinggi kartu
+   ditentukan isinya sendiri), jatuh ke min-height, lalu terlihat terpotong. */
+.dashboard-map-card {
+    display: flex;
+    flex-direction: column;
+}
+
+.dashboard-map-card .trajectory {
+    flex: 1;
+    min-height: 240px;
+}

@@ -19,6 +19,11 @@
             <i class="bi bi-camera-video"></i>
             <span>Camera</span>
         </a>
+        <a href="{{ route('admin.galeri') }}"
+            class="{{ request()->routeIs('admin.galeri') ? 'active' : '' }}">
+            <i class="bi bi-images"></i>
+            <span>Galeri Misi</span>
+        </a>
         <a href="{{ route('admin.alarm') }}"
             class="{{ request()->routeIs('admin.alarm') ? 'active' : '' }}">
             <i class="bi bi-bell"></i>

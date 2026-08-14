@@ -37,4 +37,24 @@ return [
 
     'control_timeout' => (float)env('ASV_CONTROL_TIMEOUT', 3),
 
+    /*
+    |--------------------------------------------------------------------------
+    | Folder Foto Misi
+    |--------------------------------------------------------------------------
+    |
+    | Diisi program Python saat misi imaging: mission_controller.py menyimpan
+    | frame sebagai "<warna>_<unix>.jpg" begitu kotak sasaran cukup dekat.
+    |
+    | Foldernya berada DI LUAR public/, jadi berkasnya tidak pernah dilayani
+    | langsung oleh nginx - dashboard membacanya lewat controller yang
+    | memvalidasi nama berkas. Itu disengaja: mengarahkan public/ ke folder di
+    | luar proyek berarti apa pun yang ditulis program lain ke sana bisa
+    | diunduh siapa saja.
+    |
+    | Di Raspberry Pi biasanya /home/pi/asv/mission_images
+    |
+    */
+
+    'mission_images_path' => env('ASV_MISSION_IMAGES_PATH'),
+
 ];

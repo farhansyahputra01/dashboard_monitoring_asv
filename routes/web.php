@@ -11,6 +11,7 @@ use App\Http\Controllers\Admin\AlarmController;
 use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\MonitoringSettingController;
 use App\Http\Controllers\Admin\ControlController;
+use App\Http\Controllers\GalleryController;
 
 /*
 |--------------------------------------------------------------------------
@@ -39,6 +40,12 @@ Route::get('/monitoring/active-track', [MonitoringSettingController::class, 'act
 Route::get('/camera', [UserCameraController::class, 'index'])
     ->name('camera');
 
+// Galeri foto misi. Berkasnya dicermin dari folder program Python ke
+// storage/app/public, lalu dilayani nginx lewat symlink - lihat
+// MissionImageMirror.
+Route::get('/galeri', [GalleryController::class, 'index'])
+    ->name('galeri');
+
 /*
 |--------------------------------------------------------------------------
 | ADMIN
@@ -55,6 +62,9 @@ Route::prefix('admin')
             ->name('monitoring');
         Route::get('/camera', [AdminCameraController::class, 'index'])
             ->name('camera');
+
+        Route::get('/galeri', [GalleryController::class, 'adminIndex'])
+            ->name('galeri');
         Route::get('/alarm', [AlarmController::class, 'index'])
             ->name('alarm');
         Route::get('/settings', [SettingController::class, 'index'])

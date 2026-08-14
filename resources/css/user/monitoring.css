@@ -108,6 +108,11 @@
     width:100%;
     height:100%;
 
+    /* Halaman user memuat admin/monitoring.css lebih dulu demi gaya kartu
+       datanya. Di sana .track-field diberi latar garis kisi; tampilan user
+       sengaja tanpa kisi, jadi dimatikan di sini. */
+    background:none;
+
     display:flex;
     justify-content:center;
     align-items:center;

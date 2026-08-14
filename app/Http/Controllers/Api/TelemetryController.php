@@ -37,7 +37,11 @@ class TelemetryController extends Controller
             return response()->json(['message' => 'Token tidak valid.'], 401);
         }
 
-        $payload = $this->normalise($request);
+        // Penanda "tidak valid" dari firmware (-999, GPS 0,0) diterjemahkan
+        // menjadi null SEBELUM validasi. Kalau dibalik, -999 dari kompas yang
+        // mati akan ditabrak aturan between:0,360 dan seluruh baris telemetri
+        // ditolak - padahal sensor lainnya baik-baik saja.
+        $payload = $this->applySensorRules($this->normalise($request));
 
         $validated = validator($payload, [
             'temperature' => ['nullable', 'numeric'],
@@ -53,7 +57,7 @@ class TelemetryController extends Controller
             'battery_percent' => ['nullable', 'numeric', 'between:0,100'],
         ])->validate();
 
-        $sensorData = SensorData::create($this->applySensorRules($validated));
+        $sensorData = SensorData::create($validated);
 
         // SensorDataUpdated sekarang ShouldBroadcastNow, jadi pengiriman ke
         // Reverb terjadi DI DALAM request ini (bukan lewat antrean) demi
@@ -108,7 +112,11 @@ class TelemetryController extends Controller
      */
     private function applySensorRules(array $data): array
     {
-        foreach (['temperature', 'humidity'] as $field) {
+        // Kompas ikut memakai penanda -999 sejak firmware bisa membedakan
+        // "tidak menjawab" dari "menunjuk 0 derajat". Tanpa dipetakan ke null,
+        // -999 akan ditolak aturan between:0,360 dan SELURUH baris telemetri
+        // hilang - padahal sensor lainnya baik-baik saja.
+        foreach (['temperature', 'humidity', 'heading'] as $field) {
             if (isset($data[$field]) && (float)$data[$field] === -999.0) {
                 $data[$field] = null;
             }
