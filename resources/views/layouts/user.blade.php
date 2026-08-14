@@ -4,6 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title') | Laksamana 5</title>
+
+    {{-- Harus sebelum @vite: mendefinisikan saatEchoSiap() yang dipakai skrip
+         inline halaman untuk menunggu window.Echo tanpa balapan. --}}
+    @include('partials.echo-ready')
+
     @vite([
         'resources/css/app.css',
         'resources/css/global.css',

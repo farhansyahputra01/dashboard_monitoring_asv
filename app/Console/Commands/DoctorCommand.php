@@ -185,8 +185,13 @@ class DoctorCommand extends Command
         $clientPort = (int)config('broadcasting.connections.reverb.options.port', 443);
         $clientHost = config('broadcasting.connections.reverb.options.host');
 
-        $this->hint("browser akan menyambung ke {$clientHost}:{$clientPort} "
-            . '(REVERB_HOST / REVERB_PORT), bukan ke port server di atas');
+        // Dulu baris ini berbunyi "browser akan menyambung ke REVERB_HOST".
+        // Itu keliru: echo.js memakai window.location.hostname, jadi browser
+        // selalu menyambung ke host yang sedang dibuka - .test, IP, atau ngrok.
+        $this->hint('browser menyambung ke host yang sedang dibuka di bilah '
+            . 'alamat (window.location), lewat proxy /app di nginx');
+        $this->hint("REVERB_HOST/REVERB_PORT ({$clientHost}:{$clientPort}) hanya "
+            . 'dipakai Laravel untuk menyetor siaran ke Reverb');
     }
 
     private function checkAssets(): void
@@ -214,19 +219,28 @@ class DoctorCommand extends Command
 
         $built = (string)file_get_contents(public_path('build/' . $js));
 
-        // Nilai VITE_* ditanam saat build. Kalau .env berubah tanpa build ulang,
-        // browser diam-diam menyambung ke alamat lama.
-        $host = (string)config('broadcasting.connections.reverb.options.host');
-        $port = (string)config('broadcasting.connections.reverb.options.port');
+        // JANGAN memeriksa REVERB_HOST/REVERB_PORT di sini. resources/js/echo.js
+        // sengaja mengambil host WebSocket dari window.location.hostname supaya
+        // dashboard ikut host apa pun tanpa build ulang, jadi kedua nilai itu
+        // memang tidak pernah tertanam di aset - pemeriksaannya dulu selalu
+        // GAGAL palsu dan menyuruh orang membangun ulang tanpa guna.
+        //
+        // Satu-satunya nilai .env yang benar-benar ditanam saat build adalah
+        // VITE_REVERB_APP_KEY. Kalau ini berbeda, Reverb menolak sambungan
+        // browser dan angka diam tanpa pesan apa pun di layar.
+        $key = (string)config('broadcasting.connections.reverb.key');
 
-        $hostBaked = $host === '' || str_contains($built, $host);
-        $portBaked = str_contains($built, $port);
+        if ($key === '') {
+            $this->bad('REVERB_APP_KEY kosong di .env',
+                'isi REVERB_APP_KEY, lalu: npm run build');
+            return;
+        }
 
-        if ($hostBaked && $portBaked) {
-            $this->ok("aset terbangun memuat alamat Reverb sekarang ({$host}:{$port})");
+        if (str_contains($built, $key)) {
+            $this->ok('aset terbangun memuat REVERB_APP_KEY yang sekarang');
         } else {
-            $this->bad('aset terbangun TIDAK memuat REVERB_HOST/REVERB_PORT yang sekarang',
-                'nilai VITE_* ditanam saat build. Setelah mengubah .env, WAJIB: npm run build');
+            $this->bad('aset terbangun memuat REVERB_APP_KEY yang BERBEDA dari .env',
+                'Reverb akan menolak sambungan browser. Jalankan: npm run build');
         }
     }
 

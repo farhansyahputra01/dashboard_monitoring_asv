@@ -7,6 +7,11 @@ listrik masuk.
 Kalau langsung systemd lalu ada yang gagal, kamu tidak akan tahu bagian mana
 yang salah - semuanya diam di belakang layar.
 
+> Berkas ini menjelaskan **kenapa** tiap langkah begitu. Kalau yang kamu cari
+> cuma urutan perintah siap salin-tempel, pakai
+> [runbook-deploy-linux.md](runbook-deploy-linux.md) - Tahap 0 sampai 13,
+> lengkap dengan titik periksa di tiap tahap.
+
 ---
 
 # BAGIAN 0 - Kalau di Pi SUDAH ada web lama (tinggal `git pull`)
@@ -69,8 +74,8 @@ DB_PASSWORD=<password mysql di Pi>
 BROADCAST_CONNECTION=reverb
 REVERB_SERVER_HOST=127.0.0.1
 REVERB_SERVER_PORT=8081
-REVERB_HOST=<ip-raspberry-pi>        # BUKAN dashboard_monitoring_asv.test
-REVERB_PORT=80
+REVERB_HOST=127.0.0.1                # alamat Laravel->Reverb, bukan browser
+REVERB_PORT=8081
 REVERB_SCHEME=http
 
 CAMERA_ATAS_URL=/stream/atas
@@ -92,34 +97,40 @@ ASV_MISSION_IMAGES_PATH=/home/pi/asv/mission_images
 ter-push**. Setiap kali CSS/JS berubah, asetnya harus dibangun ulang di sisi
 Pi (atau dibangun di laptop lalu disalin).
 
-Lebih dari itu: nilai `VITE_REVERB_HOST` **ditanam ke dalam berkas JS saat
-build**, bukan dibaca saat berjalan. Aset yang dibangun di laptop membawa
-`dashboard_monitoring_asv.test` di dalamnya, dan browser yang membuka
-dashboard Pi akan mencari domain itu - WebSocket gagal, angka diam, padahal
-semua servis hidup. Ini penyebab nomor satu "sudah deploy tapi tidak realtime".
+**Asetnya tidak terikat host.** `resources/js/echo.js` sengaja mengambil host
+WebSocket dari `window.location.hostname` saat halaman dibuka, bukan dari
+`VITE_REVERB_HOST` - komentar di berkas itu menjelaskan alasannya: aset yang
+dipatok ke satu domain membuat komputer lain di jaringan gagal menyambung tanpa
+pesan apa pun. Jadi aset yang dibangun di laptop **boleh langsung dipakai di
+Pi**, dan tidak perlu dibangun ulang tiap kali IP berganti.
+
+Yang tetap ikut tertanam saat build hanyalah `VITE_REVERB_APP_KEY`. Itu satu-
+satunya nilai `.env` yang, kalau diubah, mewajibkan build ulang.
 
 Dua cara, pilih salah satu:
 
 ```bash
-# Cara 1 - bangun di Pi (paling aman, tapi lambat; butuh nodejs+npm)
+# Cara 1 - bangun di Pi (lambat; butuh nodejs+npm)
 npm ci
 npm run build
 ```
 
 ```bash
-# Cara 2 - bangun di laptop TAPI dengan nilai Pi, lalu salin
-# di laptop, sementara ubah .env: REVERB_HOST=<ip-pi>, REVERB_PORT=80
+# Cara 2 - bangun di laptop lalu salin (lebih cepat)
 npm run build
 scp -r public/build pi@<ip-pi>:/var/www/dashboard_monitoring_asv/public/
-# lalu kembalikan .env laptop seperti semula
 ```
 
-Cek hasilnya sudah benar sebelum lanjut:
+Cek hasilnya sebelum lanjut:
 
 ```bash
-grep -rl "<ip-raspberry-pi>" public/build/assets | head -1   # harus ketemu
-grep -rl "dashboard_monitoring_asv.test" public/build/assets # harus KOSONG
+ls public/build/manifest.json                                    # harus ada
+grep -rl "$(grep '^REVERB_APP_KEY=' .env | cut -d= -f2)" \
+     public/build/assets | head -1                               # harus ketemu
 ```
+
+Jangan mencari IP Pi di dalam aset - memang tidak akan ketemu, dan itu bukan
+tanda kegagalan.
 
 ## 0e. Galeri foto misi - langkah yang BELUM pernah ada sebelumnya
 
@@ -165,18 +176,17 @@ menit, supaya foto tetap tersalin walau tidak ada yang membuka dashboard -
 persis situasi saat lomba berlangsung.
 
 ```bash
-sudo crontab -u www-data -e
+sudo tee /etc/cron.d/asv > /dev/null <<'EOF'
+* * * * * www-data cd /var/www/dashboard_monitoring_asv && php artisan schedule:run >> /dev/null 2>&1
+EOF
+sudo chmod 644 /etc/cron.d/asv
 ```
 
-Tambahkan satu baris:
-
-```cron
-* * * * * cd /var/www/dashboard_monitoring_asv && php artisan schedule:run >> /dev/null 2>&1
-```
-
-Pasang sebagai `www-data`, **bukan** `pi` atau `root`. Kalau cron berjalan
-sebagai user lain, berkas hasil salinan jadi milik user itu dan php-fpm tidak
-bisa menimpanya belakangan - galeri berhenti bertambah tanpa pesan apa pun.
+Kolom keenam (`www-data`) menentukan siapa penjalannya - itu format
+`/etc/cron.d`, berbeda dari crontab per-user. Harus `www-data`, **bukan** `pi`
+atau `root`: kalau cron berjalan sebagai user lain, berkas hasil salinan jadi
+milik user itu dan php-fpm tidak bisa menimpanya belakangan - galeri berhenti
+bertambah tanpa pesan apa pun.
 
 Uji sekarang juga, jangan menunggu semenit:
 
@@ -325,8 +335,8 @@ REVERB_APP_KEY=<isi>
 REVERB_APP_SECRET=<isi>
 REVERB_SERVER_HOST=127.0.0.1
 REVERB_SERVER_PORT=8081
-REVERB_HOST=<ip-raspberry-pi>
-REVERB_PORT=80
+REVERB_HOST=127.0.0.1
+REVERB_PORT=8081
 REVERB_SCHEME=http
 
 CAMERA_ATAS_URL=/stream/atas
@@ -336,12 +346,14 @@ ASV_INGEST_TOKEN=<token; buat dengan: php -r "echo bin2hex(random_bytes(24));">
 ASV_CONTROL_URL=http://127.0.0.1:8000
 ```
 
-Perhatikan dua pasangan yang berbeda peran:
+Perhatikan tiga peran yang berbeda - tidak ada satu pun di antaranya yang
+menjadi alamat bagi browser:
 
 | | Untuk siapa | Nilai |
 |---|---|---|
-| `REVERB_SERVER_HOST/PORT` | server Reverb mengikat diri | `127.0.0.1:8081` |
-| `REVERB_HOST/PORT` | alamat yang dituju **browser** | IP Pi, port 80 (lewat nginx) |
+| `REVERB_SERVER_HOST/PORT` | tempat server Reverb mengikat diri | `127.0.0.1:8081` |
+| `REVERB_HOST/PORT` | dipakai **Laravel** menyetor siaran ke Reverb (`config/broadcasting.php` baris 39) | `127.0.0.1:8081` |
+| — | alamat yang dituju **browser** | tidak diatur di `.env`; `echo.js` memakai `window.location.hostname` |
 
 ## A6. Database dan aset
 
@@ -352,9 +364,9 @@ php artisan migrate
 php artisan db:seed        # kalau perlu akun admin
 ```
 
-Bangun aset. **Urutannya penting**: nilai `VITE_*` ditanam ke dalam berkas JS
-saat build, bukan dibaca saat berjalan. Kalau `.env` diubah setelah ini, harus
-build ulang.
+Bangun aset. Satu-satunya nilai `.env` yang ikut tertanam saat build adalah
+`VITE_REVERB_APP_KEY`, jadi hanya perubahan pada `REVERB_APP_KEY` yang
+mewajibkan build ulang - lihat 0d.
 
 Cara termudah: bangun di laptop lalu salin, karena Node di Pi lambat.
 
@@ -551,8 +563,10 @@ Kalau angka masih diam padahal `asv:doctor` bilang telemetri mengalir:
 2. Tab Network -> filter `WS`. Harus ada koneksi ke `/app` berstatus `101
    Switching Protocols`. Kalau `200` atau `404`, blok `location /app` di nginx
    belum benar.
-3. Kalau browser menyambung ke alamat yang salah, berarti aset dibangun sebelum
-   `REVERB_HOST` diisi -> `npm run build` ulang lalu salin lagi.
+3. Kalau koneksi terbentuk lalu langsung tertutup, `REVERB_APP_KEY` di `.env`
+   berbeda dari yang tertanam di aset -> `npm run build` ulang lalu salin lagi.
+   Browser tidak pernah salah alamat: `echo.js` selalu memakai host yang sedang
+   dibuka.
 
 ---
 
@@ -664,8 +678,13 @@ EOF
 sudo systemctl enable --now asv-tunnel
 ```
 
-Kalau memakai ngrok, `REVERB_HOST` di `.env` harus diganti ke domain ngrok,
-`REVERB_PORT=443`, `REVERB_SCHEME=https` — lalu **`npm run build` ulang**.
+Dengan ngrok, `.env` **tidak perlu diubah dan aset tidak perlu dibangun ulang**:
+`REVERB_HOST` tetap `127.0.0.1:8081` (itu jalur Laravel->Reverb di dalam Pi),
+sedangkan browser otomatis memakai domain ngrok yang sedang dibuka lengkap
+dengan `https`, karena `echo.js` membacanya dari `window.location`.
+
+Syaratnya blok `location /app` di nginx sudah benar - lalu lintas WebSocket dari
+ngrok tetap masuk lewat port 80 Pi.
 
 ---
 
@@ -704,7 +723,8 @@ Semua `print()` di program Python muncul di `journalctl -u asv-vision`.
 | Gejala | Penyebab tersering |
 |---|---|
 | Dashboard 500 `Target class ... does not exist` | huruf besar-kecil folder; `composer dump-autoload -o` |
-| Angka diam, `sensor_data` bertambah | Reverb mati, **atau** aset dibangun dengan `REVERB_HOST` laptop (lihat 0d) |
+| Angka diam, `sensor_data` bertambah | Reverb mati, `REVERB_APP_KEY` beda dari yang tertanam di aset, atau `REVERB_HOST` server salah |
+| 404 di semua URL | `root` nginx salah path, atau situs lama masih memegang `default_server` |
 | Angka diam, `sensor_data` kosong | token salah (401) atau Python mati |
 | `.env` diubah tapi tidak berpengaruh | `php artisan config:cache` belum diulang |
 | Kamera kotak kosong | `--stream` tidak ditulis, `CAMERA_ATAS_URL` kosong, atau `proxy_buffering off` belum ada |
@@ -719,8 +739,8 @@ Semua `print()` di program Python muncul di `journalctl -u asv-vision`.
 # Yang masih kosong
 
 - **URL ngrok gratis berubah setiap restart.** Untuk lomba, pakai domain statis
-  - kalau tidak, `REVERB_HOST` harus diperbarui dan aset dibangun ulang setiap
-  kali Pi dinyalakan.
+  supaya tautan yang dibagikan ke juri tidak basi. Sisi teknisnya sendiri sudah
+  tahan ganti domain - `echo.js` mengikut host yang dibuka.
 - **`stream_server.py` mengikat ke `0.0.0.0`.** Karena nginx mem-proxy dari
   `127.0.0.1`, sebaiknya diubah ke `127.0.0.1` supaya `/control/resume` tidak
   bisa dipanggil siapa pun di WiFi yang sama.

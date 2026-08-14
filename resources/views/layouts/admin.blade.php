@@ -6,6 +6,10 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title') | Laksamana 5</title>
 
+    {{-- Harus sebelum @vite: mendefinisikan saatEchoSiap() yang dipakai skrip
+         inline halaman untuk menunggu window.Echo tanpa balapan. --}}
+    @include('partials.echo-ready')
+
     @vite([
         'resources/css/app.css',
         'resources/css/global.css',

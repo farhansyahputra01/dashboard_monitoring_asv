@@ -158,9 +158,9 @@ function getHeadingDirection(heading) {
     return 'N/A';
 }
 
-setTimeout(() => {
-    if (window.Echo) {
-        document.getElementById('system-ws-status').textContent = 'WebSockets Terhubung';
+// Teks #system-ws-status diurus resources/js/echo.js dari keadaan sambungan
+// yang sebenarnya - jangan tulis manual di sini.
+saatEchoSiap(() => {
         window.Echo.channel('sensors')
             .listen('SensorDataUpdated', (e) => {
                 const data = e.sensorData;
@@ -190,9 +190,6 @@ setTimeout(() => {
                     document.getElementById('dash-altitude').textContent = Math.round(data.altitude) + 'm';
                 }
             });
-    } else {
-        document.getElementById('system-ws-status').textContent = 'WebSockets Terputus';
-    }
-}, 1000);
+});
 </script>
 @endsection

@@ -488,8 +488,7 @@ function getHeadingDirection(heading) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    setTimeout(() => {
-        if (window.Echo) {
+    saatEchoSiap(() => {
             window.Echo.channel('sensors')
                 .listen('SensorDataUpdated', (e) => {
                     const data = e.sensorData;
@@ -571,8 +570,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         document.getElementById('mon-battery-status').textContent = bPercent < 20 ? 'Baterai Lemah' : 'Baterai Normal';
                     }
                 });
-        }
-    }, 1000);
+    });
 });
 </script>
 

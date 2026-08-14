@@ -25,3 +25,36 @@ window.Echo = new Echo({
     forceTLS: scheme === 'https',
     enabledTransports: ['ws', 'wss'],
 });
+
+// Berkas ini dimuat sebagai modul, jadi eksekusinya DITUNDA sampai HTML selesai
+// diurai - skrip inline di halaman selalu berjalan lebih dulu. Peristiwa ini
+// yang memberi tahu mereka bahwa window.Echo sudah siap dipakai.
+//
+// Jangan kembali ke pola lama "setTimeout 1 detik lalu cek window.Echo sekali":
+// di Raspberry Pi bundelnya kerap selesai lebih dari satu detik, cek itu kalah
+// balapan, listener tidak pernah terpasang, dan dashboard beku permanen tanpa
+// satu pun pesan galat. Lihat helper saatEchoSiap() di partials/echo-ready.
+window.dispatchEvent(new Event('echo:siap'));
+
+// Teks status dulu hanya menebak dari ada/tidaknya window.Echo, sehingga
+// "Terputus" sebenarnya berarti "bundel JS belum selesai dimuat" - menyesatkan
+// justru waktu paling dibutuhkan. Sekarang dibaca dari keadaan sambungan
+// Pusher yang sesungguhnya.
+const TEKS_STATUS = {
+    connected: 'WebSockets Terhubung',
+    connecting: 'Koneksi Menghubungkan...',
+    unavailable: 'WebSockets Tidak Tersedia',
+    failed: 'WebSockets Gagal',
+    disconnected: 'WebSockets Terputus',
+};
+
+function tampilkanStatus(state) {
+    document.querySelectorAll('#system-ws-status').forEach((el) => {
+        el.textContent = TEKS_STATUS[state] ?? `WebSockets: ${state}`;
+    });
+}
+
+const sambungan = window.Echo.connector.pusher.connection;
+
+sambungan.bind('state_change', ({ current }) => tampilkanStatus(current));
+tampilkanStatus(sambungan.state);
