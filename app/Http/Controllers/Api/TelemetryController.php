@@ -55,6 +55,19 @@ class TelemetryController extends Controller
             'current' => ['nullable', 'numeric'],
             'voltage' => ['nullable', 'numeric'],
             'battery_percent' => ['nullable', 'numeric', 'between:0,100'],
+
+            // Posisi peta lintasan. Longgar dengan sengaja: batas arena
+            // ditegakkan di kapal (posisi_lintasan.py menahan di 0..30), dan
+            // menolak baris telemetri hanya karena satu angka posisi meleset
+            // akan ikut membuang data sensor yang sehat.
+            'lintasan' => ['nullable', 'string', 'in:A,B'],
+            'x_m' => ['nullable', 'numeric'],
+            'y_m' => ['nullable', 'numeric'],
+            'pos_sumber' => ['nullable', 'string', 'max:24'],
+            'jarak_m' => ['nullable', 'numeric'],
+            'selisih_gps_m' => ['nullable', 'numeric'],
+            'pair_count' => ['nullable', 'integer', 'min:0'],
+            'phase' => ['nullable', 'string', 'max:24'],
         ])->validate();
 
         $sensorData = SensorData::create($validated);

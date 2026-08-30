@@ -1,0 +1,638 @@
+{
+    "_baca_ini_dulu": [
+        "Geometri lintasan lomba dalam METER. Berkas ini adalah SATU-SATUNYA sumber",
+        "kebenaran: dashboard menggambarnya, dan program kapal memakainya untuk",
+        "mengoreksi posisi tiap kali melewati gerbang.",
+        "",
+        "ANGKA DI BAWAH MASIH PERKIRAAN dari gambar lintasan (bukan dari CAD).",
+        "Yang PASTI: tiap arena 30 x 30 m, dua arena berdampingan, paddock di sisi",
+        "bawah. Yang MASIH TEBAKAN: bentuk kolam, letak tiap gerbang, letak buoy",
+        "docking, dan letak kotak imaging.",
+        "",
+        "Selama gerbang belum dikoreksi, posisi kapal hanya bertumpu pada dead",
+        "reckoning + GPS (galat beberapa meter). Begitu koordinat gerbang benar,",
+        "posisi dikunci ulang tiap kali kapal melewati satu gerbang - itulah yang",
+        "membuat ketelitian 1 meter masuk akal.",
+        "",
+        "Salin berkas ini juga ke folder program kapal (/home/pi/asv/lintasan.json)."
+    ],
+    "versi": 1,
+    "satuan": "meter",
+    "asal_koordinat": [
+        "(0,0) = sudut KIRI-BAWAH arena yang bersangkutan, dilihat dari sisi",
+        "paddock/panitia.",
+        "  x  bertambah ke KANAN   (0 .. 30)",
+        "  y  bertambah MENJAUH dari paddock, ke dalam arena (0 .. 30)",
+        "heading 0 derajat = menghadap +y (menjauh dari paddock)."
+    ],
+    "arena": {
+        "lebar": 30,
+        "tinggi": 30,
+        "grid": 1,
+        "sisi_paddock": "bawah"
+    },
+    "lintasan": {
+        "A": {
+            "nama": "Lintasan A (arena kiri)",
+            "_catatan": "Start di dekat garis tengah lapangan, yaitu sisi KANAN arena kiri.",
+            "start": {
+                "x": 27,
+                "y": 5,
+                "heading_deg": 0
+            },
+            "acuan_gps": {
+                "_cara_pakai": [
+                    "TITIK ACUAN HASIL UKUR - isi kalau punya koordinat GPS pasti.",
+                    "",
+                    "Tiap titik memasangkan koordinat PETA (x,y meter) dengan koordinat BUMI",
+                    "(lat,lon). Dengan DUA titik atau lebih, kapal tidak perlu lagi menebak:",
+                    "titik nolnya pasti, dan arah sumbu arena dihitung dari garis antar titik -",
+                    "tanpa menyentuh kompas sama sekali.",
+                    "",
+                    "Satu titik saja tetap berguna (titik nol jadi pasti), tapi arah sumbu masih",
+                    "dari kompas. Bisa juga ditulis manual lewat bearing_sumbu_deg.",
+                    "",
+                    "Ambil dua titik yang BERJAUHAN - makin panjang garisnya makin kecil",
+                    "pengaruh galat GPS terhadap sudut. Dua sudut arena yang berseberangan jauh",
+                    "lebih baik daripada dua titik yang berdekatan di dermaga start.",
+                    "",
+                    "Kosongkan (titik: []) untuk kembali ke kalibrasi otomatis dari fix pertama."
+                ],
+                "bearing_sumbu_deg": null,
+                "titik": [
+                    {
+                        "ref": "start",
+                        "nama": "Start",
+                        "lat": 1.492171,
+                        "lon": 102.1288
+                    }
+                ]
+            },
+            "petunjuk": {
+                "_cara_pakai": [
+                    "PETUNJUK ARAH PENCARIAN - dipakai saat kapal KEHILANGAN bola.",
+                    "",
+                    "Tanpa ini, kapal menyapu ke arah belokan terakhirnya - tebakan buta yang",
+                    "separuh waktunya membawa kapal menjauh dari lintasan. Padahal bentuk",
+                    "lintasan sudah diketahui sejak awal: sesudah gerbang tertentu, lintasan",
+                    "PASTI membelok ke satu arah.",
+                    "",
+                    "arah: 'kiri' | 'kanan' | 'lurus'",
+                    "  kiri/kanan -> sapu ke sana lebih dulu dan lebih lama; sisi seberangnya",
+                    "                hanya dicoba sebagai upaya terakhir",
+                    "  lurus      -> maju pelan sambil menyapu tipis ke kedua sisi",
+                    "",
+                    "Dipilih berdasarkan jumlah gerbang yang SUDAH terlewati (sesudah_gerbang),",
+                    "atau berdasarkan fase misi untuk tahap sesudah slalom.",
+                    "",
+                    "Lintasan A dan B adalah cerminan: yang satu belok kiri, yang satu kanan."
+                ],
+                "langkah": [
+                    {
+                        "sesudah_gerbang": 0,
+                        "arah": "lurus",
+                        "_": "start menuju gerbang 1-3"
+                    },
+                    {
+                        "sesudah_gerbang": 3,
+                        "arah": "kiri",
+                        "_": "belok kiri masuk gerbang 4-7"
+                    },
+                    {
+                        "sesudah_gerbang": 7,
+                        "arah": "kiri",
+                        "_": "belok kiri lagi, gerbang 8-10"
+                    },
+                    {
+                        "sesudah_gerbang": 10,
+                        "arah": "lurus",
+                        "_": "lurus mencari kotak biru"
+                    },
+                    {
+                        "fase": "UNDERWATER_IMG",
+                        "arah": "lurus",
+                        "_": "kotak biru ada di depan"
+                    },
+                    {
+                        "fase": "SURFACE_IMG",
+                        "arah": "kiri",
+                        "_": "belok kiri ke kotak hijau"
+                    },
+                    {
+                        "fase": "DOCKING",
+                        "arah": "lurus",
+                        "_": "lurus menuju dermaga"
+                    }
+                ]
+            },
+            "kolam": [
+                [
+                    0,
+                    10
+                ],
+                [
+                    0,
+                    20
+                ],
+                [
+                    1,
+                    24
+                ],
+                [
+                    5,
+                    28
+                ],
+                [
+                    10,
+                    30
+                ],
+                [
+                    20,
+                    30
+                ],
+                [
+                    25,
+                    28
+                ],
+                [
+                    29,
+                    24
+                ],
+                [
+                    30,
+                    20
+                ],
+                [
+                    30,
+                    4
+                ],
+                [
+                    27,
+                    1
+                ],
+                [
+                    22,
+                    0
+                ],
+                [
+                    8,
+                    0
+                ],
+                [
+                    2,
+                    2
+                ],
+                [
+                    0,
+                    5
+                ]
+            ],
+            "gerbang": [
+                {
+                    "no": 1,
+                    "merah": [
+                        26,
+                        12
+                    ],
+                    "hijau": [
+                        28,
+                        12
+                    ]
+                },
+                {
+                    "no": 2,
+                    "merah": [
+                        25,
+                        15
+                    ],
+                    "hijau": [
+                        27,
+                        15
+                    ]
+                },
+                {
+                    "no": 3,
+                    "merah": [
+                        26,
+                        18
+                    ],
+                    "hijau": [
+                        28,
+                        18
+                    ]
+                },
+                {
+                    "no": 4,
+                    "merah": [
+                        18,
+                        25
+                    ],
+                    "hijau": [
+                        18,
+                        27
+                    ]
+                },
+                {
+                    "no": 5,
+                    "merah": [
+                        16,
+                        25
+                    ],
+                    "hijau": [
+                        16,
+                        27
+                    ]
+                },
+                {
+                    "no": 6,
+                    "merah": [
+                        14,
+                        25
+                    ],
+                    "hijau": [
+                        14,
+                        27
+                    ]
+                },
+                {
+                    "no": 7,
+                    "merah": [
+                        12,
+                        25
+                    ],
+                    "hijau": [
+                        12,
+                        27
+                    ]
+                },
+                {
+                    "no": 8,
+                    "merah": [
+                        5,
+                        21
+                    ],
+                    "hijau": [
+                        3,
+                        21
+                    ]
+                },
+                {
+                    "no": 9,
+                    "merah": [
+                        4,
+                        17
+                    ],
+                    "hijau": [
+                        2,
+                        17
+                    ]
+                },
+                {
+                    "no": 10,
+                    "merah": [
+                        4,
+                        13
+                    ],
+                    "hijau": [
+                        2,
+                        13
+                    ]
+                }
+            ],
+            "docking_biru": [
+                [
+                    26,
+                    5
+                ],
+                [
+                    26,
+                    6
+                ],
+                [
+                    26,
+                    4
+                ]
+            ],
+            "kotak_biru": [
+                4,
+                10
+            ],
+            "kotak_hijau": [
+                5,
+                7
+            ]
+        },
+        "B": {
+            "nama": "Lintasan B (arena kanan)",
+            "_catatan": "Cerminan A: start di dekat garis tengah, yaitu sisi KIRI arena kanan. Gambar lomba memakai angka yang berbeda untuk arena kanan, jadi bagian ini WAJIB dikoreksi terpisah - jangan dianggap pasti cermin.",
+            "start": {
+                "x": 3,
+                "y": 5,
+                "heading_deg": 0
+            },
+            "acuan_gps": {
+                "_cara_pakai": [
+                    "TITIK ACUAN HASIL UKUR - isi kalau punya koordinat GPS pasti.",
+                    "",
+                    "Tiap titik memasangkan koordinat PETA (x,y meter) dengan koordinat BUMI",
+                    "(lat,lon). Dengan DUA titik atau lebih, kapal tidak perlu lagi menebak:",
+                    "titik nolnya pasti, dan arah sumbu arena dihitung dari garis antar titik -",
+                    "tanpa menyentuh kompas sama sekali.",
+                    "",
+                    "Satu titik saja tetap berguna (titik nol jadi pasti), tapi arah sumbu masih",
+                    "dari kompas. Bisa juga ditulis manual lewat bearing_sumbu_deg.",
+                    "",
+                    "Ambil dua titik yang BERJAUHAN - makin panjang garisnya makin kecil",
+                    "pengaruh galat GPS terhadap sudut. Dua sudut arena yang berseberangan jauh",
+                    "lebih baik daripada dua titik yang berdekatan di dermaga start.",
+                    "",
+                    "Kosongkan (titik: []) untuk kembali ke kalibrasi otomatis dari fix pertama."
+                ],
+                "bearing_sumbu_deg": null,
+                "titik": [
+                    {
+                        "ref": "start",
+                        "nama": "Start",
+                        "lat": 1.492171,
+                        "lon": 102.1288
+                    },
+                    {
+                        "ref": "gerbang.1",
+                        "nama": "Gerbang 1 - titik tengah",
+                        "lat": 1.4921899,
+                        "lon": 102.1288077
+                    },
+                    {
+                        "ref": "gerbang.2",
+                        "nama": "Gerbang 2 - titik tengah",
+                        "lat": 1.4921903,
+                        "lon": 102.1288821
+                    },
+                    {
+                        "ref": "gerbang.3",
+                        "nama": "Gerbang 3 - titik tengah",
+                        "lat": 1.49226,
+                        "lon": 102.128811
+                    }
+                ]
+            },
+            "petunjuk": {
+                "_cara_pakai": [
+                    "PETUNJUK ARAH PENCARIAN - dipakai saat kapal KEHILANGAN bola.",
+                    "",
+                    "Tanpa ini, kapal menyapu ke arah belokan terakhirnya - tebakan buta yang",
+                    "separuh waktunya membawa kapal menjauh dari lintasan. Padahal bentuk",
+                    "lintasan sudah diketahui sejak awal: sesudah gerbang tertentu, lintasan",
+                    "PASTI membelok ke satu arah.",
+                    "",
+                    "arah: 'kiri' | 'kanan' | 'lurus'",
+                    "  kiri/kanan -> sapu ke sana lebih dulu dan lebih lama; sisi seberangnya",
+                    "                hanya dicoba sebagai upaya terakhir",
+                    "  lurus      -> maju pelan sambil menyapu tipis ke kedua sisi",
+                    "",
+                    "Dipilih berdasarkan jumlah gerbang yang SUDAH terlewati (sesudah_gerbang),",
+                    "atau berdasarkan fase misi untuk tahap sesudah slalom.",
+                    "",
+                    "Lintasan A dan B adalah cerminan: yang satu belok kiri, yang satu kanan."
+                ],
+                "langkah": [
+                    {
+                        "sesudah_gerbang": 0,
+                        "arah": "lurus",
+                        "_": "start menuju gerbang 1-3"
+                    },
+                    {
+                        "sesudah_gerbang": 3,
+                        "arah": "kanan",
+                        "_": "belok kanan masuk gerbang 4-7"
+                    },
+                    {
+                        "sesudah_gerbang": 7,
+                        "arah": "kanan",
+                        "_": "belok kanan lagi, gerbang 8-10"
+                    },
+                    {
+                        "sesudah_gerbang": 10,
+                        "arah": "lurus",
+                        "_": "lurus mencari kotak biru"
+                    },
+                    {
+                        "fase": "UNDERWATER_IMG",
+                        "arah": "lurus",
+                        "_": "kotak biru ada di depan"
+                    },
+                    {
+                        "fase": "SURFACE_IMG",
+                        "arah": "kanan",
+                        "_": "belok kanan ke kotak hijau"
+                    },
+                    {
+                        "fase": "DOCKING",
+                        "arah": "lurus",
+                        "_": "lurus menuju dermaga"
+                    }
+                ]
+            },
+            "kolam": [
+                [
+                    28,
+                    2
+                ],
+                [
+                    30,
+                    10
+                ],
+                [
+                    30,
+                    22
+                ],
+                [
+                    28,
+                    27
+                ],
+                [
+                    22,
+                    30
+                ],
+                [
+                    15,
+                    30
+                ],
+                [
+                    8,
+                    30
+                ],
+                [
+                    3,
+                    27
+                ],
+                [
+                    0,
+                    22
+                ],
+                [
+                    0,
+                    19
+                ],
+                [
+                    0,
+                    13
+                ],
+                [
+                    0,
+                    4
+                ],
+                [
+                    3,
+                    1
+                ],
+                [
+                    10,
+                    0
+                ],
+                [
+                    15,
+                    0
+                ],
+                [
+                    24,
+                    0
+                ]
+            ],
+            "gerbang": [
+                {
+                    "no": 1,
+                    "merah": [
+                        4,
+                        12
+                    ],
+                    "hijau": [
+                        2,
+                        12
+                    ]
+                },
+                {
+                    "no": 2,
+                    "merah": [
+                        5,
+                        15
+                    ],
+                    "hijau": [
+                        3,
+                        15
+                    ]
+                },
+                {
+                    "no": 3,
+                    "merah": [
+                        4,
+                        18
+                    ],
+                    "hijau": [
+                        2,
+                        18
+                    ]
+                },
+                {
+                    "no": 4,
+                    "merah": [
+                        12,
+                        25
+                    ],
+                    "hijau": [
+                        12,
+                        27
+                    ]
+                },
+                {
+                    "no": 5,
+                    "merah": [
+                        14,
+                        25
+                    ],
+                    "hijau": [
+                        14,
+                        27
+                    ]
+                },
+                {
+                    "no": 6,
+                    "merah": [
+                        16,
+                        25
+                    ],
+                    "hijau": [
+                        16,
+                        27
+                    ]
+                },
+                {
+                    "no": 7,
+                    "merah": [
+                        18,
+                        25
+                    ],
+                    "hijau": [
+                        18,
+                        27
+                    ]
+                },
+                {
+                    "no": 8,
+                    "merah": [
+                        25,
+                        21
+                    ],
+                    "hijau": [
+                        27,
+                        21
+                    ]
+                },
+                {
+                    "no": 9,
+                    "merah": [
+                        26,
+                        17
+                    ],
+                    "hijau": [
+                        28,
+                        17
+                    ]
+                },
+                {
+                    "no": 10,
+                    "merah": [
+                        26,
+                        13
+                    ],
+                    "hijau": [
+                        28,
+                        13
+                    ]
+                }
+            ],
+            "docking_biru": [
+                [
+                    4,
+                    4
+                ],
+                [
+                    4,
+                    6
+                ],
+                [
+                    4,
+                    5
+                ]
+            ],
+            "kotak_biru": [
+                25,
+                10
+            ],
+            "kotak_hijau": [
+                24,
+                7
+            ]
+        }
+    }
+}

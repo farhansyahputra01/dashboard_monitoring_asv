@@ -103,7 +103,10 @@
             ================================================== --}}
             <div class="monitor-track-area">
 
-                @include('partials.trajectory-map', ['track' => $track])
+                @include('partials.lintasan-map', [
+                    'jejak' => $jejakLintasan,
+                    'lintasan' => $setting->active_track ?? 'A',
+                ])
             </div>
 
         </div>
@@ -520,46 +523,46 @@ document.addEventListener('DOMContentLoaded', () => {
                     
                     // Speed
                     if (data.speed !== null) {
-                        const speedKmh = parseFloat(data.speed).toFixed(1);
-                        const speedMs = (data.speed * 0.277778).toFixed(1);
-                        document.getElementById('mon-speed-ms').textContent = speedMs + ' m/s';
-                        document.getElementById('mon-speed-kmh').textContent = speedKmh + ' km/h';
+                        angkaHalus('mon-speed-ms', data.speed * 0.277778, { desimal: 1, satuan: ' m/s' });
+                        angkaHalus('mon-speed-kmh', data.speed, { desimal: 1, satuan: ' km/h' });
                     }
                     
                     // Heading
                     if (data.heading !== null) {
-                        const hDeg = Math.round(data.heading);
-                        const hDir = getHeadingDirection(data.heading);
-                        document.getElementById('mon-heading-deg').textContent = hDeg + '°';
-                        document.getElementById('mon-heading-dir').textContent = hDir;
-                        document.getElementById('mon-compass-heading').textContent = hDeg + '°';
-                        document.getElementById('mon-compass-dir').textContent = hDir;
-                        
-                        const arrow = document.getElementById('compassArrow');
-                        if (arrow) {
-                            arrow.style.transform = `rotate(${hDeg}deg)`;
-                        }
+                        // putar:true -> 350 lalu 10 derajat dibaca sebagai perputaran 20
+                        // derajat ke kanan, bukan 340 ke kiri.
+                        angkaHalus('mon-heading-deg', data.heading, {
+                            satuan: '°',
+                            putar: true,
+                            saat: (v) => {
+                                const arah = getHeadingDirection(v);
+                                document.getElementById('mon-heading-dir').textContent = arah;
+                                document.getElementById('mon-compass-dir').textContent = arah;
+                            },
+                        });
+                        angkaHalus('mon-compass-heading', data.heading, { satuan: '°', putar: true });
+                        sudutHalus('compassArrow', data.heading);
                     }
                     
                     // Altitude
                     if (data.altitude !== null) {
-                        document.getElementById('mon-alt-meters').textContent = Math.round(data.altitude) + ' m';
+                        angkaHalus('mon-alt-meters', data.altitude, { satuan: ' m' });
                     }
                     
                     // Voltage & Current
                     if (data.voltage !== null) {
-                        document.getElementById('mon-voltage').textContent = parseFloat(data.voltage).toFixed(1) + ' V';
+                        angkaHalus('mon-voltage', data.voltage, { desimal: 1, satuan: ' V' });
                     }
                     if (data.current !== null) {
-                        document.getElementById('mon-current').textContent = parseFloat(data.current).toFixed(1) + ' A';
+                        angkaHalus('mon-current', data.current, { desimal: 1, satuan: ' A' });
                     }
                     
                     // Temp & Humidity
                     if (data.temperature !== null) {
-                        document.getElementById('temperature').textContent = parseFloat(data.temperature).toFixed(1) + ' °C';
+                        angkaHalus('temperature', data.temperature, { desimal: 1, satuan: ' °C' });
                     }
                     if (data.humidity !== null) {
-                        document.getElementById('humidity').textContent = parseFloat(data.humidity).toFixed(1) + '%';
+                        angkaHalus('humidity', data.humidity, { desimal: 1, satuan: '%' });
                     }
                     
                     // Battery

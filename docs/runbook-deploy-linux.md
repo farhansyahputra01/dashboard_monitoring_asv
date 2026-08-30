@@ -61,19 +61,33 @@ di GitHub.
 sudo apt update
 sudo apt install -y php-mysql php-mbstring php-xml php-curl php-zip \
                     composer git python3-opencv python3-pip
-pip install pyserial requests flask --break-system-packages
+pip install pyserial requests flask ai-edge-litert --break-system-packages
 ```
 
 Aman diulang - apt melewati yang sudah terpasang. Pakai `python3-opencv` dari
 apt, jangan `pip install opencv-python`: versi pip harus dikompilasi di Pi dan
 makan waktu sangat lama.
 
+`ai-edge-litert` adalah interpreter TFLite untuk model deteksi buoy (YOLOv8,
+`best.tflite`). Sejak deteksi pindah dari ambang warna ke model, **tanpa paket
+ini program menolak jalan** - lihat [deteksi-yolo.md](deteksi-yolo.md).
+
+**Jangan memasang `ultralytics` di Pi.** Paket itu menarik torch + tensorflow -
+ratusan megabyte dan RAM yang tidak dimiliki kapal - hanya untuk memanggil satu
+berkas model 12 MB. Pra-proses dan pasca-prosesnya sudah ada di
+`yolo_detector.py`.
+
 **Titik periksa:**
 
 ```bash
 php -v                                    # harus 8.2 atau lebih baru
-python3 -c "import cv2, serial, requests, flask; print('python OK')"
+python3 -c "import cv2, serial, requests, flask, ai_edge_litert; print('python OK')"
 ```
+
+Kalau importnya gagal (tidak ada wheel untuk arsitektur Pi), jangan lanjut
+dengan harapan nanti jalan - selesaikan dulu di
+[deteksi-yolo.md](deteksi-yolo.md#kalau-interpreter-tflite-tidak-mau-terpasang).
+`tflite-runtime` juga diterima sebagai pengganti.
 
 ---
 
@@ -98,29 +112,66 @@ ls /dev/ttyUSB* /dev/video*               # ESP32 dan kamera terlihat
 
 # TAHAP 3 - Berkas Python
 
-Salin **seluruh isi folder `ASV2`** apa adanya ke `/home/pi/asv/`. Dari laptop:
+Salin **seluruh isi folder `asv`** apa adanya ke `/home/pi/asv/`. Dari laptop:
 
 ```bash
-scp -r /g/ASV/ASV2/*.py pi@<ip-pi>:/home/pi/asv/
+scp -r /g/ASV/asv/*.py pi@<ip-pi>:/home/pi/asv/
+scp /g/ASV/asv/best.tflite pi@<ip-pi>:/home/pi/asv/         # ~12 MB, berkas model
+scp public/data/lintasan.json pi@<ip-pi>:/home/pi/asv/      # geometri arena
 ```
 
-**Jangan mengganti nama berkas apa pun.** Kelimanya saling mengimpor:
+**Berkas model ikut disalin, dan sering terlupa** karena `scp *.py` tidak
+membawanya. Tanpa `best.tflite`, program berhenti di detik pertama dengan
+`Berkas model tidak ditemukan` - sengaja berhenti, bukan diam-diam mundur ke
+deteksi warna lama.
+
+**Jangan mengganti nama berkas apa pun.** Keenamnya saling mengimpor:
 
 ```
 telemetry_motor_controller_turn_speed.py   <- satu-satunya yang dijalankan
 buoy_detection.py
+yolo_detector.py                           <- inferensi YOLO/TFLite
+posisi_lintasan.py                         <- posisi kapal di peta lintasan
 mission_controller.py
 docking.py
 stream_server.py
+
+best.tflite                                <- berkas model, ~12 MB
+                                              (nama kelas ada DI DALAMNYA)
+lintasan.json                              <- geometri arena; SALINAN dari
+                                              public/data/lintasan.json di
+                                              repo ini. Kalau keduanya beda,
+                                              yang digambar dashboard bukan
+                                              yang dipakai kapal
 ```
 
 **Titik periksa** di Pi:
 
 ```bash
 cd /home/pi/asv
-python3 -c "import buoy_detection, mission_controller, docking, stream_server; print('import OK')"
+python3 -c "import buoy_detection, yolo_detector, mission_controller, docking, stream_server; print('import OK')"
+ls -la best.tflite                        # harus ada, ~12 MB
 mkdir -p /home/pi/asv/mission_images
 ```
+
+Lalu uji modelnya benar-benar terbaca dan ukur kecepatannya (butuh kamera
+tercolok, tanpa ESP32):
+
+```bash
+python3 yolo_detector.py --source 0 --no-display
+```
+
+Yang harus terlihat:
+
+```
+[YOLO] Model dimuat: /home/pi/asv/best.tflite
+[YOLO] LiteRT | imgsz=320 | tata letak=NCHW | conf=0.45 | thread=3
+[YOLO] Kelas: 0=ball_blue, 1=ball_green, 2=ball_red
+```
+
+**Ketiga kelas harus muncul.** Kalau yang tampil cuma dua, modelnya bukan yang
+24 Agustus 2026 dan fase docking akan buta. Catat juga angka `infer=...ms` -
+dipakai di Tahap 8 untuk menilai apakah laju kemudi masih wajar.
 
 ---
 
@@ -562,7 +613,7 @@ Tiga penyebab tersering:
    dari laptop:
 
    ```bash
-   scp /g/ASV/ASV2/mission_images/*.jpg pi@<ip-pi>:/var/lib/asv/mission_images/
+   scp /g/ASV/asv/mission_images/*.jpg pi@<ip-pi>:/var/lib/asv/mission_images/
    ```
 
 Kalau ketiganya sudah bersih tapi tetap buntu, pindah ke **Cara A** - folder
@@ -621,6 +672,17 @@ Harus muncul berulang:
 [TELEMETRY] batt=50% heading=337.3 sat=5 -> POST 201
 ```
 
+Di awal, sebelum baris telemetry, harus terlihat dulu:
+
+```
+[YOLO] Model dimuat: /home/pi/asv/best.tflite
+[YOLO] LiteRT | imgsz=320 | tata letak=NCHW | conf=0.45 | thread=3
+[YOLO] Kelas: 0=ball_blue, 1=ball_green, 2=ball_red
+```
+
+Kalau baris itu TIDAK muncul, deteksi bola tidak sedang memakai model - baca
+pesan galatnya, jangan diteruskan. Detail: [deteksi-yolo.md](deteksi-yolo.md).
+
 `--stream` **jangan sampai lupa** - bawaannya mati. Tanpa itu kotak kamera
 kosong DAN tombol berhenti darurat ikut mati.
 `--image-dir` tulis absolut - bawaannya relatif terhadap folder kerja - dan
@@ -644,6 +706,8 @@ keluaran perintah di atas.
 - `POST GAGAL (ConnectionError)` -> nginx/php-fpm mati, ulangi Tahap 8
 - `[STREAM-GAGAL] Tidak bisa mengikat port 8000` -> proses lama masih hidup,
   `sudo lsof -i :8000`
+- `[GAGAL DETEKTOR] Model YOLO tidak bisa dipakai` -> `best.tflite` belum
+  tersalin (Tahap 3) atau `ai-edge-litert` belum terpasang (Tahap 1)
 
 **Terminal 3 - periksa:**
 
@@ -734,7 +798,14 @@ Catatan:
 - **Hanya satu unit untuk Python.** `mission_controller` dan `stream_server`
   adalah modul yang diimpor, bukan program terpisah - tidak ada dua proses yang
   berebut kamera.
-- `WorkingDirectory` wajib menunjuk folder berisi kelima berkas Python.
+- `WorkingDirectory` wajib menunjuk folder berisi keenam berkas Python.
+- **Model deteksi dicari di sebelah berkas program**, yaitu
+  `/home/pi/asv/best.tflite` - jadi tidak ikut berubah kalau `WorkingDirectory`
+  salah. Kalau modelnya disimpan di tempat lain, sebutkan lewat
+  `Environment="ASV_MODEL_PATH=/path/ke/best.tflite"` atau `--model` di
+  `ExecStart`. Model yang hilang membuat unit ini gagal dan diulang terus tiap
+  5 detik oleh `Restart=always`; sebabnya terbaca jelas di
+  `journalctl -u asv-vision -n 30`.
 - `UMask=0002` membuat foto misi lahir dengan izin baca untuk grupnya, supaya
   `www-data` bisa menyalinnya.
 - **`Environment="ASV_INGEST_TOKEN=..."` harus diisi token yang sama persis
@@ -792,6 +863,21 @@ journalctl -u asv-reverb -f
 tail -f storage/logs/laravel.log
 ```
 
+## Triase pertama: apakah datanya memang masuk?
+
+Jalankan ini SEBELUM membongkar nginx, Reverb, atau bundel JS. Sering kali
+jawabannya sesederhana program Python yang berhenti dan lupa dinyalakan lagi -
+dan tanpa ini, berjam-jam bisa habis mengejar hantu di sisi web.
+
+```bash
+cd /var/www/ASV
+php artisan tinker --execute="echo \App\Models\SensorData::latest('id')->first()->created_at->diffForHumans();"
+```
+
+- **"1 second ago"** -> kapal mengirim; masalahnya di sisi tampilan, lanjut ke bawah
+- **"7 hours ago"** -> tidak ada yang mengirim. Periksa Python dulu:
+  `systemctl status asv-vision` atau `ps -ef | grep telemetry_motor`
+
 ## Kalau halamannya tampil tapi tidak ada yang bergerak
 
 Periksa dari browser, bukan dari server - gejalanya sering menyesatkan ke arah
@@ -835,6 +921,11 @@ instantiate Pusher` berarti `VITE_REVERB_APP_KEY` hilang saat build.
 | Foto jadi ikon rusak | `php artisan storage:link` belum dijalankan |
 | `.env` diubah tapi tak berpengaruh | `php artisan config:cache` belum diulang |
 | `ModuleNotFoundError: buoy_detection` | berkas Python kurang atau namanya diganti (Tahap 3) |
+| `Tidak ada interpreter TFLite yang terpasang` | `pip install ai-edge-litert` belum dijalankan (Tahap 1) |
+| `Berkas model tidak ditemukan` | `best.tflite` belum tersalin ke Pi (Tahap 3) |
+| `[YOLO] Kelas:` cuma dua kelas | model lama; fase docking akan buta, salin `best.tflite` yang baru |
+| Kapal membelok ke rumput / semak | ambang deteksi belum disetel - [deteksi-yolo.md](deteksi-yolo.md#kalau-masih-ada-salah-kenali) |
+| Kemudi terasa lamban, FPS rendah | inferensi YOLO memakan waktu; ukur dengan `python3 yolo_detector.py --source 0 --no-display` |
 
 ---
 

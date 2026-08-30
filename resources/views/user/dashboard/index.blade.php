@@ -170,8 +170,13 @@ saatEchoSiap(() => {
                     document.getElementById('dash-speed').textContent = speedMS;
                 }
                 if (data.heading !== null) {
-                    document.getElementById('dash-heading').textContent = Math.round(data.heading);
-                    document.getElementById('dash-heading-text').textContent = getHeadingDirection(data.heading);
+                    angkaHalus('dash-heading', data.heading, {
+                        putar: true,
+                        saat: (v) => {
+                            document.getElementById('dash-heading-text').textContent =
+                                getHeadingDirection(v);
+                        },
+                    });
                 }
                 if (data.battery_percent !== null) {
                     document.getElementById('dash-battery-percent').textContent = Math.round(data.battery_percent) + '%';

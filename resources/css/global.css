@@ -308,3 +308,359 @@ img[data-stream-url].camera-offline {
     padding: .1rem .35rem;
     border-radius: 4px;
 }
+
+/* ---------------------------------------------------------
+   Peta lintasan + penyunting geometri
+   --------------------------------------------------------- */
+.lintasan-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: .5rem;
+    width: 100%;
+    height: 100%;
+}
+
+/* flex:1 + min-height:0 - tanpa min-height, anak flex menolak menyusut di
+   bawah tinggi kontennya dan kanvas mendorong kartunya memanjang. */
+.lintasan-wrap .trajectory {
+    flex: 1;
+    min-height: 260px;
+}
+
+.lintasan-tools {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .4rem;
+    align-items: center;
+}
+
+/* Atribut hidden HARUS menang di sini. display:flex dari selektor kelas
+   punya kekhususan lebih tinggi daripada aturan [hidden] bawaan browser,
+   jadi tanpa baris ini baris kemajuan tetap terlihat saat disembunyikan. */
+.lintasan-progres[hidden] { display: none; }
+
+.lintasan-progres {
+    display: flex;
+    flex-direction: column;
+    gap: .35rem;
+    padding: .5rem .65rem;
+    background: #101f2e;
+    border: 1px solid #1e3a52;
+    border-radius: 9px;
+}
+
+.lintasan-progres-atas {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: .5rem;
+}
+
+.lintasan-progres-judul {
+    font-size: .7rem;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    color: #7f9db8;
+}
+
+.lintasan-progres-atas strong {
+    font-size: .95rem;
+    color: #e2e8f0;
+}
+
+/* Satu pip per gerbang, lebarnya membagi rata - jumlah gerbang boleh
+   berubah di penyunting peta tanpa gayanya ikut disesuaikan. */
+.lintasan-progres-pip {
+    display: flex;
+    gap: 3px;
+}
+
+.lintasan-progres-pip span {
+    flex: 1;
+    height: 7px;
+    border-radius: 3px;
+    background: #1e3a52;
+    transition: background .25s ease;
+}
+
+.lintasan-progres-pip span.lewat { background: #22c55e; }
+
+/* Gerbang yang sedang dituju: cukup dibedakan, tidak berkedip. Sesuatu yang
+   berkedip di layar saat lomba berjalan menarik mata operator menjauh dari
+   kapalnya. */
+.lintasan-progres-pip span.tujuan { background: #38bdf8; }
+
+.lintasan-progres-fase {
+    font-size: .7rem;
+    color: #94a3b8;
+}
+
+.lintasan-btn {
+    padding: .32rem .7rem;
+    font-size: .74rem;
+    color: #cbd5e1;
+    background: #16293a;
+    border: 1px solid #24455c;
+    border-radius: 7px;
+    cursor: pointer;
+}
+
+.lintasan-btn:hover { background: #1d3549; }
+.lintasan-btn.aktif { color: #0b1220; background: #38bdf8; border-color: #38bdf8; }
+.lintasan-btn.utama { color: #052e16; background: #22c55e; border-color: #22c55e; }
+.lintasan-btn:disabled { opacity: .45; cursor: not-allowed; }
+
+.lintasan-acuan {
+    padding: .55rem .7rem;
+    background: #101f2e;
+    border: 1px solid #1d3549;
+    border-radius: 8px;
+}
+
+.lintasan-acuan-judul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .5rem;
+    align-items: baseline;
+    margin-bottom: .45rem;
+    font-size: .76rem;
+    color: #cbd5e1;
+}
+
+.lintasan-acuan-judul span {
+    font-size: .68rem;
+    color: rgba(203, 213, 225, .55);
+}
+
+.lintasan-acuan-baris {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .35rem;
+    margin-bottom: .35rem;
+}
+
+.lintasan-acuan-baris input {
+    flex: 1 1 90px;
+    min-width: 0;
+    padding: .28rem .45rem;
+    font-size: .72rem;
+    color: #e2e8f0;
+    background: #0b1725;
+    border: 1px solid #24455c;
+    border-radius: 6px;
+}
+
+.lintasan-acuan-baris input::placeholder { color: rgba(148, 163, 184, .5); }
+
+.lintasan-btn.kecil { padding: .24rem .5rem; font-size: .68rem; }
+
+/* Hasil hitungan ditampilkan LANGSUNG saat angka diketik, bukan menunggu
+   disimpan: salah salin satu digit lat/lon menghasilkan arah yang ngawur,
+   dan lebih baik ketahuan sebelum ditekan Terapkan. */
+.lintasan-acuan-hasil {
+    font-size: .7rem;
+    color: rgba(203, 213, 225, .7);
+    font-variant-numeric: tabular-nums;
+}
+
+.lintasan-acuan-hasil.buruk { color: #fca5a5; }
+.lintasan-acuan-hasil.baik { color: #86efac; }
+
+/* ---------------------------------------------------------
+   Halaman koordinat GPS lintasan
+   --------------------------------------------------------- */
+.koordinat-halaman { max-width: 980px; }
+
+.koordinat-header {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+}
+
+.koordinat-header h2 { margin: 0 0 .25rem; font-size: 1.05rem; color: #e2e8f0; }
+.koordinat-header p { margin: 0; font-size: .8rem; color: rgba(203, 213, 225, .65); }
+
+.koordinat-tab { display: flex; gap: .4rem; margin-bottom: .8rem; }
+
+.koordinat-pesan {
+    margin-bottom: .7rem;
+    padding: .5rem .8rem;
+    font-size: .8rem;
+    border-radius: 8px;
+}
+
+.koordinat-pesan.baik { color: #86efac; background: rgba(34, 197, 94, .12); border: 1px solid rgba(34, 197, 94, .35); }
+.koordinat-pesan.buruk { color: #fca5a5; background: rgba(239, 68, 68, .12); border: 1px solid rgba(239, 68, 68, .35); }
+
+.koordinat-catatan {
+    margin: .8rem 0;
+    padding: .7rem .9rem;
+    font-size: .78rem;
+    line-height: 1.55;
+    color: rgba(203, 213, 225, .8);
+    background: #101f2e;
+    border: 1px solid #1d3549;
+    border-radius: 8px;
+}
+
+.koordinat-catatan code { color: #7dd3fc; }
+
+.koordinat-tabel {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: .8rem;
+}
+
+.koordinat-tabel th {
+    padding: .4rem .5rem;
+    text-align: left;
+    font-weight: 500;
+    color: rgba(148, 163, 184, .85);
+    border-bottom: 1px solid #1d3549;
+}
+
+.koordinat-tabel td {
+    padding: .3rem .5rem;
+    color: #cbd5e1;
+    border-bottom: 1px solid rgba(29, 53, 73, .5);
+}
+
+.koordinat-tabel .sempit { width: 68px; }
+.koordinat-tabel .angka { color: rgba(148, 163, 184, .7); font-variant-numeric: tabular-nums; }
+
+.koordinat-tabel input {
+    width: 100%;
+    padding: .28rem .45rem;
+    font-size: .78rem;
+    color: #e2e8f0;
+    background: #0b1725;
+    border: 1px solid #24455c;
+    border-radius: 6px;
+    font-variant-numeric: tabular-nums;
+}
+
+.koordinat-tabel input::placeholder { color: rgba(148, 163, 184, .4); }
+
+/* Titik warna yang sama dengan penanda di peta, supaya baris di tabel dan
+   ikon di kanvas dikenali sebagai benda yang sama tanpa perlu dibaca. */
+.koordinat-ikon {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    margin-right: .45rem;
+    border-radius: 50%;
+    vertical-align: middle;
+}
+
+.koordinat-ikon.merah { background: #ef4444; }
+.koordinat-ikon.hijau { background: #22c55e; }
+.koordinat-ikon.biru { background: #3b82f6; }
+.koordinat-ikon.start { background: transparent; border: 2px solid #e2e8f0; }
+
+/* Gerbang diwakili satu titik dua warna: merah di kiri, hijau di kanan,
+   sama seperti pasangan bolanya di peta. */
+.koordinat-ikon.gerbang {
+    background: linear-gradient(90deg, #ef4444 0 50%, #22c55e 50% 100%);
+}
+
+.koordinat-kaki {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .6rem;
+    align-items: center;
+    margin-top: .9rem;
+}
+
+.koordinat-kaki label {
+    display: flex;
+    gap: .45rem;
+    align-items: center;
+    font-size: .76rem;
+    color: rgba(203, 213, 225, .8);
+}
+
+.koordinat-kaki input {
+    width: 190px;
+    padding: .28rem .45rem;
+    font-size: .78rem;
+    color: #e2e8f0;
+    background: #0b1725;
+    border: 1px solid #24455c;
+    border-radius: 6px;
+}
+
+.koordinat-bantuan {
+    flex: 1 1 260px;
+    font-size: .72rem;
+    color: rgba(148, 163, 184, .65);
+}
+
+/* ---------------------------------------------------------
+   Kendali kapal (berhenti darurat / mulai)
+   --------------------------------------------------------- */
+.kendali-kapal {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .5rem .8rem;
+    align-items: center;
+    margin-bottom: .6rem;
+}
+
+/* Tombolnya sudah punya gaya sendiri di dashboard.css; di sini hanya
+   dipastikan pesannya tidak mendorong tata letak saat kosong. */
+.kendali-kapal .dashboard-emergency-msg {
+    margin: 0;
+    flex: 1 1 240px;
+    font-size: .74rem;
+}
+
+/* Varian ringkas: tombol seukuran kontrol lain di barisnya.
+   Gaya bawaan .dashboard-emergency-btn adalah width:100%;height:55px - benar
+   untuk kartu Dashboard yang memang menyediakan satu blok penuh untuknya,
+   tapi di baris pemilih lintasan ia menjadi spanduk merah selebar halaman. */
+.kendali-kapal--ringkas {
+    margin-top: 18px;
+    margin-bottom: 0;
+}
+
+.kendali-kapal--ringkas .dashboard-emergency-btn {
+    width: auto;
+    height: auto;
+    padding: 10px 18px;
+    font-size: 14px;
+    border-radius: 8px;
+}
+
+/* Hijau untuk MULAI. Warna harus ikut ARTI tombol, bukan tetap merah:
+   tombol merah bertuliskan "MULAI" adalah pesan yang saling bertentangan. */
+.kendali-kapal .dashboard-emergency-btn.is-stopped {
+    background: #16a34a;
+}
+
+.kendali-kapal .dashboard-emergency-btn.is-stopped:hover {
+    background: #15803d;
+}
+
+/* Tidak terjangkau bukan keadaan darurat - ia keadaan "belum tahu".
+   Merah menyala di situ membuat operator mengira ada yang meledak, padahal
+   biasanya program di kapal memang belum dinyalakan. */
+.kendali-kapal .dashboard-emergency-btn.is-offline,
+.kendali-kapal .dashboard-emergency-btn:disabled {
+    background: #334155;
+    color: rgba(226, 232, 240, .7);
+    cursor: not-allowed;
+}
+
+/* Penanda pilihan lintasan yang belum disimpan. Kuning, bukan merah: ini
+   bukan galat, hanya keterangan bahwa pilihannya belum berlaku. */
+.track-belum-simpan {
+    padding: .2rem .5rem;
+    font-size: .72rem;
+    color: #facc15;
+    background: rgba(250, 204, 21, .12);
+    border: 1px solid rgba(250, 204, 21, .4);
+    border-radius: 6px;
+}

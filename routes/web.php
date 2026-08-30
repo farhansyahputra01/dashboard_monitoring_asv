@@ -11,6 +11,7 @@ use App\Http\Controllers\Admin\AlarmController;
 use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\MonitoringSettingController;
 use App\Http\Controllers\Admin\ControlController;
+use App\Http\Controllers\Admin\LintasanGeometriController;
 use App\Http\Controllers\GalleryController;
 
 /*
@@ -81,6 +82,12 @@ Route::prefix('admin')
             ->name('settings.account.password.update');
         Route::post('/monitoring/track', [AdminMonitoringController::class, 'updateTrack'])
             ->name('monitoring.track');
+        Route::post('/monitoring/geometri', [LintasanGeometriController::class, 'simpan'])
+            ->name('monitoring.geometri');
+        Route::get('/monitoring/koordinat', [LintasanGeometriController::class, 'koordinat'])
+            ->name('monitoring.koordinat');
+        Route::post('/monitoring/koordinat', [LintasanGeometriController::class, 'simpanKoordinat'])
+            ->name('monitoring.koordinat.simpan');
 
         // Berhenti darurat. Hanya admin, karena ini menggerakkan kapal sungguhan.
         Route::post('/control/stop', [ControlController::class, 'stop'])

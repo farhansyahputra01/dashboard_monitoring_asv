@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\MonitoringSetting;
+use App\Models\SensorData;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
@@ -44,10 +46,43 @@ class ControlController extends Controller
             ], 503);
         }
 
-        return response()->json([
+        return response()->json(array_merge([
             'reachable' => true,
             'stopped' => (bool)$response->json('stopped'),
-        ]);
+        ], $this->arena()));
+    }
+
+    /**
+     * Arena yang DIPILIH operator vs arena yang SEDANG DIPAKAI kapal.
+     *
+     * Kapal membaca pilihan Lintasan sekali saja, waktu programnya dinyalakan.
+     * Kalau operator menggantinya sesudah itu, kapal tidak ikut pindah - ia
+     * terus menghitung posisi di arena lama sementara dashboard menggambar
+     * arena baru. Tidak ada galat yang muncul; petanya saja yang diam-diam
+     * salah sepanjang lomba.
+     *
+     * Karena itu keduanya dibandingkan di sini, dan tombol MULAI menolak
+     * bekerja selama tidak cocok.
+     */
+    private function arena(): array
+    {
+        $dipilih = optional(MonitoringSetting::first())->active_track;
+
+        $terakhir = SensorData::whereNotNull('lintasan')->latest('id')->first();
+
+        // Telemetri basi tidak boleh dipakai menilai: kapal yang dimatikan
+        // sejak kemarin akan terus "mengaku" memakai arena lamanya.
+        $kapal = ($terakhir && $terakhir->created_at->gt(now()->subSeconds(20)))
+            ? $terakhir->lintasan
+            : null;
+
+        return [
+            'lintasan_dipilih' => $dipilih,
+            'lintasan_kapal' => $kapal,
+            // null = kapal belum melaporkan arena apa pun (belum jalan, atau
+            // dijalankan dengan --tanpa-posisi). Itu bukan ketidakcocokan.
+            'lintasan_cocok' => $kapal === null || $kapal === $dipilih,
+        ];
     }
 
     private function forward(string $path, string $successMessage): JsonResponse

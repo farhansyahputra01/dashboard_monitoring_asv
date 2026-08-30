@@ -176,8 +176,16 @@ Yang membatasi fps **bukan** encoding JPEG. Frame program ini hanya 320x240
 Yang menentukan:
 
 1. **Kecepatan loop deteksi.** fps stream = fps loop kontrol, karena yang
-   dikirim adalah frame hasil anotasi. Ada `time.sleep(0.02)` di akhir loop,
-   jadi batas atasnya sekitar 50 fps dikurangi waktu `detect_buoy()`.
+   dikirim adalah frame hasil anotasi.
+
+   Sejak `detect_buoy()` memakai model YOLO (TFLite) dan bukan lagi ambang warna,
+   inilah satu-satunya yang menentukan: satu inferensi memakan ratusan
+   milidetik di RPi4, sehingga loop berjalan sekitar 4-8 fps - bukan puluhan
+   fps seperti dulu. Ukur sendiri dengan `python3 yolo_detector.py --source 0
+   --no-display`, dan lihat [deteksi-yolo.md](deteksi-yolo.md).
+
+   Di versi terbaru, `time.sleep(0.02)` di akhir loop sudah dibuang -
+   `cap.read()` yang menahan lajunya.
 2. **Bandwidth.** Pada 320x240 kualitas 75, satu frame kira-kira 10-20 KB. Di
    20 fps berarti sekitar 1,6-3,2 Mbps - ringan untuk WiFi lokal, tapi terasa
    lewat ngrok kalau internetnya lambat. Turunkan `JPEG_QUALITY` atau siarkan

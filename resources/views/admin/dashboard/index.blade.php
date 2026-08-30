@@ -133,17 +133,7 @@
                 Sistem Normal
             </li>
         </ul>
-        <button
-            class="dashboard-emergency-btn"
-            id="emergencyBtn"
-            type="button"
-            data-stop-url="{{ route('admin.control.stop') }}"
-            data-resume-url="{{ route('admin.control.resume') }}"
-            data-status-url="{{ route('admin.control.status') }}"
-        >
-            Emergency Button
-        </button>
-        <p id="emergencyMsg" class="dashboard-emergency-msg"></p>
+        @include('partials.kendali-kapal')
     </div>
     {{-- Posisi Kapal --}}
     <div class="card dashboard-map-card">
@@ -155,70 +145,11 @@
 
 <script>
 /* -------------------------------------------------------------------------
-   Berhenti darurat.
-   Laravel meneruskannya ke program Python di kapal — dialah pemilik port
-   serial ESP32. Kegagalan TIDAK BOLEH senyap: kalau perintah tidak sampai,
-   operator harus tahu kapal kemungkinan masih berjalan.
+   Tombol berhenti darurat / mulai sekarang ada di resources/js/kendali-kapal.js
+   dan dipasang lewat partials/kendali-kapal.blade.php, supaya halaman
+   Monitoring memakai kontrol yang SAMA - bukan salinan kedua yang harus
+   dijaga sejalan.
 ------------------------------------------------------------------------- */
-document.addEventListener('DOMContentLoaded', () => {
-    const btn = document.getElementById('emergencyBtn');
-    const msg = document.getElementById('emergencyMsg');
-    if (!btn) return;
-
-    const token = document.querySelector('meta[name="csrf-token"]')?.content;
-    let stopped = null;
-
-    function render() {
-        btn.textContent = stopped ? 'Jalankan Kembali' : 'Emergency Button';
-        btn.classList.toggle('is-stopped', stopped === true);
-    }
-
-    function show(text, isError) {
-        msg.textContent = text || '';
-        msg.classList.toggle('is-error', !!isError);
-    }
-
-    async function send(url) {
-        btn.disabled = true;
-        try {
-            const res = await fetch(url, {
-                method: 'POST',
-                headers: { 'X-CSRF-TOKEN': token, 'Accept': 'application/json' },
-            });
-            const data = await res.json();
-
-            if (!res.ok) {
-                show(data.message || 'Perintah gagal.', true);
-                return;
-            }
-            stopped = data.stopped;
-            render();
-            show(data.message, false);
-        } catch (e) {
-            show('PERINTAH TIDAK SAMPAI. Kapal kemungkinan masih berjalan.', true);
-        } finally {
-            btn.disabled = false;
-        }
-    }
-
-    btn.addEventListener('click', () => {
-        send(stopped ? btn.dataset.resumeUrl : btn.dataset.stopUrl);
-    });
-
-    // Selaraskan tampilan tombol dengan keadaan kapal yang sebenarnya,
-    // supaya refresh halaman tidak menampilkan keadaan yang keliru.
-    fetch(btn.dataset.statusUrl, { headers: { 'Accept': 'application/json' } })
-        .then((r) => r.json())
-        .then((d) => {
-            if (d.reachable) {
-                stopped = d.stopped;
-                render();
-            } else {
-                show('Kendali kapal tidak terjangkau.', true);
-            }
-        })
-        .catch(() => show('Kendali kapal tidak terjangkau.', true));
-});
 
 function getHeadingDirection(heading) {
     if (heading >= 337.5 || heading < 22.5) return 'North';
@@ -240,11 +171,16 @@ saatEchoSiap(() => {
                 const data = e.sensorData;
                 if (data.speed !== null) {
                     // Kecepatan GPS dalam km/h -> m/s
-                    document.getElementById('dash-speed').textContent = (data.speed * 0.277778).toFixed(1);
+                    angkaHalus('dash-speed', data.speed * 0.277778, { desimal: 1 });
                 }
                 if (data.heading !== null) {
-                    document.getElementById('dash-heading').textContent = Math.round(data.heading);
-                    document.getElementById('dash-heading-text').textContent = getHeadingDirection(data.heading);
+                    angkaHalus('dash-heading', data.heading, {
+                        putar: true,
+                        saat: (v) => {
+                            document.getElementById('dash-heading-text').textContent =
+                                getHeadingDirection(v);
+                        },
+                    });
                 }
                 if (data.battery_percent !== null) {
                     document.getElementById('dash-battery-percent').textContent = Math.round(data.battery_percent) + '%';

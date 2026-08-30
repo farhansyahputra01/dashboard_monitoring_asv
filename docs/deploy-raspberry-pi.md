@@ -229,8 +229,14 @@ sudo apt install -y nginx mysql-server git \
                     python3-opencv python3-pip
 
 php -v          # catat versinya, dipakai di A6 (butuh 8.2 atau lebih baru)
-pip install pyserial requests flask --break-system-packages
+pip install pyserial requests flask ai-edge-litert --break-system-packages
 ```
+
+`ai-edge-litert` menjalankan model deteksi buoy (YOLOv8, `best.tflite`).
+Deteksi bola tidak lagi memakai ambang warna, jadi tanpa paket ini program
+menolak jalan - alasan dan cara menyetelnya di
+[deteksi-yolo.md](deteksi-yolo.md). Jangan memasang `ultralytics` di Pi: ia
+menarik torch + tensorflow yang tidak dibutuhkan sama sekali.
 
 Perintah di atas aman diulang kalau sebagian sudah terpasang - apt melewati
 yang sudah ada. Yang biasanya belum ada di Pi yang sudah dipakai web lama:
@@ -253,18 +259,28 @@ diam-diam.
 
 ## A3. Berkas Python
 
-Salin **seluruh isi folder `ASV2`** apa adanya. Lima berkas, satu folder,
+Salin **seluruh isi folder `asv`** apa adanya. Enam berkas Python, satu model,
 **tanpa mengganti nama apa pun**:
 
 ```
 /home/pi/asv/
 ├── telemetry_motor_controller_turn_speed.py   <- satu-satunya yang dijalankan
 ├── buoy_detection.py                          <- diimpor, JANGAN diganti nama
+├── yolo_detector.py                           <- diimpor; inferensi YOLO/TFLite
 ├── mission_controller.py                      <- diimpor; penulis foto misi
 ├── docking.py                                 <- diimpor mission_controller
 ├── stream_server.py                           <- diimpor; MJPEG + /control
+├── best.tflite                                <- WAJIB; model deteksi ~12 MB
+│                                                 (nama kelas ada di dalamnya)
 └── mission_images/                            <- dibuat sendiri saat foto pertama
 ```
+
+Berkas `best.tflite` paling sering tertinggal karena `scp *.py` tidak
+membawanya. Tanpa folder itu program **berhenti di detik pertama** dengan
+`Berkas model tidak ditemukan` - dan itu memang disengaja: lebih baik gagal
+terang-terangan daripada diam-diam kembali ke deteksi warna yang sudah
+ditinggalkan. Latar belakangnya di
+[deteksi-yolo.md](deteksi-yolo.md).
 
 **Semuanya satu proses.** `mission_controller` dan `stream_server` adalah modul
 yang diimpor (`from mission_controller import MissionController`, `import
@@ -275,7 +291,8 @@ Uji impornya:
 
 ```bash
 cd /home/pi/asv
-python3 -c "import buoy_detection, mission_controller, docking, stream_server; print('import OK')"
+python3 -c "import buoy_detection, yolo_detector, mission_controller, docking, stream_server; print('import OK')"
+python3 yolo_detector.py --source 0 --no-display     # model + kamera, tanpa ESP32
 ```
 
 > **Versi dokumen sebelumnya menyuruh mengganti nama berkas ini menjadi
@@ -522,6 +539,8 @@ Yang harus terlihat:
 - `POST GAGAL (ConnectionError)` -> nginx/php-fpm mati, ulangi B1
 - `Permission denied` pada serial -> A2 belum dijalankan atau belum reboot
 - `ModuleNotFoundError: buoy_detection` -> berkasnya kurang atau namanya diganti, lihat A3
+- `Tidak ada interpreter TFLite` -> `pip install ai-edge-litert --break-system-packages`, lihat A1
+- `[GAGAL DETEKTOR] ... Berkas model tidak ditemukan` -> `best.tflite` belum tersalin, lihat A3
 - `[INFO] Flask tidak terpasang` -> `pip install flask --break-system-packages`
 - `[STREAM-GAGAL] Tidak bisa mengikat port 8000` -> proses lama masih hidup
   (`sudo lsof -i :8000`), atau pindah ke `--stream-port 8001` **dan** ubah

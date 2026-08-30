@@ -57,7 +57,28 @@
             <button type="submit">
                 Simpan
             </button>
+
+            {{--
+                Pilihan di kotak ini BELUM berlaku sampai Simpan ditekan.
+
+                Tanpa penanda ini, peta ikut berpindah begitu pilihan diganti
+                sementara sistem masih memakai yang lama - dua pengertian
+                "lintasan terpilih" yang berbeda di satu layar, dan operator
+                tidak punya cara tahu yang mana yang sedang berlaku.
+            --}}
+            <span class="track-belum-simpan" data-track-belum-simpan hidden>
+                belum disimpan
+            </span>
         </form>
+        {{--
+            Kendali kapal: di baris paling atas kartu, sejajar pemilih lintasan.
+
+            TIDAK boleh diletakkan di dalam .monitor-track-layout - itu grid
+            dua kolom (panel info | peta), jadi apa pun yang disisipkan di sana
+            merebut kolom peta dan mendorong petanya turun ke baris berikutnya.
+        --}}
+        @include('partials.kendali-kapal', ['ringkas' => true])
+
         {{-- AREA MONITORING LINTASAN --}}
         <div class="monitor-track-layout">
             {{-- =================================================
@@ -116,7 +137,12 @@
                  AREA LINTASAN
             ================================================== --}}
             <div class="monitor-track-area">
-                @include('partials.trajectory-map', ['track' => $track, 'bolehReset' => true])
+                @include('partials.lintasan-map', [
+                    'jejak' => $jejakLintasan,
+                    'lintasan' => $setting->active_track ?? 'A',
+                    'bolehReset' => true,
+                    'bolehEdit' => true,
+                ])
             </div>
         </div>
     </div>
@@ -359,18 +385,28 @@
 ========================================================= --}}
 <script>
 document.addEventListener("DOMContentLoaded", function () {
-    const select =
-        document.getElementById("trackSelect");
-    function tampilkan(track) {
-        document.getElementById("lintasanA").style.display =
-            track === "A" ? "block" : "none";
-        document.getElementById("lintasanB").style.display =
-            track === "B" ? "block" : "none";
+    // Dulu di sini ada dua <div id="lintasanA/B"> berisi gambar PNG lintasan
+    // yang disembunyikan bergantian. Keduanya sudah tidak ada - petanya
+    // sekarang digambar kanvas dari koordinat sungguhan - tapi kodenya
+    // tertinggal dan memanggil .style pada null. TypeError itu MENGHENTIKAN
+    // seluruh skrip inline ini, termasuk pembaruan angka sensor di bawahnya.
+    //
+    // Pergantian arena kini ditangani lintasan-map.js lewat elemen select yang
+    // sama, jadi di sini tidak ada lagi yang perlu dikerjakan.
+    const select = document.getElementById("trackSelect");
+    const lintasanA = document.getElementById("lintasanA");
+    const lintasanB = document.getElementById("lintasanB");
+
+    if (select && lintasanA && lintasanB) {
+        const tampilkan = (track) => {
+            lintasanA.style.display = track === "A" ? "block" : "none";
+            lintasanB.style.display = track === "B" ? "block" : "none";
+        };
+        tampilkan(select.value);
+        select.addEventListener("change", function () {
+            tampilkan(this.value);
+        });
     }
-    tampilkan(select.value);
-    select.addEventListener("change", function () {
-        tampilkan(this.value);
-    });
 });
 
 function getHeadingDirection(heading) {
@@ -418,47 +454,59 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 if (data.speed !== null) {
                     // Firmware mengirim km/h (gps.speed.kmph())
-                    document.getElementById('mon-speed-ms').textContent = (data.speed * 0.277778).toFixed(1) + ' m/s';
-                    document.getElementById('mon-speed-kmh').textContent = parseFloat(data.speed).toFixed(1) + ' km/h';
+                    angkaHalus('mon-speed-ms', data.speed * 0.277778, { desimal: 1, satuan: ' m/s' });
+                    angkaHalus('mon-speed-kmh', data.speed, { desimal: 1, satuan: ' km/h' });
                 }
 
                 if (data.heading !== null) {
-                    const hDeg = Math.round(data.heading);
-                    const hDir = getHeadingDirection(data.heading);
-                    document.getElementById('mon-heading-deg').textContent = hDeg + '°';
-                    document.getElementById('mon-heading-dir').textContent = hDir;
-                    document.getElementById('mon-compass-heading').textContent = hDeg + '°';
-                    document.getElementById('mon-compass-dir').textContent = hDir;
-
-                    const arrow = document.getElementById('compassArrow');
-                    if (arrow) {
-                        arrow.style.transform = `rotate(${hDeg}deg)`;
-                    }
+                    // putar:true -> 350° lalu 10° dibaca sebagai perputaran 20°
+                    // ke kanan, bukan 340° ke kiri. Lihat angka-halus.js.
+                    //
+                    // Teks arah ikut diperbarui dari nilai yang SEDANG tampil,
+                    // bukan dari nilai akhir - kalau tidak, angkanya masih
+                    // bergerak menuju 95° sementara tulisannya sudah "East".
+                    angkaHalus('mon-heading-deg', data.heading, {
+                        satuan: '°',
+                        putar: true,
+                        saat: (v) => {
+                            const arah = getHeadingDirection(v);
+                            document.getElementById('mon-heading-dir').textContent = arah;
+                            document.getElementById('mon-compass-dir').textContent = arah;
+                        },
+                    });
+                    angkaHalus('mon-compass-heading', data.heading, { satuan: '°', putar: true });
+                    sudutHalus('compassArrow', data.heading);
                 }
 
                 if (data.altitude !== null) {
-                    document.getElementById('mon-alt-meters').textContent = Math.round(data.altitude) + ' m';
+                    angkaHalus('mon-alt-meters', data.altitude, { satuan: ' m' });
                 }
 
                 if (data.voltage !== null) {
-                    document.getElementById('mon-voltage').textContent = parseFloat(data.voltage).toFixed(1) + ' V';
+                    angkaHalus('mon-voltage', data.voltage, { desimal: 1, satuan: ' V' });
                 }
                 if (data.current !== null) {
-                    document.getElementById('mon-current').textContent = parseFloat(data.current).toFixed(1) + ' A';
+                    angkaHalus('mon-current', data.current, { desimal: 1, satuan: ' A' });
                 }
 
                 if (data.temperature !== null) {
-                    document.getElementById('temperature').textContent = parseFloat(data.temperature).toFixed(1) + ' °C';
+                    angkaHalus('temperature', data.temperature, { desimal: 1, satuan: ' °C' });
                 }
                 if (data.humidity !== null) {
-                    document.getElementById('humidity').textContent = parseFloat(data.humidity).toFixed(1) + '%';
+                    angkaHalus('humidity', data.humidity, { desimal: 1, satuan: '%' });
                 }
 
                 if (data.battery_percent !== null) {
-                    const bPercent = Math.round(data.battery_percent);
-                    document.getElementById('mon-battery-percent').textContent = bPercent + '%';
-                    document.getElementById('mon-battery-fill').style.width = bPercent + '%';
-                    document.getElementById('mon-battery-status').textContent = bPercent < 20 ? 'Baterai Lemah' : 'Baterai Normal';
+                    angkaHalus('mon-battery-percent', data.battery_percent, {
+                        satuan: '%',
+                        saat: (v) => {
+                            // Batang baterai ikut nilai yang sedang tampil
+                            // supaya angka dan batangnya tidak pernah beda.
+                            document.getElementById('mon-battery-fill').style.width = v + '%';
+                        },
+                    });
+                    document.getElementById('mon-battery-status').textContent =
+                        data.battery_percent < 20 ? 'Baterai Lemah' : 'Baterai Normal';
                 }
             });
     });

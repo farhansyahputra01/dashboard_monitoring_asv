@@ -20,6 +20,12 @@ class MonitoringController extends Controller
         // ditambahkan realtime lewat siaran SensorDataUpdated.
         $track = SensorData::recentTrack();
 
-        return view('user.monitoring.index', compact('setting', 'latest', 'track'));
+        // Riwayat posisi di peta lintasan (meter). Terpisah dari $track:
+        // yang itu butuh GPS fix, yang ini butuh x/y - dan kapal bisa punya
+        // posisi peta yang sah justru saat GPS-nya sedang tidak fix.
+        $jejakLintasan = SensorData::recentLintasan($setting->active_track ?? null);
+
+        return view('user.monitoring.index',
+            compact('setting', 'latest', 'track', 'jejakLintasan'));
     }
 }

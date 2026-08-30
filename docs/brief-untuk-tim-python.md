@@ -3,6 +3,16 @@
 > Berkas ini berdiri sendiri. Bisa langsung diberikan ke AI/asisten koding
 > sebagai konteks, tanpa perlu berkas lain.
 
+> **Sudah tertinggal di dua hal.** (1) Nama berkas di sini masih versi lama
+> (`..._full_buoy_pid.py`); yang berjalan sekarang
+> `telemetry_motor_controller_turn_speed.py` di folder `asv`. (2) Bola
+> merah, hijau, DAN biru docking **tidak lagi memakai ambang warna HSV**
+> melainkan model YOLOv8 lewat TFLite (`best.tflite`), dan failsafe motor di
+> ESP32 ikut disesuaikan (1000 -> 1500 ms).
+> Keduanya dijelaskan di [deteksi-yolo.md](deteksi-yolo.md).
+> Bagian integrasi di bawah - serial, telemetri, PID, stream - masih berlaku
+> apa adanya.
+
 ---
 
 ## Konteks sistem
