@@ -20,10 +20,16 @@
     data-stop-url="{{ route('admin.control.stop') }}"
     data-resume-url="{{ route('admin.control.resume') }}"
     data-status-url="{{ route('admin.control.status') }}"
+    data-rth-url="{{ route('admin.control.rth') }}"
 >
-    <button type="button" class="dashboard-emergency-btn" data-kendali-tombol>
-        Memeriksa keadaan kapal...
-    </button>
+    <div style="display: flex; gap: 10px; width: 100%;">
+        <button type="button" class="dashboard-emergency-btn" data-kendali-tombol style="flex: 1;">
+            Memeriksa keadaan kapal...
+        </button>
+        <button type="button" class="dashboard-emergency-btn" data-kendali-rth style="flex: 1; display: none;" title="Kembali ke titik awal">
+            Return to Home (RTH)
+        </button>
+    </div>
 
     <p class="dashboard-emergency-msg" data-kendali-pesan></p>
 </div>

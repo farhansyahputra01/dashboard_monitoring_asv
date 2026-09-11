@@ -96,4 +96,6 @@ Route::prefix('admin')
             ->name('control.resume');
         Route::get('/control/status', [ControlController::class, 'status'])
             ->name('control.status');
+        Route::post('/control/rth', [ControlController::class, 'rth'])
+            ->name('control.rth');
     });

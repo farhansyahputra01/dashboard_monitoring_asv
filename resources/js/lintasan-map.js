@@ -992,6 +992,18 @@ if (wadah.length) {
                 lintasan: d.lintasan || null,
             }));
         });
+
+        window.Echo.channel('sensors').listen('ActiveTrackUpdated', (e) => {
+            peta.forEach((p) => p.setLintasan(e.activeTrack));
+            
+            // Perbarui nilai dropdown pemilih lintasan jika ada (di halaman admin)
+            const pilih = document.getElementById('trackSelect');
+            if (pilih) {
+                pilih.value = e.activeTrack;
+                const penanda = document.querySelector('[data-track-belum-simpan]');
+                if (penanda) penanda.hidden = true;
+            }
+        });
     };
 
     if (window.saatEchoSiap) {

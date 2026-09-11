@@ -71,6 +71,8 @@ class MonitoringController extends Controller
         $setting->active_track = $request->active_track;
         $setting->save();
 
+        event(new \App\Events\ActiveTrackUpdated($setting->active_track));
+
         return redirect()
             ->route('admin.monitoring')
             ->with('success', 'Lintasan diperbarui. Nyalakan ulang program di kapal '

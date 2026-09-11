@@ -34,6 +34,11 @@ class ControlController extends Controller
         return $this->forward('/control/resume', 'Kemudi otomatis dijalankan kembali.');
     }
 
+    public function rth(): JsonResponse
+    {
+        return $this->forward('/control/rth', 'Perintah Return to Home (RTH) telah dikirim ke kapal.');
+    }
+
     public function status(): JsonResponse
     {
         $response = $this->call('get', '/control/status');

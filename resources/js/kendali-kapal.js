@@ -27,6 +27,7 @@ const JEDA_MENYESUAIKAN_MS = 1500;
 
 function buatKendali(el) {
     const tombol = el.querySelector('[data-kendali-tombol]');
+    const tombolRth = el.querySelector('[data-kendali-rth]');
     const pesan = el.querySelector('[data-kendali-pesan]');
     const token = document.querySelector('meta[name="csrf-token"]')?.content;
 
@@ -44,11 +45,17 @@ function buatKendali(el) {
             tombol.disabled = true;
             tombol.classList.remove('is-stopped');
             tombol.classList.add('is-offline');
+            if (tombolRth) tombolRth.style.display = 'none';
             return;
         }
 
         tombol.disabled = false;
         tombol.classList.remove('is-offline');
+        if (tombolRth) {
+            tombolRth.style.display = 'block';
+            // Nonaktifkan RTH jika belum siap (misal kapal masih menyesuaikan lintasan)
+            tombolRth.disabled = (berhenti && !arenaCocok);
+        }
 
         if (berhenti === null) {
             tombol.textContent = 'Memeriksa keadaan kapal...';
@@ -163,6 +170,15 @@ function buatKendali(el) {
 
         kirim(berhenti ? el.dataset.resumeUrl : el.dataset.stopUrl);
     });
+
+    if (tombolRth) {
+        tombolRth.addEventListener('click', () => {
+            if (!confirm('Perintahkan kapal untuk kembali ke titik awal (Return to Home)?')) {
+                return;
+            }
+            kirim(el.dataset.rthUrl);
+        });
+    }
 
     // Rantai setTimeout, bukan setInterval: jedanya ikut berubah mengikuti
     // keadaan. Saat sedang menyesuaikan lintasan, pemeriksaan dirapatkan
