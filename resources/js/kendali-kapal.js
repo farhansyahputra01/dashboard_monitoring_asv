@@ -27,11 +27,7 @@ const JEDA_MENYESUAIKAN_MS = 1500;
 
 function buatKendali(el) {
     const tombol = el.querySelector('[data-kendali-tombol]');
-<<<<<<< HEAD
-    const tombolRth = el.querySelector('[data-kendali-rth]');
-=======
     const tombolPulang = el.querySelector('[data-kendali-pulang]');
->>>>>>> fc27ed5b06fe9959b2cb750ee245fd9ff196f6e8
     const pesan = el.querySelector('[data-kendali-pesan]');
     const token = document.querySelector('meta[name="csrf-token"]')?.content;
 
@@ -65,17 +61,11 @@ function buatKendali(el) {
             tombol.disabled = true;
             tombol.classList.remove('is-stopped');
             tombol.classList.add('is-offline');
-            if (tombolRth) tombolRth.style.display = 'none';
             return;
         }
 
         tombol.disabled = false;
         tombol.classList.remove('is-offline');
-        if (tombolRth) {
-            tombolRth.style.display = 'block';
-            // Nonaktifkan RTH jika belum siap (misal kapal masih menyesuaikan lintasan)
-            tombolRth.disabled = (berhenti && !arenaCocok);
-        }
 
         if (berhenti === null) {
             tombol.textContent = 'Memeriksa keadaan kapal...';
@@ -196,14 +186,6 @@ function buatKendali(el) {
         kirim(berhenti ? el.dataset.resumeUrl : el.dataset.stopUrl);
     });
 
-<<<<<<< HEAD
-    if (tombolRth) {
-        tombolRth.addEventListener('click', () => {
-            if (!confirm('Perintahkan kapal untuk kembali ke titik awal (Return to Home)?')) {
-                return;
-            }
-            kirim(el.dataset.rthUrl);
-=======
     if (tombolPulang) {
         tombolPulang.addEventListener('click', () => {
             if (pulang) return;
@@ -211,7 +193,6 @@ function buatKendali(el) {
                 return;
             }
             kirim(el.dataset.pulangUrl);
->>>>>>> fc27ed5b06fe9959b2cb750ee245fd9ff196f6e8
         });
     }
 
