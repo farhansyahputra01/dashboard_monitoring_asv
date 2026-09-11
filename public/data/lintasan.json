@@ -58,7 +58,22 @@
                     "",
                     "Kosongkan (titik: []) untuk kembali ke kalibrasi otomatis dari fix pertama."
                 ],
-                "bearing_sumbu_deg": null,
+                "_bearing_sumbu_deg": [
+                    "HASIL PENGAMATAN LAPANGAN (Sep 2026): kapal di titik start menghadap",
+                    "TIMUR, dan start.heading_deg = 0 = sumbu +y. Jadi sumbu +y arena =",
+                    "90 derajat kompas. Berlaku untuk A dan B (dua arena berdampingan,",
+                    "paddock di sisi yang sama).",
+                    "",
+                    "Dengan nilai ini kerangka peta TIDAK lagi bergantung pada seberapa",
+                    "lurus kapal diletakkan di dermaga. Program tetap membandingkan",
+                    "kompas saat start dengan angka ini dan memperingatkan kalau",
+                    "selisihnya besar (kapal miring, atau --kompas-offset salah).",
+                    "",
+                    "Heading kompas tiap segmen yang mengikuti dari sini:",
+                    "  A: g1-3 = 90 (T), g4-7 = 0 (U),   g8-10 = ~277 (B)",
+                    "  B: g1-3 = 90 (T), g4-7 = 180 (S), g8-10 = ~263 (B)"
+                ],
+                "bearing_sumbu_deg": 90,
                 "titik": [
                     {
                         "ref": "start",
@@ -348,7 +363,22 @@
                     "",
                     "Kosongkan (titik: []) untuk kembali ke kalibrasi otomatis dari fix pertama."
                 ],
-                "bearing_sumbu_deg": null,
+                "_bearing_sumbu_deg": [
+                    "HASIL PENGAMATAN LAPANGAN (Sep 2026): kapal di titik start menghadap",
+                    "TIMUR, dan start.heading_deg = 0 = sumbu +y. Jadi sumbu +y arena =",
+                    "90 derajat kompas. Berlaku untuk A dan B (dua arena berdampingan,",
+                    "paddock di sisi yang sama).",
+                    "",
+                    "Dengan nilai ini kerangka peta TIDAK lagi bergantung pada seberapa",
+                    "lurus kapal diletakkan di dermaga. Program tetap membandingkan",
+                    "kompas saat start dengan angka ini dan memperingatkan kalau",
+                    "selisihnya besar (kapal miring, atau --kompas-offset salah).",
+                    "",
+                    "Heading kompas tiap segmen yang mengikuti dari sini:",
+                    "  A: g1-3 = 90 (T), g4-7 = 0 (U),   g8-10 = ~277 (B)",
+                    "  B: g1-3 = 90 (T), g4-7 = 180 (S), g8-10 = ~263 (B)"
+                ],
+                "bearing_sumbu_deg": 90,
                 "titik": [
                     {
                         "ref": "start",

@@ -20,9 +20,20 @@
     data-stop-url="{{ route('admin.control.stop') }}"
     data-resume-url="{{ route('admin.control.resume') }}"
     data-status-url="{{ route('admin.control.status') }}"
+    data-pulang-url="{{ route('admin.control.pulang') }}"
 >
     <button type="button" class="dashboard-emergency-btn" data-kendali-tombol>
         Memeriksa keadaan kapal...
+    </button>
+
+    {{--
+        PULANG: kapal kembali ke titik start lewat jejak yang sudah dilewatinya.
+        Tombol terpisah dan lebih kecil - ini bukan tombol panik. Berhenti
+        darurat tetap menang: kapal yang sedang berhenti tidak akan bergerak
+        pulang sampai MULAI ditekan.
+    --}}
+    <button type="button" class="dashboard-emergency-btn dashboard-pulang-btn" data-kendali-pulang hidden>
+        PULANG ke Start
     </button>
 
     <p class="dashboard-emergency-msg" data-kendali-pesan></p>
