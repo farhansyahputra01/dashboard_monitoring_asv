@@ -27,19 +27,39 @@ const JEDA_MENYESUAIKAN_MS = 1500;
 
 function buatKendali(el) {
     const tombol = el.querySelector('[data-kendali-tombol]');
+<<<<<<< HEAD
     const tombolRth = el.querySelector('[data-kendali-rth]');
+=======
+    const tombolPulang = el.querySelector('[data-kendali-pulang]');
+>>>>>>> fc27ed5b06fe9959b2cb750ee245fd9ff196f6e8
     const pesan = el.querySelector('[data-kendali-pesan]');
     const token = document.querySelector('meta[name="csrf-token"]')?.content;
 
     if (!tombol) return;
 
     let berhenti = null;      // null = belum diketahui
+    let pulang = false;       // kapal sedang kembali ke start
     let terjangkau = null;
     let arenaCocok = true;    // arena kapal vs arena yang dipilih operator
     let arenaKapal = null;
     let arenaDipilih = null;
 
+    function gambarPulang() {
+        if (!tombolPulang) return;
+
+        // Tampil hanya kalau kendali terjangkau dan kapal SEDANG BERJALAN.
+        // Kapal yang berhenti tidak akan bergerak pulang (berhenti menang),
+        // jadi tombolnya hanya membingungkan di keadaan itu.
+        const tampil = terjangkau === true && berhenti === false;
+        tombolPulang.hidden = !tampil;
+        tombolPulang.disabled = !tampil;
+        tombolPulang.classList.toggle('is-pulang', pulang === true);
+        tombolPulang.textContent = pulang ? 'Sedang PULANG...' : 'PULANG ke Start';
+    }
+
     function gambar() {
+        gambarPulang();
+
         if (terjangkau === false) {
             tombol.textContent = 'Kendali tidak terjangkau';
             tombol.disabled = true;
@@ -104,6 +124,7 @@ function buatKendali(el) {
             }
 
             berhenti = data.stopped;
+            pulang = data.pulang === true;
             terjangkau = true;
             tulis(data.message, false);
         } catch (e) {
@@ -122,6 +143,7 @@ function buatKendali(el) {
 
             terjangkau = !!data.reachable;
             berhenti = data.reachable ? data.stopped : null;
+            pulang = data.reachable && data.pulang === true;
 
             arenaKapal = data.lintasan_kapal ?? null;
             arenaDipilih = data.lintasan_dipilih ?? null;
@@ -150,6 +172,9 @@ function buatKendali(el) {
                 );
             } else if (berhenti) {
                 tulis('Kapal dalam keadaan BERHENTI. Tekan MULAI kalau sudah siap.', false);
+            } else if (pulang) {
+                tulis('Kapal sedang PULANG ke titik start lewat jejaknya. '
+                    + 'BERHENTI DARURAT tetap berlaku; MULAI membatalkan pulang.', false);
             } else {
                 tulis('Kemudi otomatis sedang berjalan.', false);
             }
@@ -171,12 +196,22 @@ function buatKendali(el) {
         kirim(berhenti ? el.dataset.resumeUrl : el.dataset.stopUrl);
     });
 
+<<<<<<< HEAD
     if (tombolRth) {
         tombolRth.addEventListener('click', () => {
             if (!confirm('Perintahkan kapal untuk kembali ke titik awal (Return to Home)?')) {
                 return;
             }
             kirim(el.dataset.rthUrl);
+=======
+    if (tombolPulang) {
+        tombolPulang.addEventListener('click', () => {
+            if (pulang) return;
+            if (!confirm('Kapal akan meninggalkan misi dan kembali ke titik start lewat jejaknya. Lanjutkan?')) {
+                return;
+            }
+            kirim(el.dataset.pulangUrl);
+>>>>>>> fc27ed5b06fe9959b2cb750ee245fd9ff196f6e8
         });
     }
 

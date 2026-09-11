@@ -96,6 +96,11 @@ Route::prefix('admin')
             ->name('control.resume');
         Route::get('/control/status', [ControlController::class, 'status'])
             ->name('control.status');
+<<<<<<< HEAD
         Route::post('/control/rth', [ControlController::class, 'rth'])
             ->name('control.rth');
+=======
+        Route::post('/control/pulang', [ControlController::class, 'pulang'])
+            ->name('control.pulang');
+>>>>>>> fc27ed5b06fe9959b2cb750ee245fd9ff196f6e8
     });

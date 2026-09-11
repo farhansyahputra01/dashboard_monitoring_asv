@@ -34,9 +34,20 @@ class ControlController extends Controller
         return $this->forward('/control/resume', 'Kemudi otomatis dijalankan kembali.');
     }
 
+<<<<<<< HEAD
     public function rth(): JsonResponse
     {
         return $this->forward('/control/rth', 'Perintah Return to Home (RTH) telah dikirim ke kapal.');
+=======
+    /**
+     * Kapal kembali ke titik start lewat jejak yang sudah dilewatinya
+     * (peta_jalur.JejakRoti di kapal). Tidak melepas berhenti darurat:
+     * kapal yang sedang dihentikan tetap berhenti sampai MULAI ditekan.
+     */
+    public function pulang(): JsonResponse
+    {
+        return $this->forward('/control/pulang', 'Kapal diperintahkan PULANG ke titik start.');
+>>>>>>> fc27ed5b06fe9959b2cb750ee245fd9ff196f6e8
     }
 
     public function status(): JsonResponse
@@ -54,6 +65,7 @@ class ControlController extends Controller
         return response()->json(array_merge([
             'reachable' => true,
             'stopped' => (bool)$response->json('stopped'),
+            'pulang' => (bool)$response->json('pulang'),
         ], $this->arena()));
     }
 
@@ -108,6 +120,7 @@ class ControlController extends Controller
         return response()->json([
             'reachable' => true,
             'stopped' => (bool)$response->json('stopped'),
+            'pulang' => (bool)$response->json('pulang'),
             'message' => $successMessage,
         ]);
     }

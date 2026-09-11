@@ -654,6 +654,26 @@ img[data-stream-url].camera-offline {
     cursor: not-allowed;
 }
 
+/* PULANG ke start. Biru, bukan merah dan bukan hijau: ini bukan panik dan
+   bukan "jalan" - ini "kembali". Lebih kecil dari tombol utama supaya tangan
+   yang panik tidak salah menekannya alih-alih BERHENTI. */
+.kendali-kapal .dashboard-pulang-btn {
+    width: auto;
+    height: auto;
+    padding: 8px 14px;
+    font-size: 13px;
+    border-radius: 8px;
+    background: #2563eb;
+}
+
+.kendali-kapal .dashboard-pulang-btn:hover {
+    background: #1d4ed8;
+}
+
+.kendali-kapal .dashboard-pulang-btn.is-pulang {
+    background: #7c3aed;
+}
+
 /* Penanda pilihan lintasan yang belum disimpan. Kuning, bukan merah: ini
    bukan galat, hanya keterangan bahwa pilihannya belum berlaku. */
 .track-belum-simpan {

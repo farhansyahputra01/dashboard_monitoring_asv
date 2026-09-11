@@ -20,7 +20,11 @@
     data-stop-url="{{ route('admin.control.stop') }}"
     data-resume-url="{{ route('admin.control.resume') }}"
     data-status-url="{{ route('admin.control.status') }}"
+<<<<<<< HEAD
     data-rth-url="{{ route('admin.control.rth') }}"
+=======
+    data-pulang-url="{{ route('admin.control.pulang') }}"
+>>>>>>> fc27ed5b06fe9959b2cb750ee245fd9ff196f6e8
 >
     <div style="display: flex; gap: 10px; width: 100%;">
         <button type="button" class="dashboard-emergency-btn" data-kendali-tombol style="flex: 1;">
@@ -30,6 +34,16 @@
             Return to Home (RTH)
         </button>
     </div>
+
+    {{--
+        PULANG: kapal kembali ke titik start lewat jejak yang sudah dilewatinya.
+        Tombol terpisah dan lebih kecil - ini bukan tombol panik. Berhenti
+        darurat tetap menang: kapal yang sedang berhenti tidak akan bergerak
+        pulang sampai MULAI ditekan.
+    --}}
+    <button type="button" class="dashboard-emergency-btn dashboard-pulang-btn" data-kendali-pulang hidden>
+        PULANG ke Start
+    </button>
 
     <p class="dashboard-emergency-msg" data-kendali-pesan></p>
 </div>
