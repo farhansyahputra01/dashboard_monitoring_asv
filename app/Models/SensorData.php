@@ -31,6 +31,10 @@ class SensorData extends Model
         'selisih_gps_m',
         'pair_count',
         'phase',
+
+        // Thruster hidup saat baris ini dibuat. Gerbang validitas titik jejak
+        // GPS di peta - lihat migrasi add_motor_on_to_sensor_data_table.
+        'motor_on',
     ];
 
     protected $casts = [
@@ -39,6 +43,7 @@ class SensorData extends Model
         'jarak_m' => 'float',
         'selisih_gps_m' => 'float',
         'pair_count' => 'integer',
+        'motor_on' => 'boolean',
     ];
 
     /**
@@ -55,7 +60,7 @@ class SensorData extends Model
             ->whereNotNull('longitude')
             ->latest('id')
             ->limit($limit)
-            ->get(['latitude', 'longitude', 'heading', 'satellites', 'speed', 'created_at'])
+            ->get(['latitude', 'longitude', 'heading', 'satellites', 'speed', 'motor_on', 'created_at'])
             ->reverse()
             ->values();
 
@@ -87,6 +92,10 @@ class SensorData extends Model
                 // km/jam. Dipakai peta untuk membedakan kapal yang benar-benar
                 // bergerak dari desiran GPS saat kapal diam.
                 'spd' => $r->speed !== null ? (float) $r->speed : null,
+                // Thruster hidup? Gerbang validitas yang PASTI: titik jejak
+                // hanya ditambah saat motor hidup. null = program kapal versi
+                // lama, peta kembali ke saringan Doppler.
+                'mtr' => $r->motor_on !== null ? (bool) $r->motor_on : null,
                 // milidetik epoch. Peta memakainya sebagai pembagi waktu saat
                 // memeriksa apakah sebuah perpindahan masuk akal terhadap
                 // kecepatan yang dilaporkan.

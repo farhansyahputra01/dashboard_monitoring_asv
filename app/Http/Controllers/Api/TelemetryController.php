@@ -68,6 +68,7 @@ class TelemetryController extends Controller
             'selisih_gps_m' => ['nullable', 'numeric'],
             'pair_count' => ['nullable', 'integer', 'min:0'],
             'phase' => ['nullable', 'string', 'max:24'],
+            'motor_on' => ['nullable', 'boolean'],
         ])->validate();
 
         $sensorData = SensorData::create($validated);

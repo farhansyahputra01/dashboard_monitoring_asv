@@ -240,21 +240,33 @@ function buatPeta(wadah) {
             return false;
         }
 
-        // Kapal diam menurut Doppler -> apa pun yang dikatakan lat/lng, itu
-        // desiran. Dikembalikan lebih awal supaya tidak sempat masuk ke
-        // penyaring jarak, yang bisa tertipu oleh dua desiran berurutan yang
-        // kebetulan jatuh berdekatan di tempat yang salah.
+        // KAPAL DIAM -> apa pun yang dikatakan lat/lng, itu desiran.
+        // Dikembalikan lebih awal supaya tidak sempat masuk ke penyaring
+        // jarak, yang bisa tertipu oleh dua desiran berurutan yang kebetulan
+        // jatuh berdekatan di tempat yang salah.
+        //
+        // Dua cara tahu kapal diam, dari yang paling dipercaya:
+        //   1. p.mtr (thruster hidup?) - dikirim kapal, pasti. Kalau ada,
+        //      Doppler tidak dilihat sama sekali.
+        //   2. p.spd < DIAM_KMH - Doppler GPS, tebakan tidak langsung dengan
+        //      ambang hasil ukur. Hanya untuk program kapal versi lama yang
+        //      belum mengirim mtr.
         //
         // KECUALI saat peta belum punya titik sama sekali (baru dimuat, atau
-        // baru saja di-RESET). Gerbang ini ada untuk mencegah titik JANGKAR
-        // mengembara; kalau jangkarnya belum ada, satu titik tidak bisa
-        // menumpuk jadi apa pun. Tanpa pengecualian ini peta berdiam diri
-        // menulis "menunggu sinyal" sampai kapal benar-benar melaju - lama
-        // sekali, dan operator tidak tahu kapalnya sudah terbaca atau belum.
-        if (titik.length > 0
-            && p.spd !== null && p.spd !== undefined && p.spd < DIAM_KMH) {
-            tertunda = null;
-            return false;
+        // baru saja di-RESET): fix pertama saat kapal DIAM di start justru
+        // yang diinginkan sebagai jangkar 0,0 - posisi awal yang tenang,
+        // bukan fix pertama sesudah melaju. Gerbang ini ada untuk mencegah
+        // jangkar mengembara; kalau jangkarnya belum ada, satu titik tidak
+        // bisa menumpuk jadi apa pun.
+        if (titik.length > 0) {
+            const diam = (p.mtr !== null && p.mtr !== undefined)
+                ? p.mtr === false
+                : (p.spd !== null && p.spd !== undefined && p.spd < DIAM_KMH);
+
+            if (diam) {
+                tertunda = null;
+                return false;
+            }
         }
 
         if (!asal) {
@@ -756,6 +768,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 sat: d.satellites ?? null,
                 spd: d.speed !== null && d.speed !== undefined
                     ? parseFloat(d.speed)      // km/jam, sama dengan kolom database
+                    : null,
+                // Thruster hidup? Dari kapal; null kalau program versi lama.
+                mtr: d.motor_on !== null && d.motor_on !== undefined
+                    ? Boolean(d.motor_on)
                     : null,
                 // Waktu kapal, bukan waktu browser: jeda unggah yang tersendat
                 // akan membuat batas Doppler salah hitung kalau dipakai

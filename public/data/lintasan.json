@@ -74,14 +74,29 @@
                     "  B: g1-3 = 90 (T), g4-7 = 180 (S), g8-10 = ~263 (B)"
                 ],
                 "bearing_sumbu_deg": 90,
-                "titik": [
+                "_titik_dinonaktifkan_11_sep_2026": [
+                    "Acuan GPS DIMATIKAN sesudah uji lapangan 11 Sep 2026: trajectory di dashboard",
+                    "kacau dan kapal lintasan B berputar ke arah salah. Titik-titik di bawah adalah",
+                    "TEBAKAN / hasil uji di tempat lain, bukan hasil ukur di kolam lomba: start ->",
+                    "gerbang 1 menurut GPS 2,3 m (peta: 7 m), gerbang 1 -> 2 menurut GPS 8 m ke",
+                    "timur (peta: 3 m ke +y). Dengan >= 2 titik, program menghitung sumbu arena",
+                    "dari garis GPS itu dan MENGABAIKAN bearing_sumbu_deg - kerangka B terputar ~70",
+                    "derajat.",
+                    "",
+                    "Tanpa titik acuan: posisi = dead reckoning (kompas + kecepatan) yang ditambat",
+                    "ulang tiap gerbang terlewati; GPS tidak dipakai sama sekali; sumbu arena dari",
+                    "bearing_sumbu_deg (90 = timur).",
+                    "",
+                    "Kalau nanti punya lat/lon HASIL UKUR di kolam lomba, pindahkan kembali ke",
+                    "'titik' - dua titik yang BERJAUHAN, dan periksa rasio jarak GPS : peta ~ 1.",
                     {
                         "ref": "start",
                         "nama": "Start",
                         "lat": 1.492171,
                         "lon": 102.1288
                     }
-                ]
+                ],
+                "titik": []
             },
             "petunjuk": {
                 "_cara_pakai": [
@@ -379,7 +394,21 @@
                     "  B: g1-3 = 90 (T), g4-7 = 180 (S), g8-10 = ~263 (B)"
                 ],
                 "bearing_sumbu_deg": 90,
-                "titik": [
+                "_titik_dinonaktifkan_11_sep_2026": [
+                    "Acuan GPS DIMATIKAN sesudah uji lapangan 11 Sep 2026: trajectory di dashboard",
+                    "kacau dan kapal lintasan B berputar ke arah salah. Titik-titik di bawah adalah",
+                    "TEBAKAN / hasil uji di tempat lain, bukan hasil ukur di kolam lomba: start ->",
+                    "gerbang 1 menurut GPS 2,3 m (peta: 7 m), gerbang 1 -> 2 menurut GPS 8 m ke",
+                    "timur (peta: 3 m ke +y). Dengan >= 2 titik, program menghitung sumbu arena",
+                    "dari garis GPS itu dan MENGABAIKAN bearing_sumbu_deg - kerangka B terputar ~70",
+                    "derajat.",
+                    "",
+                    "Tanpa titik acuan: posisi = dead reckoning (kompas + kecepatan) yang ditambat",
+                    "ulang tiap gerbang terlewati; GPS tidak dipakai sama sekali; sumbu arena dari",
+                    "bearing_sumbu_deg (90 = timur).",
+                    "",
+                    "Kalau nanti punya lat/lon HASIL UKUR di kolam lomba, pindahkan kembali ke",
+                    "'titik' - dua titik yang BERJAUHAN, dan periksa rasio jarak GPS : peta ~ 1.",
                     {
                         "ref": "start",
                         "nama": "Start",
@@ -404,7 +433,8 @@
                         "lat": 1.49226,
                         "lon": 102.128811
                     }
-                ]
+                ],
+                "titik": []
             },
             "petunjuk": {
                 "_cara_pakai": [
