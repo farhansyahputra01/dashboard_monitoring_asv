@@ -127,7 +127,9 @@ class ControlController extends Controller
         $url = rtrim((string)config('asv.control_url'), '/') . $path;
 
         try {
-            $response = Http::timeout(config('asv.control_timeout'))
+            $timeout = (float) config('asv.control_timeout', 0.8);
+            $response = Http::timeout($timeout)
+                ->connectTimeout(min($timeout, 0.5))
                 ->acceptJson()
                 ->{$method}($url);
 

@@ -6,6 +6,12 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title') | Laksamana 5</title>
 
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+
+    @include('partials.theme-head')
+
     {{-- Harus sebelum @vite: mendefinisikan saatEchoSiap() yang dipakai skrip
          inline halaman untuk menunggu window.Echo tanpa balapan. --}}
     @include('partials.echo-ready')

@@ -1,36 +1,39 @@
+/**
+ * Sinkronisasi Lintasan Aktif Realtime Dashboard ASV
+ * Memastikan peta lintasan di sisi User dan Admin selalu sinkron otomatis saat diubah.
+ */
 document.addEventListener('DOMContentLoaded', () => {
+    let currentTrack = null;
 
-    const lintasanA = [
-        document.getElementById('dashboardAdminLintasanA'),
-        document.getElementById('dashboardUserLintasanA'),
-        document.getElementById('lintasanA')
-    ];
+    // Inisialisasi dari trackSelect jika ada
+    const select = document.getElementById('trackSelect');
+    if (select) {
+        currentTrack = select.value;
+    }
 
-    const lintasanB = [
-        document.getElementById('dashboardAdminLintasanB'),
-        document.getElementById('dashboardUserLintasanB'),
-        document.getElementById('lintasanB')
-    ];
+    function terapkanLintasan(track) {
+        if (!track || (track !== 'A' && track !== 'B')) return;
 
-    function tampilkanLintasan(track) {
+        if (currentTrack !== track) {
+            currentTrack = track;
+            
+            // Siarkan event ke kanvas lintasan-map dan komponen lainnya
+            window.dispatchEvent(new CustomEvent('active-track-changed', {
+                detail: { activeTrack: track }
+            }));
+        }
 
-        lintasanA.forEach(element => {
-            if (element) {
-                element.style.display = track === 'A' ? 'block' : 'none';
-            }
-        });
-
-        lintasanB.forEach(element => {
-            if (element) {
-                element.style.display = track === 'B' ? 'block' : 'none';
-            }
+        // Kompatibilitas elemen gambar legacy jika ada
+        ['dashboardAdminLintasan', 'dashboardUserLintasan', 'lintasan'].forEach(prefix => {
+            const elA = document.getElementById(prefix + 'A');
+            const elB = document.getElementById(prefix + 'B');
+            if (elA) elA.style.display = track === 'A' ? 'block' : 'none';
+            if (elB) elB.style.display = track === 'B' ? 'block' : 'none';
         });
     }
 
     async function cekLintasan() {
-
         try {
-
             const response = await fetch('/monitoring/active-track', {
                 method: 'GET',
                 headers: {
@@ -39,25 +42,20 @@ document.addEventListener('DOMContentLoaded', () => {
                 cache: 'no-store'
             });
 
-            if (!response.ok) {
-                return;
-            }
+            if (!response.ok) return;
 
             const data = await response.json();
-
-            if (data.active_track === 'A' || data.active_track === 'B') {
-                tampilkanLintasan(data.active_track);
+            if (data.active_track) {
+                terapkanLintasan(data.active_track);
             }
-
-        } catch (error) {
-            console.error('Gagal mengambil status lintasan:', error);
+        } catch (e) {
+            // silent catch
         }
     }
 
-    // Cek pertama kali
+    // Periksa saat pertama kali dimuat
     cekLintasan();
 
-    // Cek setiap 2 detik
-    setInterval(cekLintasan, 2000);
-
+    // Polling setiap 1.5 detik sebagai fallback instan jika WebSocket offline
+    setInterval(cekLintasan, 1500);
 });

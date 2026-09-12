@@ -71,7 +71,11 @@ class MonitoringController extends Controller
         $setting->active_track = $request->active_track;
         $setting->save();
 
-        event(new \App\Events\ActiveTrackUpdated($setting->active_track));
+        try {
+            event(new \App\Events\ActiveTrackUpdated($setting->active_track));
+        } catch (\Throwable $e) {
+            \Log::warning('ActiveTrackUpdated broadcast failed: ' . $e->getMessage());
+        }
 
         return redirect()
             ->route('admin.monitoring')

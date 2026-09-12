@@ -2,92 +2,108 @@
    USER CAMERA
 ========================================= */
 
-.user-camera-page{
-    width:100%;
+.user-camera-page {
+    width: 100%;
 }
 
-.user-camera-card{
-    background:#07131B;
-    border:1px solid #00E5FF;
-    border-radius:18px;
-    padding:25px;
+.user-camera-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-card);
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: var(--shadow-card);
+    transition: all .25s ease;
 }
 
-.user-camera-header{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    margin-bottom:25px;
+.user-camera-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
 }
 
-.user-camera-header h2{
-    color:#fff;
-    font-size:24px;
+.user-camera-header h2 {
+    color: var(--text-primary);
+    font-size: 20px;
+    font-weight: 700;
+    margin: 0;
 }
 
-.user-camera-live{
-    display:flex;
-    align-items:center;
-    gap:8px;
-    color:#fff;
-    font-size:14px;
+.user-camera-live {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--text-secondary);
+    font-size: 13px;
+    font-weight: 600;
+    padding: 6px 14px;
+    background: var(--accent-emerald-soft);
+    border-radius: 999px;
 }
 
-.user-live-dot{
-    width:10px;
-    height:10px;
-    border-radius:50%;
-    background:#44ff44;
+.user-live-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--accent-emerald);
+    box-shadow: 0 0 8px var(--accent-emerald);
 }
 
-.user-camera-item{
-    margin-bottom:22px;
-    position:relative;
+.user-camera-item {
+    margin-bottom: 22px;
+    position: relative;
 }
 
-.user-camera-item:last-child{
-    margin-bottom:0;
+.user-camera-item:last-child {
+    margin-bottom: 0;
 }
 
-.user-camera-label{
-    position:absolute;
-    top:15px;
-    left:15px;
-    z-index:5;
-    background:#000;
-    color:#fff;
-    padding:8px 18px;
-    border-radius:30px;
-    font-size:12px;
+.user-camera-label {
+    position: absolute;
+    top: 14px;
+    left: 14px;
+    z-index: 5;
+    background: rgba(0, 0, 0, 0.75);
+    backdrop-filter: blur(4px);
+    color: #fff;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    border: 1px solid rgba(255, 255, 255, 0.15);
 }
 
-.user-camera-frame{
-    width:100%;
-    height:330px;
-    overflow:hidden;
-    border-radius:15px;
-    border:2px solid #00E5FF;
-    background:#000;
-    transition:.3s;
+.user-camera-frame {
+    width: 100%;
+    height: 330px;
+    overflow: hidden;
+    border-radius: 14px;
+    border: 1px solid var(--border-card);
+    background: #000;
+    transition: all .25s ease;
 }
 
-.user-camera-frame img{
-    width:100%;
-    height:100%;
-    object-fit:cover;
+.user-camera-frame img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
 }
 
-.user-camera-frame:hover{
-    box-shadow:0 0 18px rgba(0,229,255,.4);
+.user-camera-frame:hover {
+    border-color: var(--border-card-hover);
+    box-shadow: var(--shadow-glow);
 }
 
-.user-camera-info{
-    position:absolute;
-    bottom:15px;
-    left:15px;
-    background:#000;
-    color:#fff;
-    padding:8px 18px;
-    border-radius:30px;
-    font-size:12px;
-}
+.user-camera-info {
+    position: absolute;
+    bottom: 14px;
+    left: 14px;
+    background: rgba(0, 0, 0, 0.75);
+    backdrop-filter: blur(4px);
+    color: #fff;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+}

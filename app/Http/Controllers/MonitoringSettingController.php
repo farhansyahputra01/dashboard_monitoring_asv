@@ -35,6 +35,12 @@ class MonitoringSettingController extends Controller
         $setting->active_track = $request->active_track;
         $setting->save();
 
+        try {
+            event(new \App\Events\ActiveTrackUpdated($setting->active_track));
+        } catch (\Throwable $e) {
+            \Log::warning('ActiveTrackUpdated broadcast failed: ' . $e->getMessage());
+        }
+
         return back()->with('success', 'Lintasan berhasil diperbarui.');
     }
 }

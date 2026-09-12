@@ -3,6 +3,10 @@
         <h2>@yield('title')</h2>
     </div>
     <div class="navbar-right">
+        <button type="button" class="theme-toggle-btn" data-theme-toggle aria-label="Ganti Tema" title="Ganti Mode Terang / Gelap">
+            <i class="bi bi-sun-fill"></i>
+            <span class="theme-label">Terang</span>
+        </button>
         <div class="ship-status">
             <span class="status-dot"></span>
             <span>Aktif</span>

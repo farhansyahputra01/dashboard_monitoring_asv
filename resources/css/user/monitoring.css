@@ -2,11 +2,11 @@
    LINTASAN USER
 ===================================================== */
 
-.monitor-track-layout{
-    display:grid;
-    grid-template-columns:280px 1fr;
-    gap:20px;
-    margin-top:20px;
+.monitor-track-layout {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    gap: 20px;
+    margin-top: 20px;
 }
 
 
@@ -14,29 +14,35 @@
    PANEL INFORMASI
 ===================================================== */
 
-.monitor-track-info{
-    background:#10202B;
-    border:1px solid #18323D;
-    border-radius:15px;
-    padding:18px;
+.monitor-track-info {
+    background: var(--bg-card-subtle);
+    border: 1px solid var(--border-subtle);
+    border-radius: 14px;
+    padding: 18px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
 }
 
-.track-info-section{
-    margin-bottom:20px;
+.track-info-section {
+    margin-bottom: 18px;
 }
 
-.track-info-section h4{
-    margin:0 0 10px;
-    color:#00E5FF;
-    font-size:15px;
+.track-info-section h4 {
+    margin: 0 0 8px;
+    color: var(--accent-cyan);
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
 }
 
-.track-info-section ol{
-    margin:0;
-    padding-left:20px;
-    color:#CBD5E1;
-    font-size:13px;
-    line-height:1.7;
+.track-info-section ol {
+    margin: 0;
+    padding-left: 18px;
+    color: var(--text-secondary);
+    font-size: 13px;
+    line-height: 1.6;
 }
 
 
@@ -44,17 +50,18 @@
    AREA LINTASAN
 ===================================================== */
 
-.monitor-track-area{
-    min-width:0;
+.monitor-track-area {
+    min-width: 0;
 }
 
-.track-grid{
-    position:relative;
-    height:500px;
-    padding:30px 35px 30px 45px;
-    background:#10202B;
-    border:2px solid #00E5FF;
-    border-radius:15px;
+.track-grid {
+    position: relative;
+    height: 500px;
+    padding: 30px 35px 30px 45px;
+    background: var(--map-bg);
+    border: 1px solid var(--border-card);
+    border-radius: 14px;
+    transition: background-color .3s, border-color .3s;
 }
 
 
@@ -62,20 +69,18 @@
    LABEL KOLOM
 ===================================================== */
 
-.track-column-labels{
-    position:absolute;
-    top:8px;
-    left:45px;
-    right:35px;
-
-    display:grid;
-    grid-template-columns:repeat(5,1fr);
-
-    text-align:center;
-
-    color:#CBD5E1;
-    font-weight:600;
-    font-size:13px;
+.track-column-labels {
+    position: absolute;
+    top: 8px;
+    left: 45px;
+    right: 35px;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    text-align: center;
+    color: var(--text-muted);
+    font-weight: 700;
+    font-size: 12px;
+    font-family: 'JetBrains Mono', monospace, sans-serif;
 }
 
 
@@ -83,19 +88,18 @@
    LABEL BARIS
 ===================================================== */
 
-.track-row-labels{
-    position:absolute;
-    top:30px;
-    bottom:30px;
-    left:12px;
-
-    display:flex;
-    flex-direction:column;
-    justify-content:space-between;
-
-    color:#CBD5E1;
-    font-weight:600;
-    font-size:13px;
+.track-row-labels {
+    position: absolute;
+    top: 30px;
+    bottom: 30px;
+    left: 12px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    color: var(--text-muted);
+    font-weight: 700;
+    font-size: 12px;
+    font-family: 'JetBrains Mono', monospace, sans-serif;
 }
 
 
@@ -103,19 +107,14 @@
    TRACK FIELD
 ===================================================== */
 
-.track-field{
-    position:relative;
-    width:100%;
-    height:100%;
-
-    /* Halaman user memuat admin/monitoring.css lebih dulu demi gaya kartu
-       datanya. Di sana .track-field diberi latar garis kisi; tampilan user
-       sengaja tanpa kisi, jadi dimatikan di sini. */
-    background:none;
-
-    display:flex;
-    justify-content:center;
-    align-items:center;
+.track-field {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    background: none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 
@@ -123,20 +122,20 @@
    GAMBAR LINTASAN
 ===================================================== */
 
-.track-image-wrapper{
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    width:100%;
-    height:100%;
+.track-image-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
 }
 
-.track-image{
-    width:auto;
-    height:auto;
-    max-width:100%;
-    max-height:100%;
-    display:block;
+.track-image {
+    width: auto;
+    height: auto;
+    max-width: 100%;
+    max-height: 100%;
+    display: block;
 }
 
 
@@ -144,19 +143,19 @@
    SVG LINTASAN
 ===================================================== */
 
-.track-svg{
-    position:absolute;
-    inset:0;
-    width:100%;
-    height:100%;
-    overflow:visible;
+.track-svg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
 }
 
-.track-svg path{
-    fill:none;
-    stroke:#111827;
-    stroke-width:3;
-    stroke-dasharray:7 7;
+.track-svg path {
+    fill: none;
+    stroke: var(--text-muted);
+    stroke-width: 2.5;
+    stroke-dasharray: 6 6;
 }
 
 
@@ -164,23 +163,19 @@
    TITIK LINTASAN
 ===================================================== */
 
-.track-points{
-    position:absolute;
-    inset:0;
+.track-points {
+    position: absolute;
+    inset: 0;
 }
 
-.track-points span{
-    position:absolute;
-    width:7px;
-    height:7px;
-
-    transform:translate(-50%,-50%);
-
-    background:#22C55E;
-    border-radius:50%;
-
-    box-shadow:
-        0 0 4px rgba(34,197,94,.8);
+.track-points span {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    transform: translate(-50%, -50%);
+    background: var(--accent-emerald);
+    border-radius: 50%;
+    box-shadow: 0 0 8px var(--accent-emerald);
 }
 
 
@@ -189,32 +184,26 @@
 ===================================================== */
 
 .track-start,
-.track-finish{
-    position:absolute;
-
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-
-    transform:translate(-50%,-50%);
-
-    color:#fff;
-    font-size:11px;
-    font-weight:600;
-
-    transition:
-        left .4s ease,
-        top .4s ease;
+.track-finish {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transform: translate(-50%, -50%);
+    color: var(--text-primary);
+    font-size: 11px;
+    font-weight: 700;
+    transition: left .4s ease, top .4s ease;
 }
 
-.track-start i{
-    color:#2563EB;
-    font-size:25px;
+.track-start i {
+    color: var(--accent-blue);
+    font-size: 22px;
 }
 
-.track-finish i{
-    color:#38BDF8;
-    font-size:25px;
+.track-finish i {
+    color: var(--accent-cyan);
+    font-size: 22px;
 }
 
 
@@ -222,30 +211,19 @@
    SHIP MARKER
 ===================================================== */
 
-.ship-marker{
-    position:absolute;
-
-    width:34px;
-    height:34px;
-
-    display:flex;
-    justify-content:center;
-    align-items:center;
-
-    transform:translate(-50%,-50%);
-
-    color:#FACC15;
-    font-size:25px;
-
-    z-index:20;
-
-    transition:
-        left 2s linear,
-        top 2s linear;
-
-    filter:
-        drop-shadow(0 0 4px #FACC15)
-        drop-shadow(0 0 10px #FACC15);
+.ship-marker {
+    position: absolute;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transform: translate(-50%, -50%);
+    color: var(--accent-amber);
+    font-size: 24px;
+    z-index: 20;
+    transition: left 2s linear, top 2s linear;
+    filter: drop-shadow(0 0 6px var(--accent-amber));
 }
 
 
@@ -253,26 +231,24 @@
    RESPONSIVE
 ===================================================== */
 
-@media(max-width:900px){
-
-    .monitor-track-layout{
-        grid-template-columns:1fr;
+@media(max-width: 900px) {
+    .monitor-track-layout {
+        grid-template-columns: 1fr;
     }
 
-    .monitor-track-info{
-        display:grid;
-        grid-template-columns:repeat(3,1fr);
-        gap:15px;
+    .monitor-track-info {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 15px;
     }
 }
 
-@media(max-width:600px){
-
-    .monitor-track-info{
-        grid-template-columns:1fr;
+@media(max-width: 600px) {
+    .monitor-track-info {
+        grid-template-columns: 1fr;
     }
 
-    .track-grid{
-        height:400px;
+    .track-grid {
+        height: 380px;
     }
 }

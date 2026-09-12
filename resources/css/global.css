@@ -1,24 +1,167 @@
-body{
-    margin:0;
-    font-family:'Segoe UI',sans-serif;
-    background:#0F172A;
-    color:#fff;
+/* =====================================================
+   DESIGN TOKENS & CSS VARIABLES (DARK & LIGHT THEME)
+===================================================== */
+:root,
+:root[data-theme="dark"] {
+    --bg-body: #070e17;
+    --bg-surface: #0b1523;
+    --bg-card: #0d1a29;
+    --bg-card-subtle: #112236;
+    --bg-sidebar: #08111c;
+    --bg-navbar: #0a1422;
+    --bg-input: #07121e;
+    --bg-overlay: rgba(5, 18, 26, 0.85);
+
+    --border-subtle: rgba(255, 255, 255, 0.08);
+    --border-card: rgba(0, 229, 255, 0.25);
+    --border-card-hover: rgba(0, 229, 255, 0.65);
+    --border-strong: rgba(0, 229, 255, 0.45);
+    --border-input: rgba(0, 229, 255, 0.2);
+
+    --text-primary: #f8fafc;
+    --text-secondary: #cbd5e1;
+    --text-muted: #8295a9;
+    --text-on-accent: #07131b;
+
+    --accent-cyan: #00e5ff;
+    --accent-cyan-soft: rgba(0, 229, 255, 0.12);
+    --accent-cyan-glow: 0 0 16px rgba(0, 229, 255, 0.35);
+    --accent-blue: #38bdf8;
+    --accent-emerald: #22c55e;
+    --accent-emerald-soft: rgba(34, 197, 94, 0.15);
+    --accent-amber: #facc15;
+    --accent-amber-soft: rgba(250, 204, 21, 0.15);
+    --accent-red: #ff3b30;
+    --accent-red-soft: rgba(255, 59, 48, 0.15);
+
+    --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
+    --shadow-card: 0 8px 24px rgba(0, 0, 0, 0.4);
+    --shadow-glow: 0 0 20px rgba(0, 229, 255, 0.15);
+
+    --map-bg: #09141f;
+    --map-border: #132b3d;
+    --map-grid: rgba(0, 229, 255, 0.07);
+    --compass-bg: #091522;
+    --compass-dial: #00e5ff;
+    --compass-needle: #00e5ff;
+
+    --toggle-btn-bg: rgba(255, 255, 255, 0.06);
+    --toggle-btn-border: rgba(255, 255, 255, 0.15);
+    --toggle-btn-text: #facc15;
 }
 
-a{
-    text-decoration:none;
+:root[data-theme="light"] {
+    --bg-body: #f1f5f9;
+    --bg-surface: #ffffff;
+    --bg-card: #ffffff;
+    --bg-card-subtle: #f8fafc;
+    --bg-sidebar: #ffffff;
+    --bg-navbar: #ffffff;
+    --bg-input: #f8fafc;
+    --bg-overlay: rgba(15, 23, 42, 0.6);
+
+    --border-subtle: #e2e8f0;
+    --border-card: #e2e8f0;
+    --border-card-hover: #0284c7;
+    --border-strong: #cbd5e1;
+    --border-input: #cbd5e1;
+
+    --text-primary: #0f172a;
+    --text-secondary: #475569;
+    --text-muted: #64748b;
+    --text-on-accent: #ffffff;
+
+    --accent-cyan: #0284c7;
+    --accent-cyan-soft: rgba(2, 132, 199, 0.1);
+    --accent-cyan-glow: 0 0 12px rgba(2, 132, 199, 0.2);
+    --accent-blue: #0369a1;
+    --accent-emerald: #16a34a;
+    --accent-emerald-soft: rgba(22, 163, 74, 0.12);
+    --accent-amber: #d97706;
+    --accent-amber-soft: rgba(217, 119, 6, 0.12);
+    --accent-red: #dc2626;
+    --accent-red-soft: rgba(220, 38, 38, 0.12);
+
+    --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.06);
+    --shadow-card: 0 4px 16px rgba(15, 23, 42, 0.07);
+    --shadow-glow: 0 4px 20px rgba(2, 132, 199, 0.1);
+
+    --map-bg: #f0f9ff;
+    --map-border: #bae6fd;
+    --map-grid: rgba(2, 132, 199, 0.1);
+    --compass-bg: #f8fafc;
+    --compass-dial: #0284c7;
+    --compass-needle: #0284c7;
+
+    --toggle-btn-bg: #f1f5f9;
+    --toggle-btn-border: #cbd5e1;
+    --toggle-btn-text: #0284c7;
 }
 
-ul{
-    list-style:none;
-    margin:0;
-    padding:0;
+body {
+    margin: 0;
+    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+    background: var(--bg-body);
+    color: var(--text-primary);
+    transition: background-color .3s ease, color .3s ease;
 }
 
-img{
-    max-width:100%;
-    display:block;
+a {
+    text-decoration: none;
+    color: inherit;
 }
+
+ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+img {
+    max-width: 100%;
+    display: block;
+}
+
+/* =====================================================
+   THEME TOGGLE BUTTON
+===================================================== */
+.theme-toggle-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 14px;
+    border-radius: 999px;
+    background: var(--toggle-btn-bg);
+    border: 1px solid var(--toggle-btn-border);
+    color: var(--text-primary);
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    transition: all .25s ease;
+    user-select: none;
+}
+
+.theme-toggle-btn i {
+    font-size: 15px;
+    color: var(--toggle-btn-text);
+    transition: transform .3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.theme-toggle-btn:hover {
+    border-color: var(--accent-cyan);
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.theme-toggle-btn:hover i {
+    transform: rotate(20deg) scale(1.15);
+}
+
+.theme-toggle-btn:active {
+    transform: translateY(0);
+}
+
 /* ---------------------------------------------------------------------------
    Kamera kapal
    Ditampilkan saat CAMERA_*_URL belum diisi atau stream terputus.
@@ -32,10 +175,10 @@ img{
     align-items: center;
     justify-content: center;
     gap: .5rem;
-    background: rgba(255, 255, 255, .03);
-    border: 1px dashed rgba(255, 255, 255, .18);
+    background: var(--bg-primary);
+    border: 1px dashed var(--border);
     border-radius: 8px;
-    color: rgba(255, 255, 255, .45);
+    color: var(--text-muted);
     font-size: .8rem;
     text-align: center;
     padding: 1rem;
@@ -200,8 +343,8 @@ img[data-stream-url].camera-offline {
    Galeri foto misi
 --------------------------------------------------------------------------- */
 .gallery {
-    background: #10202B;
-    border: 1px solid #18323D;
+    background: var(--bg-card);
+    border: 1px solid var(--border-card);
     border-radius: 15px;
     padding: 20px;
 }
@@ -212,17 +355,18 @@ img[data-stream-url].camera-offline {
     justify-content: space-between;
     gap: 1rem;
     padding-bottom: 1rem;
-    border-bottom: 1px solid #18323D;
+    border-bottom: 1px solid var(--border-subtle);
     margin-bottom: 1.25rem;
 }
 
-.gallery-head h3 { margin: 0 0 .3rem; color: #00E5FF; font-size: 1.05rem; }
-.gallery-head p  { margin: 0; font-size: .8rem; color: rgba(255,255,255,.5); max-width: 46ch; }
+.gallery-head h3 { margin: 0 0 .3rem; color: var(--accent-cyan); font-size: 1.05rem; }
+.gallery-head p  { margin: 0; font-size: .8rem; color: var(--text-muted); max-width: 46ch; }
 
 .gallery-count {
     font-size: .75rem;
-    color: rgba(255,255,255,.6);
-    border: 1px solid #18323D;
+    color: var(--text-muted);
+    border: 1px solid var(--border-subtle);
+    background: var(--bg-card-subtle);
     border-radius: 999px;
     padding: .25rem .7rem;
     white-space: nowrap;
@@ -237,8 +381,8 @@ img[data-stream-url].camera-offline {
 
 .gallery-item {
     margin: 0;
-    background: #0C1A22;
-    border: 1px solid #18323D;
+    background: var(--bg-card-subtle);
+    border: 1px solid var(--border-subtle);
     border-radius: 10px;
     overflow: hidden;
 }
@@ -249,7 +393,7 @@ img[data-stream-url].camera-offline {
     aspect-ratio: 4 / 3;
     object-fit: cover;
     cursor: zoom-in;
-    background: #06121a;
+    background: var(--bg-input);
 }
 
 .gallery-item figcaption {
@@ -259,7 +403,7 @@ img[data-stream-url].camera-offline {
     gap: .5rem;
     padding: .5rem .65rem;
     font-size: .7rem;
-    color: rgba(255,255,255,.55);
+    color: var(--text-muted);
     font-variant-numeric: tabular-nums;
 }
 
@@ -283,11 +427,11 @@ img[data-stream-url].camera-offline {
     gap: .5rem;
     padding: 3.5rem 1rem;
     text-align: center;
-    color: rgba(255,255,255,.45);
+    color: var(--text-muted);
 }
 
 .gallery-empty i { font-size: 2rem; }
-.gallery-empty strong { color: rgba(255,255,255,.75); font-size: .95rem; }
+.gallery-empty strong { color: var(--text-primary); font-size: .95rem; }
 .gallery-empty span { font-size: .8rem; max-width: 40ch; }
 
 .gallery-warn {
@@ -296,15 +440,15 @@ img[data-stream-url].camera-offline {
     gap: .6rem;
     padding: .8rem 1rem;
     margin-bottom: 1.1rem;
-    background: rgba(255, 180, 80, .1);
-    border: 1px solid rgba(255, 180, 80, .3);
+    background: var(--accent-amber-soft);
+    border: 1px solid var(--accent-amber);
     border-radius: 8px;
-    color: #ffcf8a;
+    color: var(--accent-amber);
     font-size: .82rem;
 }
 
 .gallery-warn code {
-    background: rgba(0, 0, 0, .3);
+    background: rgba(0, 0, 0, .2);
     padding: .1rem .35rem;
     border-radius: 4px;
 }
@@ -344,8 +488,8 @@ img[data-stream-url].camera-offline {
     flex-direction: column;
     gap: .35rem;
     padding: .5rem .65rem;
-    background: #101f2e;
-    border: 1px solid #1e3a52;
+    background: var(--bg-card-subtle);
+    border: 1px solid var(--border-subtle);
     border-radius: 9px;
 }
 
@@ -360,12 +504,12 @@ img[data-stream-url].camera-offline {
     font-size: .7rem;
     letter-spacing: .04em;
     text-transform: uppercase;
-    color: #7f9db8;
+    color: var(--text-muted);
 }
 
 .lintasan-progres-atas strong {
     font-size: .95rem;
-    color: #e2e8f0;
+    color: var(--text-primary);
 }
 
 /* Satu pip per gerbang, lebarnya membagi rata - jumlah gerbang boleh
@@ -379,41 +523,43 @@ img[data-stream-url].camera-offline {
     flex: 1;
     height: 7px;
     border-radius: 3px;
-    background: #1e3a52;
+    background: var(--border-subtle);
     transition: background .25s ease;
 }
 
-.lintasan-progres-pip span.lewat { background: #22c55e; }
+.lintasan-progres-pip span.lewat { background: var(--accent-emerald); }
 
 /* Gerbang yang sedang dituju: cukup dibedakan, tidak berkedip. Sesuatu yang
    berkedip di layar saat lomba berjalan menarik mata operator menjauh dari
    kapalnya. */
-.lintasan-progres-pip span.tujuan { background: #38bdf8; }
+.lintasan-progres-pip span.tujuan { background: var(--accent-cyan); }
 
 .lintasan-progres-fase {
     font-size: .7rem;
-    color: #94a3b8;
+    color: var(--text-muted);
 }
 
 .lintasan-btn {
     padding: .32rem .7rem;
     font-size: .74rem;
-    color: #cbd5e1;
-    background: #16293a;
-    border: 1px solid #24455c;
+    color: var(--text-secondary);
+    background: var(--bg-card-subtle);
+    border: 1px solid var(--border-subtle);
     border-radius: 7px;
     cursor: pointer;
+    font-family: inherit;
+    transition: all .2s;
 }
 
-.lintasan-btn:hover { background: #1d3549; }
-.lintasan-btn.aktif { color: #0b1220; background: #38bdf8; border-color: #38bdf8; }
-.lintasan-btn.utama { color: #052e16; background: #22c55e; border-color: #22c55e; }
+.lintasan-btn:hover { background: var(--accent-cyan-soft); color: var(--accent-cyan); }
+.lintasan-btn.aktif { color: var(--text-on-accent); background: var(--accent-cyan); border-color: var(--accent-cyan); }
+.lintasan-btn.utama { color: #fff; background: var(--accent-emerald); border-color: var(--accent-emerald); }
 .lintasan-btn:disabled { opacity: .45; cursor: not-allowed; }
 
 .lintasan-acuan {
     padding: .55rem .7rem;
-    background: #101f2e;
-    border: 1px solid #1d3549;
+    background: var(--bg-card-subtle);
+    border: 1px solid var(--border-subtle);
     border-radius: 8px;
 }
 
@@ -424,12 +570,12 @@ img[data-stream-url].camera-offline {
     align-items: baseline;
     margin-bottom: .45rem;
     font-size: .76rem;
-    color: #cbd5e1;
+    color: var(--text-primary);
 }
 
 .lintasan-acuan-judul span {
     font-size: .68rem;
-    color: rgba(203, 213, 225, .55);
+    color: var(--text-muted);
 }
 
 .lintasan-acuan-baris {
@@ -444,13 +590,14 @@ img[data-stream-url].camera-offline {
     min-width: 0;
     padding: .28rem .45rem;
     font-size: .72rem;
-    color: #e2e8f0;
-    background: #0b1725;
-    border: 1px solid #24455c;
+    color: var(--text-primary);
+    background: var(--bg-input);
+    border: 1px solid var(--border-input);
     border-radius: 6px;
+    font-family: inherit;
 }
 
-.lintasan-acuan-baris input::placeholder { color: rgba(148, 163, 184, .5); }
+.lintasan-acuan-baris input::placeholder { color: var(--text-muted); }
 
 .lintasan-btn.kecil { padding: .24rem .5rem; font-size: .68rem; }
 
@@ -459,12 +606,12 @@ img[data-stream-url].camera-offline {
    dan lebih baik ketahuan sebelum ditekan Terapkan. */
 .lintasan-acuan-hasil {
     font-size: .7rem;
-    color: rgba(203, 213, 225, .7);
+    color: var(--text-muted);
     font-variant-numeric: tabular-nums;
 }
 
-.lintasan-acuan-hasil.buruk { color: #fca5a5; }
-.lintasan-acuan-hasil.baik { color: #86efac; }
+.lintasan-acuan-hasil.buruk { color: var(--accent-red); }
+.lintasan-acuan-hasil.baik { color: var(--accent-emerald); }
 
 /* ---------------------------------------------------------
    Halaman koordinat GPS lintasan
@@ -480,8 +627,8 @@ img[data-stream-url].camera-offline {
     margin-bottom: 1rem;
 }
 
-.koordinat-header h2 { margin: 0 0 .25rem; font-size: 1.05rem; color: #e2e8f0; }
-.koordinat-header p { margin: 0; font-size: .8rem; color: rgba(203, 213, 225, .65); }
+.koordinat-header h2 { margin: 0 0 .25rem; font-size: 1.05rem; color: var(--text-primary); }
+.koordinat-header p { margin: 0; font-size: .8rem; color: var(--text-muted); }
 
 .koordinat-tab { display: flex; gap: .4rem; margin-bottom: .8rem; }
 
@@ -492,19 +639,20 @@ img[data-stream-url].camera-offline {
     border-radius: 8px;
 }
 
-.koordinat-pesan.baik { color: #86efac; background: rgba(34, 197, 94, .12); border: 1px solid rgba(34, 197, 94, .35); }
-.koordinat-pesan.buruk { color: #fca5a5; background: rgba(239, 68, 68, .12); border: 1px solid rgba(239, 68, 68, .35); }
+.koordinat-pesan.baik { color: var(--accent-emerald); background: var(--accent-emerald-soft); border: 1px solid var(--accent-emerald); }
+.koordinat-pesan.buruk { color: var(--accent-red); background: var(--accent-red-soft); border: 1px solid var(--accent-red); }
 
 .koordinat-catatan {
     margin: .8rem 0;
     padding: .7rem .9rem;
     font-size: .78rem;
     line-height: 1.55;
-    color: rgba(203, 213, 225, .8);
-    background: #101f2e;
-    border: 1px solid #1d3549;
+    color: var(--text-secondary);
+    background: var(--bg-card-subtle);
+    border: 1px solid var(--border-subtle);
     border-radius: 8px;
 }
+
 
 .koordinat-catatan code { color: #7dd3fc; }
 
@@ -517,32 +665,33 @@ img[data-stream-url].camera-offline {
 .koordinat-tabel th {
     padding: .4rem .5rem;
     text-align: left;
-    font-weight: 500;
-    color: rgba(148, 163, 184, .85);
-    border-bottom: 1px solid #1d3549;
+    font-weight: 600;
+    color: var(--text-muted);
+    border-bottom: 1px solid var(--border-subtle);
 }
 
 .koordinat-tabel td {
     padding: .3rem .5rem;
-    color: #cbd5e1;
-    border-bottom: 1px solid rgba(29, 53, 73, .5);
+    color: var(--text-secondary);
+    border-bottom: 1px solid var(--border-subtle);
 }
 
 .koordinat-tabel .sempit { width: 68px; }
-.koordinat-tabel .angka { color: rgba(148, 163, 184, .7); font-variant-numeric: tabular-nums; }
+.koordinat-tabel .angka { color: var(--text-muted); font-variant-numeric: tabular-nums; }
 
 .koordinat-tabel input {
     width: 100%;
     padding: .28rem .45rem;
     font-size: .78rem;
-    color: #e2e8f0;
-    background: #0b1725;
-    border: 1px solid #24455c;
+    color: var(--text-primary);
+    background: var(--bg-input);
+    border: 1px solid var(--border-input);
     border-radius: 6px;
     font-variant-numeric: tabular-nums;
+    font-family: inherit;
 }
 
-.koordinat-tabel input::placeholder { color: rgba(148, 163, 184, .4); }
+.koordinat-tabel input::placeholder { color: var(--text-muted); }
 
 /* Titik warna yang sama dengan penanda di peta, supaya baris di tabel dan
    ikon di kanvas dikenali sebagai benda yang sama tanpa perlu dibaca. */
@@ -558,7 +707,7 @@ img[data-stream-url].camera-offline {
 .koordinat-ikon.merah { background: #ef4444; }
 .koordinat-ikon.hijau { background: #22c55e; }
 .koordinat-ikon.biru { background: #3b82f6; }
-.koordinat-ikon.start { background: transparent; border: 2px solid #e2e8f0; }
+.koordinat-ikon.start { background: transparent; border: 2px solid var(--text-muted); }
 
 /* Gerbang diwakili satu titik dua warna: merah di kiri, hijau di kanan,
    sama seperti pasangan bolanya di peta. */
@@ -579,24 +728,26 @@ img[data-stream-url].camera-offline {
     gap: .45rem;
     align-items: center;
     font-size: .76rem;
-    color: rgba(203, 213, 225, .8);
+    color: var(--text-secondary);
 }
 
 .koordinat-kaki input {
     width: 190px;
     padding: .28rem .45rem;
     font-size: .78rem;
-    color: #e2e8f0;
-    background: #0b1725;
-    border: 1px solid #24455c;
+    color: var(--text-primary);
+    background: var(--bg-input);
+    border: 1px solid var(--border-input);
     border-radius: 6px;
+    font-family: inherit;
 }
 
 .koordinat-bantuan {
     flex: 1 1 260px;
     font-size: .72rem;
-    color: rgba(148, 163, 184, .65);
+    color: var(--text-muted);
 }
+
 
 /* ---------------------------------------------------------
    Kendali kapal (berhenti darurat / mulai)
