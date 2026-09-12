@@ -1,12 +1,28 @@
 # Uji Lapangan 12 September 2026 — Checklist
 
-> **Diperbarui 11 Sep malam, sesudah uji air pertama.** Bagian 0 di bawah
-> merangkum apa yang ditemukan dan apa yang berubah. Perintah jalan di
-> bagian C sudah direvisi — pakai yang itu.
+> **Diperbarui 12 Sep sore, sesudah uji air kedua.** Bagian 0a = temuan uji
+> pertama; bagian 0b = tiga perubahan 12 Sep pagi yang ternyata **memperburuk**
+> dan sudah dikembalikan. Perintah jalan di bagian C sudah direvisi lagi.
 
 ---
 
-## 0. Temuan uji air 11 Sep dan perbaikannya
+## 0b. Uji air kedua (12 Sep): tiga perubahan yang ditarik kembali
+
+| Gejala | Penyebab (perubahan 12 Sep pagi) | Sekarang |
+|---|---|---|
+| Garis gerbang / garis arah kapal hilang di kamera | overlay bersih jadi bawaan | **overlay penuh kembali bawaan**; `--kamera-bersih` untuk mode bersih |
+| Kapal mundur sebentar saat mulai | `--pivot-mundur 1.4`: sisi mundur diperkuat, sisi maju jatuh di zona mati → dorongan bersih mundur | bawaan `1.0`, **jangan dipakai** sampai zona mati diukur |
+| Pasangan terlihat, tiba-tiba pilih satu bola dan belok tajam | `--satu-pivot-px 70`: pasangan gagal dipasangkan *sesaat* (rasio ukuran 0,30 terlalu ketat saat mendekat menyerong) → satu bola → taksiran tengah di luar bingkai → **pivot 50%** | satu bola kembali **koreksi lembut** seperti 11 Sep (`--satu-pivot-px 0`); rasio pasangan dilonggarkan 0,30 → 0,22 |
+| "Menyerah" saat tidak ada bola; RTH diam | `SEARCH_SPEED` 90 × 0,2 = **18** → di bawah zona mati ESC → thruster diam. Plus RTH menolak jalan saat posisi "tidak dipercaya" | pencarian & pulang memakai **tenaga manuver** (`--tenaga-putar`, bawaan ≥ 40%); `--motor-min` bawaan 25; RTH tetap jalan walau posisi ragu (mode `PULANG_..._RAGU`) |
+
+Yang **dipertahankan** dari 12 Sep pagi karena terbukti perlu: gerbang dihitung
+dari jarak (`--pass-jarak`), GPS mati di peta, sasaran = gerbang yang belum
+terlewati, kunci haluan hanya saat posisi dipercaya, `motor_on` untuk peta
+jejak, panel Kendali Kapal di Monitoring.
+
+---
+
+## 0a. Temuan uji air 11 Sep dan perbaikannya
 
 | Gejala di kolam | Akar | Perbaikan |
 |---|---|---|
@@ -34,12 +50,13 @@ Yang diuji hari ini, semuanya **baru dan belum pernah menyentuh air**:
 | 7 | Jalur menghindari tepi kolam | `--margin-kolam 2.0` | `--margin-kolam 0` |
 | 8 | PULANG: tombol dashboard + baterai | `--batt-pulang 25` | jangan tulis flag-nya |
 | 9 | Gerbang dihitung dari jarak | `--pass-jarak 2.2` | `--pass-jarak 0` (kembali ke luas — tidak disarankan) |
-| 10 | Pivot bertenaga + sisi mundur diperkuat | `--tenaga-putar 0.5 --pivot-mundur 1.4` | hapus flag-nya |
-| 11 | Satu bola: pivot dulu kalau error besar | `--satu-pivot-px 70` | `--satu-pivot-px 0` |
+| 10 | Tenaga manuver (pivot, pencarian, pulang) terpisah dari jelajah | `--tenaga-putar 0.5` | hapus flag (bawaan ≥ 40%) |
+| 11 | ~~Satu bola pivot~~ — DITARIK 12 Sep, bawaan mati | `--satu-pivot-px 0` | — |
 | 12 | GPS diabaikan di peta | otomatis (titik acuan kosong) / `--tanpa-gps` | isi kembali `titik` di JSON |
 | 13 | Monitor layar penuh | `--fullscreen` | hapus flag |
 | 14 | Peta jejak GPS: titik valid hanya saat thruster hidup (`motor_on` dari kapal) | otomatis | — (program lama → saringan Doppler) |
-| 15 | Kamera bersih: hanya lingkaran bola yang dipakai kemudi; angka HUD pindah ke panel "Kendali Kapal" di Monitoring admin (`/stream/status`) | otomatis | `--hud` (overlay penuh lama) |
+| 15 | Kamera bersih (bawaan): 2 lingkaran bola pilihan + garis tengah + garis sasaran, tanpa teks; angka di panel "Kendali Kapal" Monitoring (`/stream/status`) | otomatis | `--hud` (teks + semua bola) |
+| 16 | **Sisi aman**: hijau selalu di luar, merah di dalam — penjepit sasaran kemudi untuk semua mode. Log: `sisi-aman:geser` / `konflik` | otomatis | `--tanpa-sisi-aman`, atau kode: `git checkout sebelum-sisi-aman -- .` di `~/asv` |
 
 **Prinsip uji: satu fitur baru per percobaan pertama.** Kalau semuanya
 dinyalakan sekaligus lalu kapal berperilaku aneh, kamu tidak tahu yang mana.
@@ -140,18 +157,21 @@ python3 telemetry_motor_controller_turn_speed.py \
     --image-dir /var/lib/asv/mission_images \
     --api-url http://127.0.0.1/api/telemetry \
     --tenaga 0.2 --motor-min <N> \
-    --tenaga-putar 0.5 --pivot-mundur 1.4 \
+    --tenaga-putar 0.5 \
     --pass-jarak 2.2 --tanpa-gps \
     --batt-pulang 25 --batt-cutoff 15
 ```
 
-Tambahkan `--fullscreen` (dan hapus `--no-display`) kalau ada monitor tercolok.
+`<N>` = zona mati ESC dari B1; kalau belum diukur, hapus flag-nya (bawaan 25).
+**Jangan** menambah `--pivot-mundur` atau `--satu-pivot-px` — keduanya penyebab
+gejala 12 Sep. Tambahkan `--fullscreen` (dan hapus `--no-display`) kalau ada
+monitor tercolok.
 
 Baris yang harus muncul di awal:
 
 ```
 Tenaga motor: 20% (BASE 150 -> 30, MAX 255 -> 51), zona mati ESC: ..., ambang diam peta: ...
-Putaran: tenaga pivot 50%, sisi mundur x1.40, satu bola pivot bila error > 70 px
+Putaran: tenaga pivot 50%, sisi mundur x1.00, satu bola selalu maju-belok
 Algoritma gerbang: kunci gerbang 2.5s, bobot arah 0.50, kunci haluan peta AKTIF, margin kolam 2.0 m, pulang otomatis <25%
 [POSISI] Kerangka dari sumbu manual: start di (3.0, 5.0), sumbu +y menghadap 90.0 derajat. GPS TIDAK dipakai ...
 Gerbang dihitung LEWAT saat kedua bola rata-rata <= 2.2 m (r >= 12 px, luas ~452 px^2). --pass-area 4000 tidak dipakai.
