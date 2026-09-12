@@ -1,12 +1,16 @@
 /* =========================================
-   ADMIN CAMERA
+   CAMERA PAGE (Shared & Harmonized)
 ========================================= */
 
-.admin-camera-page {
+.camera-page,
+.admin-camera-page,
+.user-camera-page {
     width: 100%;
 }
 
-.admin-camera-card {
+.camera-card,
+.admin-camera-card,
+.user-camera-card {
     background: var(--bg-card);
     border: 1px solid var(--border-card);
     border-radius: 16px;
@@ -15,21 +19,27 @@
     transition: all .25s ease;
 }
 
-.admin-camera-header {
+.camera-header,
+.admin-camera-header,
+.user-camera-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 24px;
 }
 
-.admin-camera-header h2 {
+.camera-header h2,
+.admin-camera-header h2,
+.user-camera-header h2 {
     color: var(--text-primary);
     font-size: 20px;
     font-weight: 700;
     margin: 0;
 }
 
-.admin-camera-live {
+.camera-live,
+.admin-camera-live,
+.user-camera-live {
     display: flex;
     align-items: center;
     gap: 8px;
@@ -41,7 +51,9 @@
     border-radius: 999px;
 }
 
-.admin-live-dot {
+.live-dot,
+.admin-live-dot,
+.user-live-dot {
     width: 8px;
     height: 8px;
     border-radius: 50%;
@@ -49,16 +61,22 @@
     box-shadow: 0 0 8px var(--accent-emerald);
 }
 
-.admin-camera-item {
+.camera-item,
+.admin-camera-item,
+.user-camera-item {
     margin-bottom: 22px;
     position: relative;
 }
 
-.admin-camera-item:last-child {
+.camera-item:last-child,
+.admin-camera-item:last-child,
+.user-camera-item:last-child {
     margin-bottom: 0;
 }
 
-.admin-camera-label {
+.camera-label,
+.admin-camera-label,
+.user-camera-label {
     position: absolute;
     top: 14px;
     left: 14px;
@@ -73,7 +91,9 @@
     border: 1px solid rgba(255, 255, 255, 0.15);
 }
 
-.admin-camera-frame {
+.camera-frame,
+.admin-camera-frame,
+.user-camera-frame {
     width: 100%;
     height: 330px;
     overflow: hidden;
@@ -83,18 +103,24 @@
     transition: all .25s ease;
 }
 
-.admin-camera-frame img {
+.camera-frame img,
+.admin-camera-frame img,
+.user-camera-frame img {
     width: 100%;
     height: 100%;
     object-fit: cover;
 }
 
-.admin-camera-frame:hover {
+.camera-frame:hover,
+.admin-camera-frame:hover,
+.user-camera-frame:hover {
     border-color: var(--border-card-hover);
     box-shadow: var(--shadow-glow);
 }
 
-.admin-camera-info {
+.camera-info,
+.admin-camera-info,
+.user-camera-info {
     position: absolute;
     bottom: 14px;
     left: 14px;
@@ -106,4 +132,4 @@
     font-size: 12px;
     font-weight: 600;
     border: 1px solid rgba(255, 255, 255, 0.15);
-}
+}
