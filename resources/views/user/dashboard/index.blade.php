@@ -18,13 +18,17 @@
         };
     };
     $sat = $latest?->satellites ?? 0;
+    $batt = $latest?->battery_percent !== null ? round($latest->battery_percent) : 0;
+    $volt = $latest?->voltage ?? 0;
+    $curr = $latest?->current ?? 0;
+    $power = number_format($volt * $curr, 1);
 @endphp
-<div class="user-dashboard-grid">
-    {{-- STATUS KAPAL --}}
-    <div class="user-card user-status-card">
-        <div class="user-status-content">
-            <div class="user-status-icon">
-                <i class="bi bi-shield-fill-check"></i>
+<div class="dashboard-grid">
+    {{-- Status Kapal --}}
+    <div class="card dashboard-status-card">
+        <div class="dashboard-status-content">
+            <div class="dashboard-status-icon">
+                <i class="bi bi-shield-check"></i>
             </div>
             <div>
                 <small>Status Kapal</small>
@@ -33,30 +37,32 @@
             </div>
         </div>
     </div>
-    {{-- KECEPATAN --}}
-    <div class="user-card user-speed-card">
+
+    {{-- Kecepatan --}}
+    <div class="card dashboard-speed-card">
         <i class="bi bi-speedometer2"></i>
         <div>
             <small>Kecepatan</small>
             <h2><span id="dash-speed">{{ $latest?->speed !== null ? number_format($latest->speed * 0.277778, 1) : '0.0' }}</span> <span>m/s</span></h2>
         </div>
     </div>
-    {{-- HALUAN --}}
-    <div class="user-card user-heading-card">
+
+    {{-- Haluan --}}
+    <div class="card dashboard-heading-card">
         <i class="bi bi-compass"></i>
         <div>
             <small>Haluan</small>
-            <h2><span id="dash-heading">{{ round($latest?->heading ?? 0) }}</span>°</h2>
+            <h2><span id="dash-heading">{{ $latest?->heading !== null ? round($latest->heading) : 0 }}</span>°</h2>
             <p id="dash-heading-text">{{ $arahHaluan($latest?->heading) }}</p>
         </div>
     </div>
-    {{-- KAMERA --}}
-    <div class="user-card user-camera-card">
+
+    {{-- Kamera --}}
+    <div class="card dashboard-camera-card">
         <h3>Kamera Permukaan</h3>
-        <div class="user-camera-wrapper">
-            {{-- Kamera Atas Air --}}
-            <div class="user-camera-item">
-                <div class="user-camera-box">
+        <div class="dashboard-camera-wrapper">
+            <div class="dashboard-camera-item">
+                <div class="dashboard-camera-box">
                     @include('partials.camera-frame', [
                         'url' => config('camera.streams.atas'),
                         'label' => 'Kamera Atas Air',
@@ -64,9 +70,8 @@
                 </div>
                 <p>Kamera Atas Air</p>
             </div>
-            {{-- Kamera Bawah Air --}}
-            <div class="user-camera-item">
-                <div class="user-camera-box">
+            <div class="dashboard-camera-item">
+                <div class="dashboard-camera-box">
                     @include('partials.camera-frame', [
                         'url' => config('camera.streams.bawah'),
                         'label' => 'Kamera Bawah Air',
@@ -76,14 +81,9 @@
             </div>
         </div>
     </div>
-    {{-- BATTERY --}}
-    @php
-        $batt = $latest?->battery_percent !== null ? round($latest->battery_percent) : 0;
-        $volt = $latest?->voltage ?? 0;
-        $curr = $latest?->current ?? 0;
-        $power = number_format($volt * $curr, 1);
-    @endphp
-    <div class="user-card user-battery-card">
+
+    {{-- Performa Baterai --}}
+    <div class="card dashboard-battery-card">
         <div class="dash-card-header">
             <h3><i class="bi bi-battery-charging"></i> Performa Baterai</h3>
             <span class="dash-status-pill {{ $batt < 20 ? 'pill-danger' : 'pill-normal' }}" id="dash-battery-status-pill">{{ $batt < 20 ? 'Lemah' : 'Normal' }}</span>
@@ -117,22 +117,23 @@
             </div>
         </div>
     </div>
-    {{-- PERFORMA --}}
-    <div class="user-card user-performance-card">
+
+    {{-- Performa Kapal --}}
+    <div class="card dashboard-performance-card">
         <div class="dash-card-header">
             <h3><i class="bi bi-cpu"></i> Performa Kapal</h3>
             <span class="dash-status-pill {{ $sat > 0 ? 'pill-normal' : 'pill-warning' }}" id="dash-gps-status">{{ $sat > 0 ? 'GPS Terkunci' : 'Mencari...' }}</span>
         </div>
-        <div class="user-performance-wrapper">
-            <div class="user-performance-item">
-                <div class="user-circle">
+        <div class="dashboard-performance-wrapper">
+            <div class="dashboard-performance-item">
+                <div class="dashboard-circle">
                     <span id="dash-satellites">{{ $sat }}</span>
                 </div>
                 <p>Satelit GPS</p>
                 <small id="dash-gps-sub">{{ $sat >= 4 ? 'Sinyal Kuat' : ($sat > 0 ? 'Sinyal Cukup' : 'Mencari...') }}</small>
             </div>
-            <div class="user-performance-item">
-                <div class="user-circle user-circle-76">
+            <div class="dashboard-performance-item">
+                <div class="dashboard-circle">
                     <span id="dash-altitude">{{ round($latest?->altitude ?? 0) }}m</span>
                 </div>
                 <p>Ketinggian</p>
@@ -156,8 +157,9 @@
             </div>
         </div>
     </div>
-    {{-- STATUS SISTEM --}}
-    <div class="user-card user-system-card">
+
+    {{-- Status Sistem --}}
+    <div class="card dashboard-system-card">
         <h3>Status Sistem</h3>
         <ul>
             <li>
@@ -173,16 +175,21 @@
                 Sistem Normal
             </li>
         </ul>
+        <div class="dashboard-system-mode">
+            <span class="dash-status-pill pill-normal">
+                <i class="bi bi-shield-check"></i> Mode Pemantauan
+            </span>
+        </div>
     </div>
-    {{-- LINTASAN --}}
-    <div class="user-card user-map-card">
+
+    {{-- Posisi Kapal --}}
+    <div class="card dashboard-map-card">
         <h3>Posisi Kapal</h3>
         @include('partials.trajectory-map', ['track' => $track])
     </div>
 </div>
 
 <script>
-
 function getHeadingDirection(heading) {
     if (heading >= 337.5 || heading < 22.5) return 'North';
     if (heading >= 22.5 && heading < 67.5) return 'North East';
@@ -198,73 +205,72 @@ function getHeadingDirection(heading) {
 // Teks #system-ws-status diurus resources/js/echo.js dari keadaan sambungan
 // yang sebenarnya - jangan tulis manual di sini.
 saatEchoSiap(() => {
-        window.Echo.channel('sensors')
-            .listen('SensorDataUpdated', (e) => {
-                const data = e.sensorData;
-                if (data.speed !== null) {
-                    // Convert km/h to m/s if speed is in km/h (1 km/h = 0.277778 m/s)
-                    const speedMS = (data.speed * 0.277778).toFixed(1);
-                    document.getElementById('dash-speed').textContent = speedMS;
+    window.Echo.channel('sensors')
+        .listen('SensorDataUpdated', (e) => {
+            const data = e.sensorData;
+            if (data.speed !== null) {
+                // Kecepatan GPS dalam km/h -> m/s
+                angkaHalus('dash-speed', data.speed * 0.277778, { desimal: 1 });
+            }
+            if (data.heading !== null) {
+                angkaHalus('dash-heading', data.heading, {
+                    putar: true,
+                    saat: (v) => {
+                        document.getElementById('dash-heading-text').textContent =
+                            getHeadingDirection(v);
+                    },
+                });
+            }
+            if (data.battery_percent !== null) {
+                const bPercent = Math.round(data.battery_percent);
+                document.getElementById('dash-battery-percent').textContent = bPercent + '%';
+                const bar = document.getElementById('dash-battery-bar');
+                if (bar) bar.style.width = bPercent + '%';
+                const pill = document.getElementById('dash-battery-status-pill');
+                if (pill) {
+                    pill.textContent = bPercent < 20 ? 'Lemah' : 'Normal';
+                    pill.className = 'dash-status-pill ' + (bPercent < 20 ? 'pill-danger' : 'pill-normal');
                 }
-                if (data.heading !== null) {
-                    angkaHalus('dash-heading', data.heading, {
-                        putar: true,
-                        saat: (v) => {
-                            document.getElementById('dash-heading-text').textContent =
-                                getHeadingDirection(v);
-                        },
-                    });
+            }
+            let currentVolt = null;
+            let currentCurr = null;
+            if (data.voltage !== null) {
+                currentVolt = parseFloat(data.voltage);
+                document.getElementById('dash-voltage').textContent = currentVolt.toFixed(1) + ' V';
+            }
+            if (data.current !== null) {
+                currentCurr = parseFloat(data.current);
+                document.getElementById('dash-current').textContent = currentCurr.toFixed(1) + ' A';
+            }
+            const powerEl = document.getElementById('dash-power');
+            if (powerEl && (data.voltage !== null || data.current !== null)) {
+                const v = currentVolt !== null ? currentVolt : parseFloat(document.getElementById('dash-voltage')?.textContent || 0);
+                const i = currentCurr !== null ? currentCurr : parseFloat(document.getElementById('dash-current')?.textContent || 0);
+                if (!isNaN(v) && !isNaN(i)) {
+                    powerEl.textContent = (v * i).toFixed(1) + ' W';
                 }
-                if (data.battery_percent !== null) {
-                    const bPercent = Math.round(data.battery_percent);
-                    document.getElementById('dash-battery-percent').textContent = bPercent + '%';
-                    const bar = document.getElementById('dash-battery-bar');
-                    if (bar) bar.style.width = bPercent + '%';
-                    const pill = document.getElementById('dash-battery-status-pill');
-                    if (pill) {
-                        pill.textContent = bPercent < 20 ? 'Lemah' : 'Normal';
-                        pill.className = 'dash-status-pill ' + (bPercent < 20 ? 'pill-danger' : 'pill-normal');
-                    }
+            }
+            if (data.satellites !== null) {
+                const s = data.satellites;
+                document.getElementById('dash-satellites').textContent = s;
+                const gpsStatus = document.getElementById('dash-gps-status');
+                if (gpsStatus) {
+                    gpsStatus.textContent = s > 0 ? 'GPS Terkunci' : 'Mencari...';
+                    gpsStatus.className = 'dash-status-pill ' + (s > 0 ? 'pill-normal' : 'pill-warning');
                 }
-                let currentVolt = null;
-                let currentCurr = null;
-                if (data.voltage !== null) {
-                    currentVolt = parseFloat(data.voltage);
-                    document.getElementById('dash-voltage').textContent = currentVolt.toFixed(1) + ' V';
+                const gpsSub = document.getElementById('dash-gps-sub');
+                if (gpsSub) {
+                    gpsSub.textContent = s >= 4 ? 'Sinyal Kuat' : (s > 0 ? 'Sinyal Cukup' : 'Mencari...');
                 }
-                if (data.current !== null) {
-                    currentCurr = parseFloat(data.current);
-                    document.getElementById('dash-current').textContent = currentCurr.toFixed(1) + ' A';
+                const gpsQual = document.getElementById('dash-gps-quality');
+                if (gpsQual) {
+                    gpsQual.textContent = s >= 6 ? '3D Fix (Akurat)' : (s > 0 ? '2D Fix' : 'Mencari Sinyal');
                 }
-                const powerEl = document.getElementById('dash-power');
-                if (powerEl && (data.voltage !== null || data.current !== null)) {
-                    const v = currentVolt !== null ? currentVolt : parseFloat(document.getElementById('dash-voltage')?.textContent || 0);
-                    const i = currentCurr !== null ? currentCurr : parseFloat(document.getElementById('dash-current')?.textContent || 0);
-                    if (!isNaN(v) && !isNaN(i)) {
-                        powerEl.textContent = (v * i).toFixed(1) + ' W';
-                    }
-                }
-                if (data.satellites !== null) {
-                    const s = data.satellites;
-                    document.getElementById('dash-satellites').textContent = s;
-                    const gpsStatus = document.getElementById('dash-gps-status');
-                    if (gpsStatus) {
-                        gpsStatus.textContent = s > 0 ? 'GPS Terkunci' : 'Mencari...';
-                        gpsStatus.className = 'dash-status-pill ' + (s > 0 ? 'pill-normal' : 'pill-warning');
-                    }
-                    const gpsSub = document.getElementById('dash-gps-sub');
-                    if (gpsSub) {
-                        gpsSub.textContent = s >= 4 ? 'Sinyal Kuat' : (s > 0 ? 'Sinyal Cukup' : 'Mencari...');
-                    }
-                    const gpsQual = document.getElementById('dash-gps-quality');
-                    if (gpsQual) {
-                        gpsQual.textContent = s >= 6 ? '3D Fix (Akurat)' : (s > 0 ? '2D Fix' : 'Mencari Sinyal');
-                    }
-                }
-                if (data.altitude !== null) {
-                    document.getElementById('dash-altitude').textContent = Math.round(data.altitude) + 'm';
-                }
-            });
+            }
+            if (data.altitude !== null) {
+                document.getElementById('dash-altitude').textContent = Math.round(data.altitude) + 'm';
+            }
+        });
 });
 </script>
 @endsection

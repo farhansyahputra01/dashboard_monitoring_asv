@@ -39,59 +39,61 @@
          LINTASAN
     ====================================================== --}}
     <div class="monitor-card monitor-map-card">
-        <div class="monitor-card-title">
-            <i class="bi bi-signpost-2-fill"></i>
-            <span>Lintasan</span>
-        </div>
-        {{-- PILIHAN LINTASAN --}}
-        <form
-            action="{{ route('admin.monitoring.track') }}"
-            method="POST"
-            class="monitor-track-selector"
-        >
-            @csrf
-            <label>Pilih Lintasan</label>
-            <select
-                name="active_track"
-                id="trackSelect"
+        <div class="monitor-card-header-row">
+            <div class="monitor-card-title">
+                <i class="bi bi-signpost-2-fill"></i>
+                <span>Lintasan</span>
+            </div>
+            {{-- PILIHAN LINTASAN --}}
+            <form
+                action="{{ route('admin.monitoring.track') }}"
+                method="POST"
+                class="monitor-track-selector"
             >
-                <option
-                    value="A"
-                    {{ optional($setting)->active_track=='A' ? 'selected' : '' }}
+                @csrf
+                <label>Pilih Lintasan</label>
+                <select
+                    name="active_track"
+                    id="trackSelect"
                 >
-                    Lintasan A
-                </option>
-                <option
-                    value="B"
-                    {{ optional($setting)->active_track=='B' ? 'selected' : '' }}
-                >
-                    Lintasan B
-                </option>
-            </select>
-            <button type="submit">
-                Simpan
-            </button>
+                    <option
+                        value="A"
+                        {{ optional($setting)->active_track=='A' ? 'selected' : '' }}
+                    >
+                        Lintasan A
+                    </option>
+                    <option
+                        value="B"
+                        {{ optional($setting)->active_track=='B' ? 'selected' : '' }}
+                    >
+                        Lintasan B
+                    </option>
+                </select>
+                <button type="submit">
+                    Simpan
+                </button>
 
+                {{--
+                    Pilihan di kotak ini BELUM berlaku sampai Simpan ditekan.
+
+                    Tanpa penanda ini, peta ikut berpindah begitu pilihan diganti
+                    sementara sistem masih memakai yang lama - dua pengertian
+                    "lintasan terpilih" yang berbeda di satu layar, dan operator
+                    tidak punya cara tahu yang mana yang sedang berlaku.
+                --}}
+                <span class="track-belum-simpan" data-track-belum-simpan hidden>
+                    belum disimpan
+                </span>
+            </form>
             {{--
-                Pilihan di kotak ini BELUM berlaku sampai Simpan ditekan.
+                Kendali kapal: di baris paling atas kartu, sejajar pemilih lintasan.
 
-                Tanpa penanda ini, peta ikut berpindah begitu pilihan diganti
-                sementara sistem masih memakai yang lama - dua pengertian
-                "lintasan terpilih" yang berbeda di satu layar, dan operator
-                tidak punya cara tahu yang mana yang sedang berlaku.
+                TIDAK boleh diletakkan di dalam .monitor-track-layout - itu grid
+                dua kolom (panel info | peta), jadi apa pun yang disisipkan di sana
+                merebut kolom peta dan mendorong petanya turun ke baris berikutnya.
             --}}
-            <span class="track-belum-simpan" data-track-belum-simpan hidden>
-                belum disimpan
-            </span>
-        </form>
-        {{--
-            Kendali kapal: di baris paling atas kartu, sejajar pemilih lintasan.
-
-            TIDAK boleh diletakkan di dalam .monitor-track-layout - itu grid
-            dua kolom (panel info | peta), jadi apa pun yang disisipkan di sana
-            merebut kolom peta dan mendorong petanya turun ke baris berikutnya.
-        --}}
-        @include('partials.kendali-kapal', ['ringkas' => true])
+            @include('partials.kendali-kapal', ['ringkas' => true])
+        </div>
 
         {{-- AREA MONITORING LINTASAN --}}
         <div class="monitor-track-layout">
@@ -213,7 +215,7 @@
         <div class="monitor-card">
             <div class="monitor-info-header">
                 <i class="bi bi-signpost-2-fill"></i>
-                <span>Altitude / Satelites</span>
+                <span>Altitude / Satelit</span>
             </div>
             <div class="monitor-info-value">
                 <strong id="mon-alt-meters">

@@ -26,20 +26,22 @@
          LINTASAN
     ====================================================== --}}
     <div class="monitor-card monitor-map-card">
-
-        <div class="monitor-card-title">
-            <i class="bi bi-signpost-2-fill"></i>
-            <span>Lintasan</span>
+        <div class="monitor-card-header-row">
+            <div class="monitor-card-title">
+                <i class="bi bi-signpost-2-fill"></i>
+                <span>Lintasan</span>
+            </div>
+            <span class="monitor-track-badge">
+                <i class="bi bi-geo-alt-fill"></i> Lintasan {{ $setting->active_track ?? 'A' }} (Aktif)
+            </span>
         </div>
 
         {{-- AREA MONITORING LINTASAN --}}
         <div class="monitor-track-layout">
-
             {{-- =================================================
                  PANEL INFORMASI
             ================================================== --}}
             <div class="monitor-track-info">
-
                 <div class="track-info-section">
                     <h4>Positioning</h4>
                     <ol>
@@ -71,410 +73,237 @@
 
                 {{-- STATUS GPS --}}
                 <div class="track-status">
-
                     <div>
                         <span>Latitude</span>
                         <strong id="dummyLatitude">
                             {{ $latest?->latitude !== null ? number_format($latest->latitude, 6, '.', '') : '-' }}
                         </strong>
                     </div>
-
                     <div>
                         <span>Longitude</span>
                         <strong id="dummyLongitude">
                             {{ $latest?->longitude !== null ? number_format($latest->longitude, 6, '.', '') : '-' }}
                         </strong>
                     </div>
-
                     <div>
                         <span>GPS</span>
                         <strong id="gpsStatusText" class="{{ $sat > 0 ? 'gps-active' : '' }}">
                             {{ $sat > 0 ? '● ACTIVE' : '● SEARCHING' }}
                         </strong>
                     </div>
-
                 </div>
-
             </div>
-
 
             {{-- =================================================
                  AREA LINTASAN
             ================================================== --}}
             <div class="monitor-track-area">
-
                 @include('partials.lintasan-map', [
                     'jejak' => $jejakLintasan,
                     'lintasan' => $setting->active_track ?? 'A',
                 ])
             </div>
-
         </div>
-
     </div>
 
-
     {{-- =====================================================
-         INFO
+         INFO SENSOR
     ====================================================== --}}
     <div class="monitor-info-grid">
-
-        {{-- KOORDINAT --}}
+        {{-- Koordinat --}}
         <div class="monitor-card">
-
             <div class="monitor-info-header">
                 <i class="bi bi-geo-alt-fill"></i>
                 <span>Koordinat</span>
             </div>
-
             <div class="monitor-info-value">
-
                 <strong id="coordinateLatitude">
                     {{ $latest?->latitude !== null ? number_format($latest->latitude, 6, '.', '') : '-' }}
                 </strong>
-
                 <small id="coordinateLongitude">
                     {{ $latest?->longitude !== null ? number_format($latest->longitude, 6, '.', '') : '-' }}
                 </small>
-
             </div>
-
         </div>
 
-
-        {{-- KECEPATAN --}}
+        {{-- Kecepatan --}}
         <div class="monitor-card">
-
             <div class="monitor-info-header">
                 <i class="bi bi-speedometer2"></i>
                 <span>Kecepatan</span>
             </div>
-
             <div class="monitor-info-value">
-
                 <strong id="mon-speed-ms">
                     {{ number_format(($latest?->speed ?? 0) * 0.277778, 1) }} m/s
                 </strong>
-
                 <small id="mon-speed-kmh">
                     {{ number_format($latest?->speed ?? 0, 1) }} km/h
                 </small>
-
             </div>
-
         </div>
 
-
-        {{-- HALUAN --}}
+        {{-- Haluan --}}
         <div class="monitor-card">
-
             <div class="monitor-info-header">
                 <i class="bi bi-compass-fill"></i>
                 <span>Haluan</span>
             </div>
-
             <div class="monitor-info-value">
-
                 <strong id="mon-heading-deg">
                     {{ round($latest?->heading ?? 0) }}°
                 </strong>
-
                 <small id="mon-heading-dir">
                     {{ $arahHaluan($latest?->heading) }}
                 </small>
-
             </div>
-
         </div>
 
-
-        {{-- TOTAL JARAK --}}
+        {{-- Altitude / Satelit --}}
         <div class="monitor-card">
-
             <div class="monitor-info-header">
                 <i class="bi bi-signpost-2-fill"></i>
-                <span>Altitude / Satelites</span>
+                <span>Altitude / Satelit</span>
             </div>
-
             <div class="monitor-info-value">
-
                 <strong id="mon-alt-meters">
                     {{ round($latest?->altitude ?? 0) }} m
                 </strong>
-
                 <small id="mon-satellites">
                     {{ $sat }} Sats
                 </small>
-
             </div>
-
         </div>
 
-
-        {{-- WAKTU TEMPUH --}}
+        {{-- Tegangan & Arus --}}
         <div class="monitor-card">
-
             <div class="monitor-info-header">
                 <i class="bi bi-lightning-charge-fill"></i>
-                <span>Tegangan & Arus</span>
+                <span>Tegangan &amp; Arus</span>
             </div>
-
             <div class="monitor-info-value">
-
                 <strong id="mon-voltage">
                     {{ number_format($latest?->voltage ?? 0, 1) }} V
                 </strong>
-
                 <small id="mon-current">
                     {{ number_format($latest?->current ?? 0, 1) }} A
                 </small>
-
             </div>
-
         </div>
 
-
-        {{-- LOKASI --}}
+        {{-- Lokasi Perairan --}}
         <div class="monitor-card">
-
             <div class="monitor-info-header">
                 <i class="bi bi-water"></i>
                 <span>Lokasi Perairan</span>
             </div>
-
             <div class="monitor-info-value">
-
-                <strong>
-                    Kolam Lomba KKI 2026
-                </strong>
-
-                <small>
-                    Politeknik Negeri Bengkalis
-                </small>
-
+                <strong>Kolam Lomba KKI 2026</strong>
+                <small>Politeknik Negeri Bengkalis</small>
             </div>
-
         </div>
 
-
-        {{-- SUHU --}}
+        {{-- Suhu --}}
         <div class="monitor-card">
-
             <div class="monitor-info-header">
                 <i class="bi bi-thermometer-half"></i>
                 <span>Suhu</span>
             </div>
-
             <div class="monitor-info-value">
-
                 <strong id="temperature">
                     {{ $latest?->temperature !== null ? number_format($latest->temperature, 1) . ' °C' : '- °C' }}
                 </strong>
-
-                <small>
-                    Suhu Lingkungan
-                </small>
-
+                <small>Suhu Lingkungan</small>
             </div>
-
         </div>
 
-
-        {{-- KELEMBAPAN --}}
+        {{-- Kelembapan --}}
         <div class="monitor-card">
-
             <div class="monitor-info-header">
                 <i class="bi bi-droplet-fill"></i>
                 <span>Kelembapan</span>
             </div>
-
             <div class="monitor-info-value">
-
                 <strong id="humidity">
                     {{ $latest?->humidity !== null ? number_format($latest->humidity, 1) . '%' : '-%' }}
                 </strong>
-
-                <small>
-                    Kelembapan Lingkungan
-                </small>
-
+                <small>Kelembapan Lingkungan</small>
             </div>
-
         </div>
-
     </div>
-
 
     {{-- =====================================================
          MONITORING TAMBAHAN
     ====================================================== --}}
     <div class="monitor-bottom-grid">
-
-
-        {{-- =================================================
-             COMPASS
-        ================================================== --}}
+        {{-- Compass --}}
         <div class="monitor-card">
-
             <div class="monitor-card-title">
-
                 <i class="bi bi-compass-fill"></i>
-
                 <span>Compass</span>
-
             </div>
-
-
             <div class="monitor-compass-wrapper">
-
                 <div class="monitor-compass-circle">
-
-                    <div class="monitor-north">
-                        N
-                    </div>
-
-                    <div class="monitor-east">
-                        E
-                    </div>
-
-                    <div class="monitor-south">
-                        S
-                    </div>
-
-                    <div class="monitor-west">
-                        W
-                    </div>
-
+                    <div class="monitor-north">N</div>
+                    <div class="monitor-east">E</div>
+                    <div class="monitor-south">S</div>
+                    <div class="monitor-west">W</div>
                     <div class="monitor-compass-center" id="compassArrow" style="transform: rotate({{ round($latest?->heading ?? 0) }}deg);">
-
                         <svg class="compass-needle" viewBox="0 0 24 24" aria-hidden="true">
                             <polygon points="12,2 19,21 12,17 5,21"/>
                         </svg>
-
                     </div>
-
                 </div>
-
-
                 <div class="monitor-heading-value">
-
-                    <h2 id="mon-compass-heading">
-                        {{ round($latest?->heading ?? 0) }}°
-                    </h2>
-
-                    <p id="mon-compass-dir">
-                        {{ $arahHaluan($latest?->heading) }}
-                    </p>
-
+                    <h2 id="mon-compass-heading">{{ round($latest?->heading ?? 0) }}°</h2>
+                    <p id="mon-compass-dir">{{ $arahHaluan($latest?->heading) }}</p>
                 </div>
-
             </div>
-
         </div>
 
-
-        {{-- =================================================
-             BATTERY
-        ================================================== --}}
+        {{-- Battery --}}
         <div class="monitor-card">
-
             <div class="monitor-card-title">
-
                 <i class="bi bi-battery-half"></i>
-
                 <span>Status Baterai</span>
-
             </div>
-
-
             <div class="monitor-battery">
-
                 <i class="bi bi-battery-half monitor-battery-big"></i>
-
-                <h1 id="mon-battery-percent">
-                    {{ $batt }}%
-                </h1>
-
-                <p id="mon-battery-status">
-                    {{ $batt < 20 ? 'Baterai Lemah' : 'Baterai Normal' }}
-                </p>
-
+                <h1 id="mon-battery-percent">{{ $batt }}%</h1>
+                <p id="mon-battery-status">{{ $batt < 20 ? 'Baterai Lemah' : 'Baterai Normal' }}</p>
                 <div class="monitor-battery-bar">
-
-                    <div
-                        id="mon-battery-fill"
-                        class="monitor-battery-fill"
-                        style="width:{{ $batt }}%"
-                    ></div>
-
+                    <div id="mon-battery-fill" class="monitor-battery-fill" style="width:{{ $batt }}%"></div>
                 </div>
-
             </div>
-
         </div>
 
-
-        {{-- =================================================
-             DISTRIBUSI DAYA
-        ================================================== --}}
+        {{-- Power Distribution --}}
         <div class="monitor-card">
-
             <div class="monitor-card-title">
-
                 <i class="bi bi-lightning-charge-fill"></i>
-
-                <span>
-                    Distribusi Konsumsi Daya
-                </span>
-
+                <span>Distribusi Konsumsi Daya</span>
             </div>
-
-
             <div class="monitor-power-list">
-
                 @foreach([
-                    ['Motor Kiri',38],
-                    ['Motor Kanan',34],
-                    ['Mini PC',10],
-                    ['Kamera',8],
-                    ['Sensor',5],
-                    ['Komunikasi',5]
+                    ['Motor Kiri', 38],
+                    ['Motor Kanan', 34],
+                    ['Mini PC', 10],
+                    ['Kamera', 8],
+                    ['Sensor', 5],
+                    ['Komunikasi', 5]
                 ] as $item)
-
                     <div class="monitor-power-item">
-
                         <div class="monitor-power-top">
-
-                            <span>
-                                {{ $item[0] }}
-                            </span>
-
-                            <strong>
-                                {{ $item[1] }}%
-                            </strong>
-
+                            <span>{{ $item[0] }}</span>
+                            <strong>{{ $item[1] }}%</strong>
                         </div>
-
-
                         <div class="monitor-progress">
-
-                            <div
-                                class="monitor-progress-fill"
-                                style="width:{{ $item[1] }}%"
-                            ></div>
-
+                            <div class="monitor-progress-fill" style="width:{{ $item[1] }}%"></div>
                         </div>
-
                     </div>
-
                 @endforeach
-
             </div>
-
         </div>
-
     </div>
-
 </div>
 
 <script>
@@ -492,89 +321,90 @@ function getHeadingDirection(heading) {
 
 document.addEventListener('DOMContentLoaded', () => {
     saatEchoSiap(() => {
-            window.Echo.channel('sensors')
-                .listen('SensorDataUpdated', (e) => {
-                    const data = e.sensorData;
-                    
-                    // Lat/Lng
-                    if (data.latitude !== null) {
-                        const lat = parseFloat(data.latitude).toFixed(6);
-                        document.getElementById('dummyLatitude').textContent = lat;
-                        document.getElementById('coordinateLatitude').textContent = lat;
+        window.Echo.channel('sensors')
+            .listen('SensorDataUpdated', (e) => {
+                const data = e.sensorData;
+
+                // Posisi
+                if (data.latitude !== null) {
+                    const lat = parseFloat(data.latitude).toFixed(6);
+                    document.getElementById('dummyLatitude').textContent = lat;
+                    document.getElementById('coordinateLatitude').textContent = lat;
+                }
+                if (data.longitude !== null) {
+                    const lng = parseFloat(data.longitude).toFixed(6);
+                    document.getElementById('dummyLongitude').textContent = lng;
+                    document.getElementById('coordinateLongitude').textContent = lng;
+                }
+
+                // Satelit & GPS Status
+                if (data.satellites !== null) {
+                    document.getElementById('mon-satellites').textContent = data.satellites + ' Sats';
+                    const gpsText = document.getElementById('gpsStatusText');
+                    if (data.satellites > 0) {
+                        gpsText.textContent = '● ACTIVE';
+                        gpsText.className = 'gps-active';
+                    } else {
+                        gpsText.textContent = '● SEARCHING';
+                        gpsText.className = '';
                     }
-                    if (data.longitude !== null) {
-                        const lng = parseFloat(data.longitude).toFixed(6);
-                        document.getElementById('dummyLongitude').textContent = lng;
-                        document.getElementById('coordinateLongitude').textContent = lng;
-                    }
-                    
-                    // Satellites & GPS Status
-                    if (data.satellites !== null) {
-                        document.getElementById('mon-satellites').textContent = data.satellites + ' Sats';
-                        const gpsText = document.getElementById('gpsStatusText');
-                        if (data.satellites > 0) {
-                            gpsText.textContent = '● ACTIVE';
-                            gpsText.className = 'gps-active';
-                        } else {
-                            gpsText.textContent = '● SEARCHING';
-                            gpsText.className = '';
-                        }
-                    }
-                    
-                    // Speed
-                    if (data.speed !== null) {
-                        angkaHalus('mon-speed-ms', data.speed * 0.277778, { desimal: 1, satuan: ' m/s' });
-                        angkaHalus('mon-speed-kmh', data.speed, { desimal: 1, satuan: ' km/h' });
-                    }
-                    
-                    // Heading
-                    if (data.heading !== null) {
-                        // putar:true -> 350 lalu 10 derajat dibaca sebagai perputaran 20
-                        // derajat ke kanan, bukan 340 ke kiri.
-                        angkaHalus('mon-heading-deg', data.heading, {
-                            satuan: '°',
-                            putar: true,
-                            saat: (v) => {
-                                const arah = getHeadingDirection(v);
-                                document.getElementById('mon-heading-dir').textContent = arah;
-                                document.getElementById('mon-compass-dir').textContent = arah;
-                            },
-                        });
-                        angkaHalus('mon-compass-heading', data.heading, { satuan: '°', putar: true });
-                        sudutHalus('compassArrow', data.heading);
-                    }
-                    
-                    // Altitude
-                    if (data.altitude !== null) {
-                        angkaHalus('mon-alt-meters', data.altitude, { satuan: ' m' });
-                    }
-                    
-                    // Voltage & Current
-                    if (data.voltage !== null) {
-                        angkaHalus('mon-voltage', data.voltage, { desimal: 1, satuan: ' V' });
-                    }
-                    if (data.current !== null) {
-                        angkaHalus('mon-current', data.current, { desimal: 1, satuan: ' A' });
-                    }
-                    
-                    // Temp & Humidity
-                    if (data.temperature !== null) {
-                        angkaHalus('temperature', data.temperature, { desimal: 1, satuan: ' °C' });
-                    }
-                    if (data.humidity !== null) {
-                        angkaHalus('humidity', data.humidity, { desimal: 1, satuan: '%' });
-                    }
-                    
-                    // Battery
-                    if (data.battery_percent !== null) {
-                        const bPercent = Math.round(data.battery_percent);
-                        document.getElementById('mon-battery-percent').textContent = bPercent + '%';
-                        document.getElementById('mon-battery-fill').style.width = bPercent + '%';
-                        document.getElementById('mon-battery-status').textContent = bPercent < 20 ? 'Baterai Lemah' : 'Baterai Normal';
-                    }
-                });
+                }
+
+                // Kecepatan
+                if (data.speed !== null) {
+                    angkaHalus('mon-speed-ms', data.speed * 0.277778, { desimal: 1, satuan: ' m/s' });
+                    angkaHalus('mon-speed-kmh', data.speed, { desimal: 1, satuan: ' km/h' });
+                }
+
+                // Haluan & Kompas
+                if (data.heading !== null) {
+                    angkaHalus('mon-heading-deg', data.heading, {
+                        satuan: '°',
+                        putar: true,
+                        saat: (v) => {
+                            const arah = getHeadingDirection(v);
+                            document.getElementById('mon-heading-dir').textContent = arah;
+                            document.getElementById('mon-compass-dir').textContent = arah;
+                        },
+                    });
+                    angkaHalus('mon-compass-heading', data.heading, { satuan: '°', putar: true });
+                    sudutHalus('compassArrow', data.heading);
+                }
+
+                // Altitude
+                if (data.altitude !== null) {
+                    angkaHalus('mon-alt-meters', data.altitude, { satuan: ' m' });
+                }
+
+                // Tegangan & Arus
+                if (data.voltage !== null) {
+                    angkaHalus('mon-voltage', data.voltage, { desimal: 1, satuan: ' V' });
+                }
+                if (data.current !== null) {
+                    angkaHalus('mon-current', data.current, { desimal: 1, satuan: ' A' });
+                }
+
+                // Suhu & Kelembapan
+                if (data.temperature !== null) {
+                    angkaHalus('temperature', data.temperature, { desimal: 1, satuan: ' °C' });
+                }
+                if (data.humidity !== null) {
+                    angkaHalus('humidity', data.humidity, { desimal: 1, satuan: '%' });
+                }
+
+                // Baterai
+                if (data.battery_percent !== null) {
+                    angkaHalus('mon-battery-percent', data.battery_percent, {
+                        satuan: '%',
+                        saat: (v) => {
+                            document.getElementById('mon-battery-fill').style.width = v + '%';
+                        },
+                    });
+                    document.getElementById('mon-battery-status').textContent =
+                        data.battery_percent < 20 ? 'Baterai Lemah' : 'Baterai Normal';
+                }
+            });
     });
 });
 </script>
-
 @endsection
