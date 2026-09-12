@@ -6,4 +6,5 @@ import './camera-stream';
 import './trajectory-map';
 import './lintasan-map';
 import './kendali-kapal';
+import './panel-kendali';
 

@@ -101,31 +101,35 @@
                  PANEL INFORMASI
             ================================================== --}}
             <div class="monitor-track-info">
-                <div class="track-info-section">
-                    <h4>Positioning</h4>
-                    <ol>
-                        <li>Start</li>
-                        <li>Floating Ball Set 1–10</li>
-                        <li>Mission Surface</li>
-                        <li>Mission Underwater</li>
-                        <li>Docking</li>
-                        <li>Finish</li>
-                    </ol>
-                </div>
-                <div class="track-info-section">
-                    <h4>Altitude Information</h4>
-                    <ol>
-                        <li>TOG</li>
-                        <li>COG</li>
-                        <li>COG</li>
-                    </ol>
-                </div>
-                <div class="track-info-section">
-                    <h4>Indikator Lain</h4>
-                    <ol>
-                        <li>Battery Level</li>
-                        <li>Visual Video</li>
-                    </ol>
+                {{--
+                    KENDALI KAPAL (LANGSUNG). Dulu angka-angka ini ditulis
+                    program Python di atas gambar kamera. Gambarnya sekarang
+                    bersih (hanya lingkaran bola yang dipakai kemudi), dan
+                    angkanya dibaca dari GET /stream/status - JSON yang ditulis
+                    kapal tiap frame, lewat proxy /stream/ nginx. Bukan dari
+                    telemetri database (1 Hz). Lihat resources/js/panel-kendali.js.
+                --}}
+                <div class="track-info-section panel-kendali" data-panel-kendali data-status-url="/stream/status">
+                    <h4>Kendali Kapal <small class="panel-kendali-tanda is-diam" data-k-tanda>memeriksa...</small></h4>
+                    <div class="panel-kendali-mode" data-k="mode">-</div>
+                    <dl class="panel-kendali-grid">
+                        <dt>Motor L / R</dt><dd data-k="motor">-</dd>
+                        <dt>Terkirim</dt><dd data-k="kirim">-</dd>
+                        <dt>Error</dt><dd data-k="error">-</dd>
+                        <dt>Gerbang</dt><dd data-k="gerbang">-</dd>
+                        <dt>Fase</dt><dd data-k="phase">-</dd>
+                        <dt>Bola</dt><dd data-k="bola">-</dd>
+                        <dt>Pelacak</dt><dd data-k="lacak">-</dd>
+                        <dt>Kunci gerbang</dt><dd data-k="kunci">-</dd>
+                        <dt>Sisi</dt><dd data-k="sisi">-</dd>
+                        <dt>Peta</dt><dd data-k="peta">-</dd>
+                        <dt>Posisi</dt><dd data-k="pos">-</dd>
+                        <dt>Dipercaya</dt><dd data-k="percaya">-</dd>
+                        <dt>FPS</dt><dd data-k="fps">-</dd>
+                        <dt>Detektor</dt><dd data-k="det">-</dd>
+                        <dt>Tenaga</dt><dd data-k="tenaga">-</dd>
+                    </dl>
+                    <p class="panel-kendali-ket" data-k="ket">-</p>
                 </div>
                 {{-- STATUS GPS --}}
                 <div class="track-status">

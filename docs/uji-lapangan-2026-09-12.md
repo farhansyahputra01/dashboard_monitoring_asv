@@ -39,6 +39,7 @@ Yang diuji hari ini, semuanya **baru dan belum pernah menyentuh air**:
 | 12 | GPS diabaikan di peta | otomatis (titik acuan kosong) / `--tanpa-gps` | isi kembali `titik` di JSON |
 | 13 | Monitor layar penuh | `--fullscreen` | hapus flag |
 | 14 | Peta jejak GPS: titik valid hanya saat thruster hidup (`motor_on` dari kapal) | otomatis | — (program lama → saringan Doppler) |
+| 15 | Kamera bersih: hanya lingkaran bola yang dipakai kemudi; angka HUD pindah ke panel "Kendali Kapal" di Monitoring admin (`/stream/status`) | otomatis | `--hud` (overlay penuh lama) |
 
 **Prinsip uji: satu fitur baru per percobaan pertama.** Kalau semuanya
 dinyalakan sekaligus lalu kapal berperilaku aneh, kamu tidak tahu yang mana.
