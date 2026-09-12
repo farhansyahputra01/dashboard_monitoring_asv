@@ -21,6 +21,20 @@
     $batt = $latest?->battery_percent !== null ? round($latest->battery_percent) : 0;
 @endphp
 <div class="monitoring-page">
+    @if(session('success'))
+        <div class="alert alert-success" style="padding: 12px 18px; border-radius: 12px; background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.3); color: var(--accent-emerald); font-weight: 600; font-size: 13px; display: flex; align-items: center; gap: 10px;">
+            <i class="bi bi-check-circle-fill" style="font-size: 16px;"></i>
+            <span>{{ session('success') }}</span>
+        </div>
+    @endif
+
+    @if($errors->any())
+        <div class="alert alert-danger" style="padding: 12px 18px; border-radius: 12px; background: rgba(244, 63, 94, 0.15); border: 1px solid rgba(244, 63, 94, 0.3); color: var(--accent-rose); font-weight: 600; font-size: 13px; display: flex; align-items: center; gap: 10px;">
+            <i class="bi bi-exclamation-triangle-fill" style="font-size: 16px;"></i>
+            <span>{{ $errors->first() }}</span>
+        </div>
+    @endif
+
     {{-- =====================================================
          LINTASAN
     ====================================================== --}}

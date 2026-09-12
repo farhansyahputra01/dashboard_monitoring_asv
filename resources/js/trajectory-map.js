@@ -147,15 +147,34 @@ const LANGKAH_HALUS_M = 1;
 // paling halus yang menyingkir saat sudah terlalu jauh untuk berguna.
 const MIN_PIKSEL_GRID_HALUS = 6;
 
-const WARNA = {
-    gridHalus: 'rgba(255,255,255,.035)',
-    grid: 'rgba(255,255,255,.10)',
-    sumbu: 'rgba(255,255,255,.22)',
-    jejak: '#00E5FF',
-    home: '#4ade80',
-    kapal: '#FFD166',
-    teks: 'rgba(255,255,255,.55)',
-};
+function getWarnaTrajectory() {
+    const isLight = document.documentElement.getAttribute('data-theme') === 'light';
+    if (isLight) {
+        return {
+            gridHalus: 'rgba(2, 132, 199, 0.08)',
+            grid: 'rgba(2, 132, 199, 0.20)',
+            sumbu: 'rgba(71, 85, 105, 0.65)',
+            jejak: '#0284c7',
+            home: '#16a34a',
+            kapal: '#d97706',
+            teks: 'rgba(71, 85, 105, 0.85)',
+        };
+    }
+    return {
+        gridHalus: 'rgba(255,255,255,.035)',
+        grid: 'rgba(255,255,255,.10)',
+        sumbu: 'rgba(255,255,255,.22)',
+        jejak: '#00E5FF',
+        home: '#4ade80',
+        kapal: '#FFD166',
+        teks: 'rgba(255,255,255,.55)',
+    };
+}
+
+const WARNA = new Proxy({}, {
+    get: (_, prop) => getWarnaTrajectory()[prop]
+});
+
 
 function buatPeta(wadah) {
     const canvas = wadah.querySelector('.trajectory-canvas');
@@ -742,6 +761,11 @@ document.addEventListener('DOMContentLoaded', () => {
     // Ukuran kanvas ikut ukuran kartu, jadi harus digambar ulang saat berubah.
     const amati = new ResizeObserver(() => peta.forEach((p) => p.gambar()));
     wadah.forEach((el) => amati.observe(el));
+
+    const amatiTema = new MutationObserver(() => peta.forEach((p) => p.gambar()));
+    amatiTema.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+    window.addEventListener('theme-changed', () => peta.forEach((p) => p.gambar()));
+
 
     setTimeout(() => {
         if (!window.Echo) {

@@ -11,17 +11,16 @@ window.Pusher = Pusher;
 // sensor beku tanpa pesan error. Dengan cara ini dashboard ikut host apapun -
 // .test di laptop, IP di komputer lain - tanpa perlu build ulang saat IP
 // laptop berganti.
-const scheme = window.location.protocol === 'https:' ? 'https' : 'http';
-const port = window.location.port
-    ? Number(window.location.port)
-    : (scheme === 'https' ? 443 : 80);
+const wsHost = import.meta.env.VITE_REVERB_HOST || window.location.hostname;
+const wsPort = import.meta.env.VITE_REVERB_PORT ? Number(import.meta.env.VITE_REVERB_PORT) : 8080;
+const scheme = (import.meta.env.VITE_REVERB_SCHEME ?? (window.location.protocol === 'https:' ? 'https' : 'http'));
 
 window.Echo = new Echo({
     broadcaster: 'reverb',
     key: import.meta.env.VITE_REVERB_APP_KEY,
-    wsHost: window.location.hostname,
-    wsPort: port,
-    wssPort: port,
+    wsHost: wsHost,
+    wsPort: wsPort,
+    wssPort: wsPort,
     forceTLS: scheme === 'https',
     enabledTransports: ['ws', 'wss'],
 });

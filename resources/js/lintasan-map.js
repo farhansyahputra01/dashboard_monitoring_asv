@@ -29,24 +29,52 @@
  * klik saat lomba berjalan adalah bahaya, bukan kemudahan.
  */
 
-const WARNA = {
-    latar: '#0b1220',
-    arena: '#111c2e',
-    gridHalus: 'rgba(148, 163, 184, 0.12)',
-    gridTebal: 'rgba(148, 163, 184, 0.28)',
-    tepi: 'rgba(148, 163, 184, 0.55)',
-    label: 'rgba(148, 163, 184, 0.75)',
-    kolam: 'rgba(56, 189, 248, 0.10)',
-    kolamTepi: 'rgba(56, 189, 248, 0.55)',
-    merah: '#ef4444',
-    hijau: '#22c55e',
-    biru: '#3b82f6',
-    jejak: 'rgba(250, 204, 21, 0.85)',
-    kapal: '#facc15',
-    start: 'rgba(226, 232, 240, 0.8)',
-    pegangan: 'rgba(255, 255, 255, 0.85)',
-    peganganAktif: '#38bdf8',
-};
+function getWarna() {
+    const isLight = document.documentElement.getAttribute('data-theme') === 'light';
+    if (isLight) {
+        return {
+            latar: '#f0f9ff',
+            arena: '#ffffff',
+            gridHalus: 'rgba(2, 132, 199, 0.08)',
+            gridTebal: 'rgba(2, 132, 199, 0.20)',
+            tepi: 'rgba(71, 85, 105, 0.65)',
+            label: 'rgba(71, 85, 105, 0.90)',
+            kolam: 'rgba(2, 132, 199, 0.08)',
+            kolamTepi: 'rgba(2, 132, 199, 0.45)',
+            merah: '#dc2626',
+            hijau: '#16a34a',
+            biru: '#2563eb',
+            jejak: 'rgba(217, 119, 6, 0.9)',
+            kapal: '#d97706',
+            start: 'rgba(15, 23, 42, 0.8)',
+            pegangan: 'rgba(15, 23, 42, 0.85)',
+            peganganAktif: '#0284c7',
+        };
+    }
+    return {
+        latar: '#09141f',
+        arena: '#0d1a29',
+        gridHalus: 'rgba(148, 163, 184, 0.12)',
+        gridTebal: 'rgba(148, 163, 184, 0.28)',
+        tepi: 'rgba(148, 163, 184, 0.55)',
+        label: 'rgba(148, 163, 184, 0.75)',
+        kolam: 'rgba(56, 189, 248, 0.10)',
+        kolamTepi: 'rgba(56, 189, 248, 0.55)',
+        merah: '#ef4444',
+        hijau: '#22c55e',
+        biru: '#3b82f6',
+        jejak: 'rgba(250, 204, 21, 0.85)',
+        kapal: '#facc15',
+        start: 'rgba(226, 232, 240, 0.8)',
+        pegangan: 'rgba(255, 255, 255, 0.85)',
+        peganganAktif: '#38bdf8',
+    };
+}
+
+const WARNA = new Proxy({}, {
+    get: (_, prop) => getWarna()[prop]
+});
+
 
 // Tepi untuk angka sumbu (piksel). Tanpa ruang ini, label "0" dan "30"
 // terpotong di pinggir kanvas.
@@ -936,6 +964,24 @@ if (wadah.length) {
 
     const amati = new ResizeObserver(() => peta.forEach((p) => p.gambar()));
     wadah.forEach((el) => amati.observe(el));
+
+    const amatiTema = new MutationObserver(() => peta.forEach((p) => p.gambar()));
+    amatiTema.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+    window.addEventListener('theme-changed', () => peta.forEach((p) => p.gambar()));
+
+    // Sinkronisasi lintasan aktif realtime (dari event lokal atau polling track-sync)
+    window.addEventListener('active-track-changed', (e) => {
+        if (e.detail && (e.detail.activeTrack === 'A' || e.detail.activeTrack === 'B')) {
+            peta.forEach((p) => p.setLintasan(e.detail.activeTrack));
+            const pilih = document.getElementById('trackSelect');
+            if (pilih) {
+                pilih.value = e.detail.activeTrack;
+                const penanda = document.querySelector('[data-track-belum-simpan]');
+                if (penanda) penanda.hidden = true;
+            }
+        }
+    });
+
 
     // Pemilih Lintasan A/B yang sudah ada di halaman admin.
     const pilih = document.getElementById('trackSelect');

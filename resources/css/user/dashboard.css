@@ -14,16 +14,27 @@
 ========================================= */
 
 .user-card {
-    background: #07131B;
-    border: 1px solid #00E5FF;
-    border-radius: 18px;
-    padding: 20px;
-    color: #fff;
+    background: var(--bg-card);
+    border: 1px solid var(--border-card);
+    border-radius: 16px;
+    padding: 22px;
+    color: var(--text-primary);
+    box-shadow: var(--shadow-card);
+    transition: all .25s ease;
+}
+
+.user-card:hover {
+    border-color: var(--border-card-hover);
 }
 
 .user-card h3 {
-    margin-bottom: 18px;
-    font-size: 18px;
+    margin: 0 0 18px;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--accent-cyan);
+    display: flex;
+    align-items: center;
+    gap: 8px;
 }
 
 
@@ -49,18 +60,34 @@
 
 .user-battery-card {
     grid-column: 9 / 13;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
 }
 
 .user-performance-card {
     grid-column: 1 / 5;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
 }
 
 .user-system-card {
     grid-column: 5 / 8;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
 }
 
 .user-map-card {
     grid-column: 8 / 13;
+    display: flex;
+    flex-direction: column;
+}
+
+.user-map-card .trajectory {
+    flex: 1;
+    min-height: 240px;
 }
 
 
@@ -71,25 +98,35 @@
 .user-status-content {
     display: flex;
     align-items: center;
-    gap: 20px;
+    gap: 18px;
 }
 
 .user-status-icon {
-    font-size: 60px;
-    color: #00E5FF;
+    font-size: 48px;
+    color: var(--accent-emerald);
+    filter: drop-shadow(0 0 10px var(--accent-emerald-soft));
 }
 
 .user-status-content h2 {
-    margin: 8px 0;
-    color: #00E5FF;
+    margin: 4px 0 2px;
+    font-size: 22px;
+    font-weight: 800;
+    color: var(--accent-emerald);
+    letter-spacing: 0.04em;
 }
 
 .user-status-content small {
-    color: #94A3B8;
+    color: var(--text-muted);
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
 }
 
 .user-status-content p {
-    color: #CBD5E1;
+    margin: 0;
+    color: var(--text-secondary);
+    font-size: 13px;
 }
 
 
@@ -101,19 +138,46 @@
 .user-heading-card {
     display: flex;
     align-items: center;
-    gap: 20px;
+    gap: 18px;
 }
 
 .user-speed-card i,
 .user-heading-card i {
-    font-size: 52px;
-    color: #00E5FF;
+    font-size: 42px;
+    color: var(--accent-cyan);
+}
+
+.user-speed-card small,
+.user-heading-card small {
+    color: var(--text-muted);
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
 }
 
 .user-speed-card h2,
 .user-heading-card h2 {
-    margin-top: 8px;
-    color: #00E5FF;
+    margin: 4px 0 0;
+    font-size: 28px;
+    font-weight: 800;
+    font-family: 'JetBrains Mono', monospace, sans-serif;
+    color: var(--accent-cyan);
+    font-variant-numeric: tabular-nums;
+}
+
+.user-speed-card h2 span:last-child {
+    font-size: 14px;
+    color: var(--text-muted);
+    font-weight: 600;
+    margin-left: 4px;
+}
+
+#dash-heading-text {
+    margin: 2px 0 0;
+    font-size: 13px;
+    color: var(--text-secondary);
+    font-weight: 600;
 }
 
 
@@ -124,7 +188,7 @@
 .user-camera-wrapper {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 20px;
+    gap: 16px;
 }
 
 .user-camera-item {
@@ -132,14 +196,16 @@
 }
 
 .user-camera-item p {
-    margin-top: 10px;
-    color: #CBD5E1;
+    margin: 8px 0 0;
+    color: var(--text-secondary);
+    font-size: 13px;
+    font-weight: 600;
 }
 
 .user-camera-box {
     height: 230px;
-    border: 2px solid #00E5FF;
-    border-radius: 15px;
+    border: 1px solid var(--border-card);
+    border-radius: 12px;
     overflow: hidden;
     background: #000;
 }
@@ -158,19 +224,18 @@
 .user-camera-placeholder {
     width: 100%;
     height: 100%;
-
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-
-    background: #07131B;
-    color: #00E5FF;
+    background: var(--bg-card-subtle);
+    color: var(--text-muted);
 }
 
 .user-camera-placeholder i {
-    font-size: 40px;
-    margin-bottom: 10px;
+    font-size: 36px;
+    margin-bottom: 8px;
+    color: var(--accent-cyan);
 }
 
 .user-camera-placeholder span {
@@ -179,48 +244,159 @@
 
 
 /* =========================================
-   BATTERY
+   DASHBOARD CARD HEADER & STATUS PILLS
 ========================================= */
 
-.user-battery-content {
-    display: flex;
-    gap: 25px;
-    align-items: center;
-}
-
-.user-battery-icon {
-    font-size: 80px;
-    color: #00E5FF;
-}
-
-.user-battery-info {
-    flex: 1;
-}
-
-.user-battery-item {
+.dash-card-header {
     display: flex;
     justify-content: space-between;
-    margin-bottom: 15px;
-    padding-bottom: 10px;
-    border-bottom: 1px solid rgba(255, 255, 255, .08);
+    align-items: center;
+    margin-bottom: 12px;
 }
 
-.user-battery-item span {
-    color: #CBD5E1;
+.dash-card-header h3 {
+    margin: 0;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--accent-cyan);
+    display: flex;
+    align-items: center;
+    gap: 8px;
 }
 
-.user-battery-item strong {
-    color: #00E5FF;
+.dash-status-pill {
+    font-size: 10px;
+    font-weight: 700;
+    padding: 3px 9px;
+    border-radius: 20px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+.pill-normal {
+    background: var(--accent-emerald-soft);
+    color: var(--accent-emerald);
+    border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.pill-warning {
+    background: rgba(245, 158, 11, 0.15);
+    color: #f59e0b;
+    border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+.pill-danger {
+    background: var(--accent-rose-soft);
+    color: var(--accent-rose);
+    border: 1px solid rgba(244, 63, 94, 0.3);
 }
 
 
 /* =========================================
-   PERFORMANCE
+   BATTERY CARD
+========================================= */
+
+.dash-battery-hero {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 4px 0 8px;
+}
+
+.dash-battery-hero-icon {
+    font-size: 44px;
+    color: var(--accent-emerald);
+    line-height: 1;
+    filter: drop-shadow(0 0 10px var(--accent-emerald-soft));
+}
+
+.dash-battery-hero-main {
+    display: flex;
+    flex-direction: column;
+}
+
+.dash-battery-big-val {
+    font-size: 32px;
+    font-weight: 800;
+    font-family: 'JetBrains Mono', monospace, sans-serif;
+    color: var(--text-primary);
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+}
+
+.dash-battery-sub {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-muted);
+}
+
+.dash-battery-bar-container {
+    margin: 8px 0 14px;
+}
+
+.dash-battery-bar-track {
+    width: 100%;
+    height: 8px;
+    background: var(--bg-card-subtle);
+    border: 1px solid var(--border-subtle);
+    border-radius: 6px;
+    overflow: hidden;
+    padding: 1px;
+}
+
+.dash-battery-bar-fill {
+    height: 100%;
+    border-radius: 4px;
+    background: linear-gradient(90deg, var(--accent-emerald) 0%, var(--accent-cyan) 100%);
+    transition: width 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+    box-shadow: 0 0 8px var(--accent-emerald-soft);
+}
+
+.dash-battery-metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    background: var(--bg-card-subtle);
+    padding: 10px 12px;
+    border-radius: 12px;
+    border: 1px solid var(--border-subtle);
+}
+
+.dash-battery-metric-item {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    text-align: center;
+}
+
+.dash-battery-metric-item .metric-label {
+    font-size: 11px;
+    color: var(--text-muted);
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+}
+
+.dash-battery-metric-item strong {
+    font-family: 'JetBrains Mono', monospace, sans-serif;
+    font-size: 13px;
+    color: var(--accent-cyan);
+    font-weight: 700;
+}
+
+
+/* =========================================
+   PERFORMANCE CARD
 ========================================= */
 
 .user-performance-wrapper {
     display: flex;
     justify-content: space-around;
+    align-items: center;
+    padding: 6px 0;
+    margin-bottom: 8px;
 }
 
 .user-performance-item {
@@ -228,12 +404,61 @@
 }
 
 .user-performance-item p {
-    margin-top: 15px;
-    font-weight: 600;
+    margin: 8px 0 2px;
+    font-weight: 700;
+    font-size: 13px;
+    color: var(--text-primary);
 }
 
 .user-performance-item small {
-    color: #94A3B8;
+    color: var(--text-muted);
+    font-size: 11px;
+}
+
+.dash-perf-footer-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    background: var(--bg-card-subtle);
+    padding: 10px 12px;
+    border-radius: 12px;
+    border: 1px solid var(--border-subtle);
+    margin-top: auto;
+}
+
+.dash-perf-footer-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.dash-perf-footer-item i {
+    font-size: 18px;
+    color: var(--accent-cyan);
+    background: var(--accent-cyan-soft);
+    padding: 6px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.dash-perf-footer-item small {
+    display: block;
+    font-size: 10px;
+    color: var(--text-muted);
+    font-weight: 600;
+    line-height: 1.2;
+}
+
+.dash-perf-footer-item strong {
+    display: block;
+    font-size: 12px;
+    color: var(--text-primary);
+    font-weight: 700;
+    line-height: 1.2;
+    margin-top: 2px;
 }
 
 
@@ -242,52 +467,42 @@
 ========================================= */
 
 .user-circle {
-    width: 120px;
-    height: 120px;
-
+    width: 100px;
+    height: 100px;
     border-radius: 50%;
-
     background: conic-gradient(
-        #00E5FF 79%,
-        #173543 79%
+        var(--accent-cyan) 79%,
+        var(--border-subtle) 79%
     );
-
     display: flex;
     justify-content: center;
     align-items: center;
-
     position: relative;
+    box-shadow: 0 0 15px var(--accent-cyan-soft);
 }
 
 .user-circle::before {
     content: "";
-
     position: absolute;
-
-    width: 88px;
-    height: 88px;
-
-    background: #07131B;
+    width: 74px;
+    height: 74px;
+    background: var(--bg-card);
     border-radius: 50%;
 }
 
 .user-circle span {
     position: relative;
     z-index: 1;
-
-    font-size: 24px;
-    font-weight: bold;
+    font-size: 20px;
+    font-weight: 800;
+    font-family: 'JetBrains Mono', monospace, sans-serif;
+    color: var(--accent-cyan);
 }
-
-
-/* =========================================
-   CIRCLE 76%
-========================================= */
 
 .user-circle-76 {
     background: conic-gradient(
-        #00E5FF 76%,
-        #173543 76%
+        var(--accent-blue) 76%,
+        var(--border-subtle) 76%
     );
 }
 
@@ -297,19 +512,28 @@
 ========================================= */
 
 .user-system-card ul {
-    margin: 20px 0;
+    margin: 8px 0 0;
     padding: 0;
     list-style: none;
 }
 
 .user-system-card li {
-    margin-bottom: 15px;
-    color: #CBD5E1;
+    display: flex;
+    align-items: center;
+    margin-bottom: 12px;
+    color: var(--text-secondary);
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.user-system-card li:last-child {
+    margin-bottom: 0;
 }
 
 .user-system-card i {
-    color: #00E5FF;
-    margin-right: 8px;
+    color: var(--accent-emerald);
+    margin-right: 10px;
+    font-size: 16px;
 }
 
 
@@ -319,17 +543,13 @@
 
 .user-map-placeholder {
     height: 250px;
-
-    border: 2px solid #00E5FF;
-    border-radius: 15px;
-
+    border: 1px solid var(--border-card);
+    border-radius: 12px;
     display: flex;
     justify-content: center;
     align-items: center;
-
-    background: #10202B;
-    color: #00E5FF;
-
+    background: var(--map-bg);
+    color: var(--accent-cyan);
     font-weight: bold;
 }
 
@@ -339,7 +559,6 @@
 ========================================= */
 
 @media (max-width: 1100px) {
-
     .user-dashboard-grid {
         grid-template-columns: repeat(6, 1fr);
     }
@@ -362,9 +581,7 @@
     }
 }
 
-
 @media (max-width: 768px) {
-
     .user-dashboard-grid {
         display: flex;
         flex-direction: column;
@@ -372,6 +589,7 @@
 
     .user-card {
         width: 100%;
+        box-sizing: border-box;
     }
 
     .user-camera-wrapper {
@@ -383,51 +601,3 @@
     }
 }
 
-/* =====================================================
-   LINTASAN DASHBOARD
-===================================================== */
-
-.dashboard-track-wrapper {
-    width: 100%;
-    height: 300px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    overflow: hidden;
-    margin-top: 15px;
-}
-
-.dashboard-track-item {
-    width: 100%;
-    height: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-.dashboard-track-item .track-image-wrapper {
-    width: 100%;
-    height: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-.dashboard-track-item .track-image {
-    max-width: 100%;
-    max-height: 100%;
-    width: auto;
-    height: auto;
-    display: block;
-    object-fit: contain;
-}
-/* Lihat catatan yang sama di admin/dashboard.css */
-.user-map-card {
-    display: flex;
-    flex-direction: column;
-}
-
-.user-map-card .trajectory {
-    flex: 1;
-    min-height: 240px;
-}

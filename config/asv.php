@@ -33,9 +33,9 @@ return [
     |
     */
 
-    'control_url' => env('ASV_CONTROL_URL', 'http://127.0.0.1:8000'),
+    'control_url' => env('ASV_CONTROL_URL', 'http://127.0.0.1:5000'),
 
-    'control_timeout' => (float)env('ASV_CONTROL_TIMEOUT', 3),
+    'control_timeout' => (float)env('ASV_CONTROL_TIMEOUT', 1.0),
 
     /*
     |--------------------------------------------------------------------------
