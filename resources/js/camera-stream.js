@@ -34,6 +34,14 @@ const RETRY_MS = 3000;
 // menentukan, bukan angka ini.
 const FOTO_JEDA_MS = 80;
 
+// Berapa permintaan foto boleh berjalan BERSAMAAN. Satu per satu, lajunya
+// = 1 / RTT: lewat ngrok (RTT 200-500 ms) cuma 2-4 fps dan gambar tampak
+// patah-patah (terlihat 15 Sep 2026). Dua sekaligus menggandakan lajunya,
+// sementara tumpukan paling banyak tetap dua frame - masih tidak bisa
+// "makin tertinggal" seperti MJPEG. Jangan terlalu besar: ngrok gratis
+// membatasi laju request, dan tiap permintaan menambah beban kapal.
+const FOTO_PARALEL = 2;
+
 /* ------------------------------------------------------------------ */
 /* Pilihan mode                                                        */
 /* ------------------------------------------------------------------ */
@@ -63,35 +71,89 @@ function tambahCacheBuster(url, kunci) {
 }
 
 /* ------------------------------------------------------------------ */
-/* Mode foto: minta satu frame, tunggu sampai, minta lagi              */
+/* Mode foto: FOTO_PARALEL permintaan berjalan bersamaan; tiap kali satu   */
+/* sampai, ditampilkan dan diganti permintaan baru                        */
 /* ------------------------------------------------------------------ */
 
 function pasangTarik(img, url) {
     let timer = null;
+    let berjalan = 0;        // permintaan yang belum kembali
+    let nomorMinta = 0;      // nomor urut permintaan berikutnya
+    let nomorTampil = 0;     // nomor terbesar yang sudah ditampilkan
+    let blobUrlAktif = null;
+    let blobUrlBekas = [];
+
+    // Frame ditampilkan lewat blob URL (fetch), bukan img.src langsung:
+    // hanya dengan fetch dua permintaan bisa berjalan bersamaan pada satu
+    // <img>. Blob URL yang sudah tergantikan dilepas begitu ada frame baru
+    // yang selesai termuat - termasuk yang tergantikan sebelum sempat
+    // termuat, supaya tidak bocor.
+    img.addEventListener('load', () => {
+        blobUrlBekas.forEach((u) => URL.revokeObjectURL(u));
+        blobUrlBekas = [];
+    });
+
+    const tampilkan = (blob, nomor) => {
+        // Permintaan yang kembalinya menyalip: frame lebih tua dari yang
+        // sudah tampil dibuang, jangan sampai gambar mundur.
+        if (nomor < nomorTampil) {
+            return;
+        }
+        nomorTampil = nomor;
+        if (blobUrlAktif) {
+            blobUrlBekas.push(blobUrlAktif);
+        }
+        blobUrlAktif = URL.createObjectURL(blob);
+        img.src = blobUrlAktif;
+        img.classList.remove('camera-offline');
+    };
+
+    const jadwal = (ms) => {
+        if (timer) {
+            return;
+        }
+        timer = setTimeout(() => {
+            timer = null;
+            minta();
+        }, ms);
+    };
 
     const minta = () => {
-        timer = null;
         // <img> yang sudah dilepas dari halaman (penampil layar penuh
         // ditutup) berhenti sendiri - tidak ada yang perlu membatalkan.
         if (!img.isConnected) {
             return;
         }
-        img.src = tambahCacheBuster(url, '_t');
+
+        while (berjalan < FOTO_PARALEL) {
+            berjalan += 1;
+            const nomor = ++nomorMinta;
+
+            fetch(tambahCacheBuster(url, '_t'), { cache: 'no-store' })
+                .then((resp) => {
+                    if (!resp.ok) {
+                        throw new Error(`HTTP ${resp.status}`);
+                    }
+                    return resp.blob();
+                })
+                .then((blob) => {
+                    berjalan -= 1;
+                    tampilkan(blob, nomor);
+                    jadwal(FOTO_JEDA_MS);
+                })
+                .catch(() => {
+                    berjalan -= 1;
+                    img.classList.add('camera-offline');
+                    // Kapal/ngrok sedang tidak menjawab: jangan menghujani.
+                    // Timer jeda pendek yang mungkin sudah terpasang dibatalkan.
+                    if (timer) {
+                        clearTimeout(timer);
+                        timer = null;
+                    }
+                    jadwal(RETRY_MS);
+                });
+        }
     };
-
-    img.addEventListener('load', () => {
-        img.classList.remove('camera-offline');
-        if (!timer) {
-            timer = setTimeout(minta, FOTO_JEDA_MS);
-        }
-    });
-
-    img.addEventListener('error', () => {
-        img.classList.add('camera-offline');
-        if (!timer) {
-            timer = setTimeout(minta, RETRY_MS);
-        }
-    });
 
     minta();
 }

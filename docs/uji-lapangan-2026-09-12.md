@@ -6,6 +6,157 @@
 
 ---
 
+## 0c. Uji air 15 Sep: belok kanan sesudah gerbang 7
+
+> **Perubahan di bagian ini ada di folder TERPISAH: `G:\ASV\asv2` (di Jetson
+> rencananya `~/asv2`; di git = branch `asv2` repo asv, dipasang sebagai worktree).** `G:\ASV\asv` / `~/asv` tetap versi 12 Sep yang sudah
+> terbukti — tidak disentuh. Jalankan dari `~/asv2` untuk mencoba; kalau
+> hasilnya lebih buruk, kembali ke `~/asv` tanpa perlu mengubah apa pun.
+> `lintasan.json` di `asv2` = `public/data/lintasan.json` (bearing 90, titik
+> GPS kosong); yang di `asv` masih versi lama berisi titik GPS.
+
+Hasil: lintasan B mantap; lintasan A lolos 7 gerbang (belok kiri sesudah
+gerbang 3 benar), tapi sesudah gerbang 7 kapal **belok kanan** padahal tabel
+petunjuk berkata kiri → nyasar. Di B sesudah gerbang 7 kapal juga terlihat
+"langsung belok kanan" begitu keluar gerbang (di B arahnya kebetulan benar).
+
+| Gejala | Penyebab di kode | Sekarang |
+|---|---|---|
+| Langsung berbelok begitu keluar gerbang | *belok proaktif*: di tikungan (petunjuk kiri/kanan) jeda maju-pelan `TEMP_FORWARD` 1,5 s **dilewati**, pivot mulai saat haluan masih sejajar gerbang | jeda maju pelan **selalu** berlaku: `CARI_MAJU_AWAL` 2 s @ 63 (`--cari-maju-sec 2.0`, `--cari-maju-rasio 0.7`), baru tangga sapuan. `--cari-maju-sec 0` = perilaku lama |
+| Belok ke sisi yang salah walau tabel bilang kiri | urutan prioritas lama: **bukti arah** (bola gerbang yang *baru dilewati* keluar bingkai lewat kanan → "kanan") → kunci haluan peta → **arah koordinat tanpa cek posisi dipercaya** (`arah_pencarian` menunjuk ke `pair_count+1` walau DR sudah hanyut / hitungan tertinggal) → tabel paling akhir | di tikungan (tabel kiri/kanan): **bukti arah diabaikan**, koordinat hanya kalau posisi dipercaya (`HALUAN_*`), selain itu **sapu ke arah tabel** (`CARI_KIRI`). `arah_pencarian` kini juga memakai `posisi_dipercaya()` + `gerbang_sasaran()` |
+| Sapuan sisi seberang (`CARI_KANAN_BALIK`) tetap dicoba 2 s | disengaja (tabel bisa salah kalau hitungan gerbang meleset) | tidak berubah; kalau hitungan gerbang di dashboard tidak sampai 7, bacanya **D2 dulu** |
+
+Urutan waktu sesudah bola hilang sekarang (detik sejak bola terakhir):
+`KUNCI_GERBANG` 2,5 s (BASE 150) → `CARI_MAJU_AWAL` 0–2 s @ 63 → `CARI_KIRI`
+(busur) 2–5 s → `CARI_MAJU` 5–6,5 s → `CARI_KIRI_2` (pivot) 6,5–9,5 s →
+`CARI_KANAN_BALIK` 9,5–11,5 s → sapu terus. Kalau peta dipercaya, sesudah
+`CARI_MAJU_AWAL` yang muncul `HALUAN_PIVOT_KIRI` / `HALUAN_LURUS`.
+
+Cek dari log lapangan berikutnya: baris `[LOST]` pertama sesudah gerbang 7
+harus `CARI_MAJU_AWAL`, lalu `CARI_KIRI`/`HALUAN_*KIRI` (A) atau
+`CARI_KANAN`/`HALUAN_*KANAN` (B). Kalau `CARI_KANAN` muncul di A → tabel
+tidak terbaca: pastikan `lintasan.json` di Jetson = `public/data/lintasan.json`
+(`bearing_sumbu_deg: 90`, `titik: []`) dan dashboard memilih lintasan A.
+
+### 0c-2. Foto kotak biru dari kamera bawah air (ketentuan lomba — ada di `asv` DAN `asv2`)
+
+Keadaan sebelum 15 Sep: fase `UNDERWATER_IMG` / `SURFACE_IMG` mendeteksi
+kotak biru/hijau dengan kamera **atas** dan menyimpan frame kamera atas itu
+juga ke `mission_images/`. Kamera bawah hanya disiarkan ke `/stream/bawah`.
+
+Sekarang (master `asv` commit `e418fb1`, dan `asv2`): deteksi dan kemudi tetap kamera atas; saat `area >=
+--box-area`:
+
+| Kotak | Fase | Foto dari |
+|---|---|---|
+| biru (bawah air) | `UNDERWATER_IMG` | **kamera bawah** — `blue_<ts>.jpg`, log `BLUE_IMAGE_CAPTURED (..., kamera bawah)` |
+| hijau (permukaan) | `SURFACE_IMG` | kamera atas (tidak berubah) — `green_<ts>.jpg` |
+
+Kalau `--source-bawah` tidak dipasang atau kamera bawah macet (> 2 s tanpa
+frame) → kotak biru pun difoto kamera atas + baris `!! FOTO BLUE: kamera
+bawah tidak punya frame ...`; fase tetap lanjut. Baris "Misi aktif: ... Foto
+kotak biru: KAMERA BAWAH, kotak hijau: kamera atas" saat start memastikan
+kamera bawah ikut dipakai.
+
+Yang **belum** ada dan perlu diuji sebelum diandalkan:
+
+- `--box-area 8000` belum pernah dikalibrasi (kotak ~90×90 px di 320×240 —
+  sangat dekat). Uji di darat: tekan `n` sampai `UNDERWATER_IMG`, sodorkan
+  kotak, baca `area=` di log `[MISSION]`, set `--box-area` dari situ.
+- Kotak tidak terlihat → kapal hanya **maju lurus** `base_speed/2` sampai
+  `--phase-timeout` 60 s lalu lompat fase. Petunjuk fase di `lintasan.json`
+  dan koordinat `kotak_biru`/`kotak_hijau` belum dipakai `mission_controller`.
+- Fase ini belum pernah terpicu di air: hitungan gerbang belum pernah
+  mencapai `--total-pairs 10`.
+
+### 0c-3. Deploy ke Jetson: `asv2` baru + update foto di `asv` lama
+
+Repo `G:\ASV\asv` tidak punya remote, jadi semuanya lewat `scp` dari laptop.
+Dua folder di Jetson, satu yang jalan pada satu waktu.
+
+**1. `~/asv` (lama) — hanya dua berkas yang berubah (foto kotak biru dari
+kamera bawah, commit `e418fb1`):**
+
+```bash
+# dari laptop, folder G:\ASV\asv
+scp mission_controller.py telemetry_motor_controller_turn_speed.py \
+    <user>@<ip-jetson>:~/asv/
+```
+
+**2. `~/asv2` (baru) — seluruh folder, pertama kali:**
+
+```bash
+# dari laptop, folder G:\ASV
+scp -r asv2 <user>@<ip-jetson>:~/asv2
+# folder .git ikut tersalin (kecil) - tidak apa-apa, tapi worktree-nya tidak
+# berfungsi di Jetson; kalau mengganggu: rm -rf ~/asv2/.git
+```
+
+Update berikutnya `asv2` cukup berkas `.py` + `lintasan.json`:
+
+```bash
+scp asv2/*.py asv2/lintasan.json <user>@<ip-jetson>:~/asv2/
+```
+
+**3. Di Jetson — titik periksa sebelum masuk air:**
+
+```bash
+# asv lama: harus ada fungsi foto kamera bawah, TIDAK ada mode pencarian baru
+cd ~/asv  && grep -c "foto_kamera_bawah" telemetry_motor_controller_turn_speed.py   # >= 1
+            grep -c "CARI_MAJU_AWAL"     telemetry_motor_controller_turn_speed.py   # 0
+
+# asv2 baru: dua-duanya ada, dan lintasan.json versi repo
+cd ~/asv2 && grep -c "foto_kamera_bawah" telemetry_motor_controller_turn_speed.py   # >= 1
+            grep -c "CARI_MAJU_AWAL"     telemetry_motor_controller_turn_speed.py   # >= 1
+            python3 -c "import json;d=json.load(open('lintasan.json'));print(d['lintasan']['A']['acuan_gps']['bearing_sumbu_deg'], d['lintasan']['A']['acuan_gps']['titik'])"   # 90 []
+            python3 -c "import peta_jalur, posisi_lintasan, pelacak_gerbang, mission_controller; print('import OK')"
+            python3 telemetry_motor_controller_turn_speed.py --help | grep -c cari-maju   # >= 2
+```
+
+**4. Perintah jalan** — sama persis dengan bagian C, hanya `cd`-nya yang
+beda (`cd ~/asv` atau `cd ~/asv2`). `--image-dir /var/lib/asv/mission_images`
+dipakai bersama oleh keduanya, jadi galeri dashboard tidak perlu diubah.
+`--source-bawah` WAJIB ada — tanpa itu foto kotak biru jatuh ke kamera atas.
+
+Baris awal yang membedakan keduanya:
+
+```
+asv : Algoritma gerbang: kunci gerbang 2.5s, ..., margin kolam 2.0 m
+      Misi aktif: 10 pasang bola -> ... Foto kotak biru: KAMERA BAWAH, kotak hijau: kamera atas
+asv2: Algoritma gerbang: kunci gerbang 2.5s, ..., margin kolam 2.0 m, cari: maju pelan 2.0s @63 dulu
+      Misi aktif: 10 pasang bola -> ... Foto kotak biru: KAMERA BAWAH, kotak hijau: kamera atas
+```
+
+Kalau tertulis `Foto kotak biru: kamera atas (--source-bawah tidak dipasang!)`
+→ berhenti, tambahkan `--source-bawah`.
+
+### 0c-4. Kamera di dashboard lewat ngrok patah-patah (15 Sep)
+
+Bukan FPS kendali (jendela OpenCV di kapal normal). Sejak `/stream/foto`
+(commit `988ba70`), halaman yang dibuka lewat host ngrok memakai mode
+**foto-tarik**: satu request HTTP per frame, baru minta lagi sesudah frame
+sampai. Lajunya = 1 / (RTT ngrok + 80 ms) ≈ 2–4 fps. Ini sengaja: MJPEG lewat
+ngrok halus tapi tertinggal makin jauh lalu macet (gejala 12 Sep).
+
+Perbaikan 15 Sep (`resources/js/camera-stream.js`, `FOTO_PARALEL = 2`): dua
+request berjalan bersamaan → laju ~2× (simulasi RTT 300 ms: 2,6 → 5,3 fps),
+tumpukan tetap maksimum 2 frame jadi tidak bisa tertinggal jauh. Frame yang
+kembalinya menyalip dibuang supaya gambar tidak mundur.
+
+`public/build` di-ignore git → sesudah `npm run build` **salin manual**:
+
+```bash
+scp -r public/build <user>@<ip-jetson>:/var/www/dashboard_monitoring_asv/public/
+```
+
+Kalau masih kurang: coba `?stream=mjpeg` di URL ngrok + `--stream-fps 5` di
+kapal; pakai kalau 3–5 menit tidak makin tertinggal. Cek juga ngrok inspector
+(`http://127.0.0.1:4040` di Jetson) — respons `429` berarti ngrok gratis
+membatasi laju request; turunkan `FOTO_PARALEL` ke 1 atau naikkan
+`FOTO_JEDA_MS`.
+
+---
+
 ## 0b. Uji air kedua (12 Sep): tiga perubahan yang ditarik kembali
 
 | Gejala | Penyebab (perubahan 12 Sep pagi) | Sekarang |
@@ -46,7 +197,7 @@ Yang diuji hari ini, semuanya **baru dan belum pernah menyentuh air**:
 | 3 | Sumbu arena = 90° (timur) + cek kompas start | `lintasan.json` | — |
 | 4 | Komitmen gerbang (jangan lompat ke bola jauh) | `--kunci-sec 2.5` | `--kunci-sec 0` |
 | 5 | Pilih bola berbobot arah peta (dua hijau) | `--bobot-arah 0.5` | `--bobot-arah 0` |
-| 6 | Kunci haluan ke peta saat bola hilang + belok proaktif | otomatis | `--tanpa-kunci-haluan` |
+| 6 | Kunci haluan ke peta saat bola hilang (belok proaktif dicabut 15 Sep, lihat 0c) | otomatis | `--tanpa-kunci-haluan` |
 | 7 | Jalur menghindari tepi kolam | `--margin-kolam 2.0` | `--margin-kolam 0` |
 | 8 | PULANG: tombol dashboard + baterai | `--batt-pulang 25` | jangan tulis flag-nya |
 | 9 | Gerbang dihitung dari jarak | `--pass-jarak 2.2` | `--pass-jarak 0` (kembali ke luas — tidak disarankan) |
@@ -215,13 +366,16 @@ Lalu perhatikan komitmen saat melewati tiap gerbang:
 gerbang berikutnya. Kalau kapal justru lurus terlalu lama dan melewatkan
 belokan → turunkan `--kunci-sec 1.5`.
 
-### D3. Kunci haluan + belok proaktif (tikungan sesudah gerbang 3)
+### D3. Kunci haluan (tikungan sesudah gerbang 3)
 
-Hapus `--tanpa-kunci-haluan`. Sesudah gerbang 3, bola hilang. Log:
+Hapus `--tanpa-kunci-haluan`. Sesudah gerbang 3, bola hilang. Log versi
+`asv2` (belok proaktif dicabut — lihat 0c; di `asv` lama baris pertama
+langsung `HALUAN_PIVOT_KIRI` tanpa `CARI_MAJU_AWAL`):
 
 ```
-[LOST] HALUAN_PIVOT_KIRI 0.3s -> L=-90 R=90       ← langsung pivot, tanpa TEMP_FORWARD
-[LOST] HALUAN_LURUS 2.1s -> L=90 R=90
+[LOST] CARI_MAJU_AWAL 0.3s -> L=63 R=63           ← maju pelan dulu 2 s
+[LOST] HALUAN_PIVOT_KIRI 2.2s -> L=-90 R=90       ← baru pivot ke gerbang 4
+[LOST] HALUAN_LURUS 4.1s -> L=90 R=90
 [TRACK] ...                                        ← gerbang 4 masuk bingkai
 ```
 
