@@ -40,7 +40,40 @@ const FOTO_JEDA_MS = 80;
 // sementara tumpukan paling banyak tetap dua frame - masih tidak bisa
 // "makin tertinggal" seperti MJPEG. Jangan terlalu besar: ngrok gratis
 // membatasi laju request, dan tiap permintaan menambah beban kapal.
-const FOTO_PARALEL = 2;
+const FOTO_PARALEL_BAWAAN = 2;
+
+// Ukuran frame pada mode foto: lebar piksel dan kualitas JPEG, dikirim
+// sebagai ?w=&q= ke /stream/foto/. Lewat ngrok, yang habis bukan RTT
+// melainkan lebar pita UNGGAH hotspot kapal: 320x240 q75 ~25 KB per frame,
+// dua kamera, dua permintaan bersamaan -> frame antre di uplink dan gambar
+// tertinggal 2-3 detik (15 Sep 2026). 240x180 q50 ~7 KB: tiga kali lebih
+// ringan, masih cukup untuk melihat bola dan gerbang.
+//
+// Ubah dari URL tanpa build ulang:
+//   ?foto=penuh      -> ukuran asli (tanpa w/q)
+//   ?foto=160,40     -> lebar 160, kualitas 40
+//   ?paralel=1       -> satu permintaan pada satu waktu
+const FOTO_KECIL_BAWAAN = { w: 240, q: 50 };
+
+function bacaAturanFoto() {
+    const p = new URLSearchParams(window.location.search);
+    let kecil = FOTO_KECIL_BAWAAN;
+    const foto = p.get('foto');
+    if (foto === 'penuh') {
+        kecil = null;
+    } else if (foto && /^\d+,\d+$/.test(foto)) {
+        const [w, q] = foto.split(',').map(Number);
+        kecil = { w, q };
+    }
+    const paralel = parseInt(p.get('paralel'), 10);
+    return {
+        kecil,
+        paralel: paralel >= 1 && paralel <= 4 ? paralel : FOTO_PARALEL_BAWAAN,
+    };
+}
+
+const ATURAN_FOTO = bacaAturanFoto();
+const FOTO_PARALEL = ATURAN_FOTO.paralel;
 
 /* ------------------------------------------------------------------ */
 /* Pilihan mode                                                        */
@@ -62,7 +95,15 @@ const MODE = pilihMode();
  */
 function urlFoto(url) {
     const hasil = url.replace(/\/stream\/([^/?#]+)(?=[?#]|$)/, '/stream/foto/$1');
-    return hasil === url ? null : hasil;
+    if (hasil === url) {
+        return null;
+    }
+    const kecil = ATURAN_FOTO.kecil;
+    if (!kecil) {
+        return hasil;
+    }
+    const pemisah = hasil.includes('?') ? '&' : '?';
+    return `${hasil}${pemisah}w=${kecil.w}&q=${kecil.q}`;
 }
 
 function tambahCacheBuster(url, kunci) {

@@ -143,6 +143,24 @@ request berjalan bersamaan → laju ~2× (simulasi RTT 300 ms: 2,6 → 5,3 fps),
 tumpukan tetap maksimum 2 frame jadi tidak bisa tertinggal jauh. Frame yang
 kembalinya menyalip dibuang supaya gambar tidak mundur.
 
+**Masih tertinggal 3 detik sesudah itu** → batasnya bukan RTT, tapi lebar
+pita UNGGAH hotspot kapal: 320×240 q75 ≈ 25 KB/frame × 2 kamera × 2 permintaan
+≈ 100 KB antre di uplink 40–60 KB/s. Perbaikan kedua (15 Sep, `stream_server.py`
+commit `84c540b` master / `67734cc` asv2, **harus di-scp ke KEDUA folder**):
+`/stream/foto/<cam>?w=240&q=50` mengirim versi kecil (~7 KB, 3× lebih ringan;
+di-encode sekali per frame, cache per seq). Dashboard lewat ngrok memintanya
+otomatis. Penimpa dari URL, tanpa build ulang:
+
+| URL | Arti |
+|---|---|
+| `?foto=penuh` | ukuran asli (untuk membandingkan) |
+| `?foto=160,40` | lebar 160 px, kualitas 40 — kalau uplink sangat lemah |
+| `?paralel=1` | satu permintaan pada satu waktu — coba kalau delay malah naik dengan 2 |
+
+Cara memastikan penyebabnya memang uplink: di DevTools → Network, lihat satu
+request `/stream/foto/atas` — kalau *Waiting (TTFB)* kecil tapi *Content
+Download* ratusan ms, itu lebar pita; kalau TTFB-nya yang besar, itu ngrok/RTT.
+
 `public/build` di-ignore git → sesudah `npm run build` **salin manual**:
 
 ```bash
