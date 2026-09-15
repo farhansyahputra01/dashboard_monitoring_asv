@@ -13,6 +13,13 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
+        // Lewat ngrok halaman datang sebagai https, tapi nginx meneruskannya ke
+        // php-fpm sebagai http. Tanpa ini asset() menulis http://...css dan
+        // browser memblokirnya sebagai mixed content - halaman tampil polos
+        // tanpa CSS/JS. Satu-satunya yang bicara ke php-fpm adalah nginx di
+        // mesin yang sama, jadi memercayai header X-Forwarded-* dari '*' aman.
+        $middleware->trustProxies(at: '*');
+
         $middleware->alias([
             'admin' => \App\Http\Middleware\AdminMiddleware::class,
         ]);

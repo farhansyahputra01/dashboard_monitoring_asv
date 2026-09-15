@@ -224,7 +224,8 @@ ia hanya membuang wilayah yang memang bukan air.
 
 Terukur di laptop pengembangan (LiteRT, 4 thread): **±40-55 ms per frame**. Di
 RPi4 perkirakan **150-400 ms**, dan lebih lambat lagi kalau CPU panas - **angka
-ini wajib diukur sendiri di Pi**, jangan dipercaya dari dokumen.
+ini wajib diukur sendiri di Pi**, jangan dipercaya dari dokumen. Di Jetson Orin
+Nano (CPU, LiteRT) terukur 12-15 FPS; untuk memakai GPU-nya lihat bagian 5.
 
 Yang berubah karena itu: laju loop kendali turun dari ~27 FPS ke sekitar 4-8
 FPS. Kemudi tetap bekerja (PID memakai selisih waktu sungguhan, bukan asumsi
@@ -243,6 +244,107 @@ Satu hal lagi yang menghemat banyak: `detect_buoy()` memanggil model **sekali**
 untuk ketiga kelas, tidak sekali untuk bola lalu sekali lagi untuk biru.
 Memecahnya jadi dua panggilan membelah FPS kendali tepat dua tanpa menambah
 satu pun informasi.
+
+### 5. Jetson: `best.onnx` di GPU (sejak 15 September 2026)
+
+Di Jetson Orin Nano, `best.tflite` lewat LiteRT mentok **12-15 FPS** - dan
+itu batas wajarnya, karena LiteRT hanya memakai CPU ARM; GPU Orin tidak pernah
+tersentuh. Tim mengekspor bobot yang sama ke `best.onnx` (14 September 2026,
+6 kelas yang sama, masukan 320x320) supaya bisa dijalankan lewat
+**onnxruntime-gpu** di TensorRT/CUDA.
+
+Yang perlu dipahami sebelum menguji: **berkas `.onnx` sendiri tidak
+mempercepat apa pun**. Terukur di laptop dengan onnxruntime CPU: ~34 ms/frame,
+TFLite ~37 ms - sama saja. Kenaikan FPS hanya datang kalau providernya
+TensorRT atau CUDA, dan itu hanya ada di build onnxruntime-gpu khusus Jetson.
+Wheel `onnxruntime-gpu` dari PyPI biasa adalah x86_64 dan tidak akan terpasang
+di aarch64.
+
+`yolo_detector.py` memilih backend dari ekstensi berkas: `.tflite` -> LiteRT,
+`.onnx` -> onnxruntime dengan urutan provider TensorRT -> CUDA -> CPU. Baris
+kedua log `[YOLO]` menyebut mana yang benar-benar aktif -
+`onnxruntime/TensorRT`, `onnxruntime/CUDA`, atau `onnxruntime/CPU`. **Kalau
+tertulis CPU, GPU tidak dipakai** dan angka FPS tidak akan berubah.
+
+Pemasangan di Jetson (`lsb_release -a` menentukan barisnya):
+
+```bash
+# JetPack 6 (Ubuntu 22.04, CUDA 12.x) - indeks pip resmi Jetson AI Lab:
+pip3 install onnxruntime-gpu --index-url https://pypi.jetson-ai-lab.io/jp6/cu126
+#   (kalau JetPack 6.0/CUDA 12.2: ganti cu126 -> cu122; indeks lama beralamat
+#    pypi.jetson-ai-lab.dev - coba yang .io dulu)
+
+# JetPack 5 (Ubuntu 20.04, CUDA 11.4) - unduh wheel dari Jetson Zoo:
+#   https://elinux.org/Jetson_Zoo#ONNX_Runtime  -> pilih yang JP5 + python 3.8
+pip3 install ./onnxruntime_gpu-*-cp38-cp38-linux_aarch64.whl
+
+# pastikan providernya ada - harus menyebut Tensorrt dan CUDA:
+python3 -c "import onnxruntime as ort; print(ort.get_available_providers())"
+
+# Jetson di mode daya penuh, kalau tidak angkanya tidak bisa dibandingkan:
+sudo nvpmodel -m 0 && sudo jetson_clocks
+```
+
+Uji yang adil - dua perintah yang sama persis, hanya modelnya beda, kamera
+yang sama, 300 frame:
+
+```bash
+cd ~/asv
+python3 yolo_detector.py --source 0 --no-display --frames 300
+python3 yolo_detector.py --source 0 --no-display --frames 300 --model best.onnx
+```
+
+Ringkasan di akhir mencetak dua angka yang sengaja dipisah: **`infer`** hanya
+model, **`FPS loop`** seluruh putaran termasuk kamera. Kalau `infer` sudah
+turun ke satu digit milidetik tapi `FPS loop` berhenti di ~30, yang membatasi
+sekarang kamera (30 fps), bukan model - dan itu memang hasil yang diharapkan.
+
+Hal-hal yang akan ditemui:
+
+- **Start pertama dengan TensorRT lambat, 1-3 menit** - engine dibangun untuk
+  GPU ini. Program menunggu di `[YOLO] Pemanasan ... s` sebelum kamera
+  dibuka. Engine disimpan di `~/asv/trt_cache/`, start berikutnya beberapa
+  detik. Folder itu terikat versi TensorRT + GPU: jangan disalin antar mesin,
+  hapus saja kalau ada yang aneh setelah update JetPack.
+- **Membandingkan provider**: `ASV_ONNX_PROVIDER=cuda` atau `=cpu` memaksa
+  satu provider, misalnya untuk memisahkan "TensorRT bermasalah" dari
+  "modelnya lambat". `ASV_ONNX_PROVIDER=cuda` juga jalan keluar kalau
+  pembangunan engine TensorRT gagal di lapangan - lebih lambat dari TensorRT,
+  masih jauh lebih cepat dari CPU.
+- **Koordinat keluaran ONNX dalam piksel**, TFLite ternormalisasi 0..1.
+  `yolo_detector.py` sudah menangani keduanya; terverifikasi kotak deteksi
+  kedua backend selisih <=2 px pada gambar yang sama. Kalau suatu saat ada
+  ekspor baru dan semua kotak menumpuk di pojok kiri atas atau melesat ke
+  luar frame, satuan inilah yang tertukar - lihat `_koordinat_normal`.
+- **Model 14 September adalah hasil latih yang berbeda** dari `best.tflite`
+  9 September (Ultralytics 8.4.152 vs 8.4.145), bukan sekadar ekspor ulang.
+  Pada gambar sintetis uji, ia memberi `box_blue` palsu berskor 0,44-0,47 di
+  tepi frame hitam yang tidak dikeluarkan model lama - di bawah `--conf 0.45`
+  bawaan itu lolos-tidaknya tipis. Periksa lagi salah kenali di air
+  sesungguhnya sebelum menjadikannya bawaan.
+
+**Efek samping FPS naik: stream dashboard lewat ngrok tertinggal lalu macet.**
+Terukur 15 Sep 2026 setelah loop naik ke ~30 FPS: tampilan di LAN lancar,
+lewat ngrok delay kecil yang makin lama makin besar sampai freeze. Sebabnya
+`--stream-every 3` menghitung *frame*, jadi laju MJPEG ikut naik 5 → 10 fps
+dan melampaui uplink ngrok; frame yang belum terkirim menumpuk di buffer
+jaringan dan server tidak bisa menariknya kembali. Dua perbaikan yang sudah
+masuk:
+
+- `stream_server.py` membatasi MJPEG per penonton berbasis **waktu**
+  (`--stream-fps`, bawaan 10; turunkan ke 5 kalau masih tertinggal).
+- Endpoint `/stream/foto/<kamera>` (satu JPEG terbaru) + `camera-stream.js`
+  yang otomatis memakai mode **tarik** kalau host halaman mengandung `ngrok`:
+  browser meminta frame berikutnya baru setelah yang sebelumnya sampai, jadi
+  tumpukannya paling banyak satu frame. Paksa dengan `?stream=foto` /
+  `?stream=mjpeg` di URL dashboard. Perlu `npm run build` + salin
+  `public/build` ke Jetson.
+
+`best.tflite` **tetap bawaan** sampai `best.onnx` terbukti di air; untuk
+memakainya di kapal tambahkan `--model best.onnx` pada perintah
+`telemetry_motor_controller_turn_speed.py` (atau `ExecStart` di systemd).
+Setelah FPS naik, `MOTOR_TIMEOUT` 1500 ms di firmware **tidak perlu**
+diturunkan - lebih longgar tidak merugikan apa pun.
 
 ---
 

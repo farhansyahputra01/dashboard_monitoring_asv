@@ -9,9 +9,92 @@
  * 2. Klik dua kali pada kamera membuka layar penuh. Di dalamnya, geser ke
  *    kanan/kiri (sentuh atau seret tetikus) berpindah antar kamera, sama
  *    seperti panah kiri/kanan di papan ketik.
+ *
+ * 3. Dua cara menerima gambar, dipilih otomatis dari host halaman:
+ *
+ *    MJPEG (dorong)  - kapal mendorong frame secepat ia menghasilkannya.
+ *                      Bagus di LAN. Lewat link yang lebih lambat dari laju
+ *                      frame (ngrok), frame yang belum terkirim menumpuk di
+ *                      buffer jaringan: tampilan tertinggal makin lama makin
+ *                      jauh, lalu macet. Server tidak bisa menarik kembali
+ *                      byte yang sudah masuk buffer.
+ *    Foto (tarik)    - browser meminta SATU frame (/stream/foto/<kamera>),
+ *                      dan baru meminta lagi setelah frame itu sampai.
+ *                      Lajunya mengikuti kecepatan link dengan sendirinya;
+ *                      tumpukan paling banyak satu frame, jadi tidak pernah
+ *                      "makin tertinggal". Di ngrok inilah yang dipakai.
+ *
+ *    Paksa lewat ?stream=foto atau ?stream=mjpeg di URL halaman.
  */
 
 const RETRY_MS = 3000;
+
+// Jeda antar permintaan pada mode foto, dihitung SESUDAH frame sebelumnya
+// sampai. Di LAN ini membatasi ke ~10 fps; lewat ngrok RTT-nya yang
+// menentukan, bukan angka ini.
+const FOTO_JEDA_MS = 80;
+
+/* ------------------------------------------------------------------ */
+/* Pilihan mode                                                        */
+/* ------------------------------------------------------------------ */
+
+function pilihMode() {
+    const minta = new URLSearchParams(window.location.search).get('stream');
+    if (minta === 'foto' || minta === 'mjpeg') {
+        return minta;
+    }
+    return /ngrok/i.test(window.location.hostname) ? 'foto' : 'mjpeg';
+}
+
+const MODE = pilihMode();
+
+/**
+ * /stream/atas -> /stream/foto/atas. Null kalau URL-nya bukan bentuk itu
+ * (misal stream dari alat lain): pemanggil lalu kembali ke MJPEG.
+ */
+function urlFoto(url) {
+    const hasil = url.replace(/\/stream\/([^/?#]+)(?=[?#]|$)/, '/stream/foto/$1');
+    return hasil === url ? null : hasil;
+}
+
+function tambahCacheBuster(url, kunci) {
+    const pemisah = url.includes('?') ? '&' : '?';
+    return `${url}${pemisah}${kunci}=${Date.now()}`;
+}
+
+/* ------------------------------------------------------------------ */
+/* Mode foto: minta satu frame, tunggu sampai, minta lagi              */
+/* ------------------------------------------------------------------ */
+
+function pasangTarik(img, url) {
+    let timer = null;
+
+    const minta = () => {
+        timer = null;
+        // <img> yang sudah dilepas dari halaman (penampil layar penuh
+        // ditutup) berhenti sendiri - tidak ada yang perlu membatalkan.
+        if (!img.isConnected) {
+            return;
+        }
+        img.src = tambahCacheBuster(url, '_t');
+    };
+
+    img.addEventListener('load', () => {
+        img.classList.remove('camera-offline');
+        if (!timer) {
+            timer = setTimeout(minta, FOTO_JEDA_MS);
+        }
+    });
+
+    img.addEventListener('error', () => {
+        img.classList.add('camera-offline');
+        if (!timer) {
+            timer = setTimeout(minta, RETRY_MS);
+        }
+    });
+
+    minta();
+}
 
 /* ------------------------------------------------------------------ */
 /* Sambung ulang stream yang putus                                     */
@@ -19,6 +102,15 @@ const RETRY_MS = 3000;
 
 function pasangSambungUlang(img) {
     const baseUrl = img.dataset.streamUrl;
+
+    if (MODE === 'foto') {
+        const foto = urlFoto(baseUrl);
+        if (foto) {
+            pasangTarik(img, foto);
+            return;
+        }
+    }
+
     let pending = null;
 
     const reconnect = () => {
@@ -83,9 +175,19 @@ function buatPenampil(daftarKamera) {
             const img = document.createElement('img');
             img.className = 'camera-viewer-img';
             img.alt = kamera.label;
-            const pemisah = kamera.url.includes('?') ? '&' : '?';
-            img.src = `${kamera.url}${pemisah}_fs=${Date.now()}`;
             stage.appendChild(img);
+
+            // Foto galeri (bukan stream) selalu dimuat biasa; hanya stream
+            // kapal yang ikut mode foto/MJPEG.
+            const foto = kamera.stream && MODE === 'foto'
+                ? urlFoto(kamera.url)
+                : null;
+
+            if (foto) {
+                pasangTarik(img, foto);
+            } else {
+                img.src = tambahCacheBuster(kamera.url, '_fs');
+            }
         } else {
             const kosong = document.createElement('div');
             kosong.className = 'camera-placeholder';
@@ -230,6 +332,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const daftarKamera = elemen.map((el) => ({
         label: el.dataset.cameraLabel,
         url: el.dataset.cameraUrl || null,
+        stream: Boolean(el.dataset.streamUrl),
     }));
 
     const penampil = buatPenampil(daftarKamera);

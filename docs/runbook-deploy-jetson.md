@@ -496,6 +496,12 @@ yang bergeser, bukan telemetrinya:
 [YOLO] Kelas: 0=ball_blue, 1=ball_green, 2=ball_red
 ```
 
+Kalau dijalankan dengan `--model best.onnx` (GPU, lihat
+[deteksi-yolo.md](deteksi-yolo.md) bagian "Jetson: best.onnx di GPU"), baris
+kedua harus berbunyi `onnxruntime/TensorRT` atau `onnxruntime/CUDA` — kalau
+`onnxruntime/CPU`, onnxruntime-gpu build Jetson belum terpasang dan FPS tidak
+akan naik.
+
 **`--api-url` sekarang `http://127.0.0.1/api/telemetry`** — bukan ngrok, bukan
 IP laptop. Python dan Laravel ada di mesin yang sama; keluar ke internet lalu
 kembali lagi berarti telemetri ikut mati saat WiFi putus.
